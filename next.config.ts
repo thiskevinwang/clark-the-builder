@@ -1,35 +1,36 @@
-import type { NextConfig } from 'next'
-import { withBotId } from 'botid/next/config'
+import { withBotId } from "botid/next/config";
+import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  devIndicators: false,
   webpack(config) {
     config.module.rules.push({
       test: /\.md/,
-      type: 'asset/source',
-    })
-    return config
+      type: "asset/source",
+    });
+    return config;
   },
   turbopack: {
     rules: {
-      '*.md': {
-        loaders: ['raw-loader'],
-        as: '*.js',
+      "*.md": {
+        loaders: ["raw-loader"],
+        as: "*.js",
       },
     },
   },
   images: {
     remotePatterns: [
       {
-        protocol: 'https',
-        hostname: 'vercel.com',
-        port: '',
-        pathname: '/api/www/avatar/**',
+        protocol: "https",
+        hostname: "vercel.com",
+        port: "",
+        pathname: "/api/www/avatar/**",
       },
     ],
     dangerouslyAllowSVG: true,
-    contentDispositionType: 'attachment',
+    contentDispositionType: "attachment",
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
-}
+};
 
-export default withBotId(nextConfig)
+export default withBotId(nextConfig);

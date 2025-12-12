@@ -1,28 +1,29 @@
-import type { Command, CommandLog } from '@/components/commands-logs/types'
-import type { DataPart } from '@/ai/messages/data-parts'
-import type { ChatStatus, DataUIPart } from 'ai'
-import { useMonitorState } from '@/components/error-monitor/state'
-import { useMemo } from 'react'
-import { create } from 'zustand'
+import type { Command, CommandLog } from "@/components/commands-logs/types";
+import type { DataPart } from "@/ai/messages/data-parts";
+import type { ChatStatus, DataUIPart } from "ai";
+import { useClerkAppsStore } from "@/lib/storage/clerk-apps-store";
+import { useMonitorState } from "@/components/error-monitor/state";
+import { useMemo } from "react";
+import { create } from "zustand";
 
 interface SandboxStore {
-  addGeneratedFiles: (files: string[]) => void
-  addLog: (data: { sandboxId: string; cmdId: string; log: CommandLog }) => void
-  addPaths: (paths: string[]) => void
-  chatStatus: ChatStatus
-  clearGeneratedFiles: () => void
-  commands: Command[]
-  generatedFiles: Set<string>
-  paths: string[]
-  sandboxId?: string
-  setChatStatus: (status: ChatStatus) => void
-  setSandboxId: (id: string) => void
-  setStatus: (status: 'running' | 'stopped') => void
-  setUrl: (url: string, uuid: string) => void
-  status?: 'running' | 'stopped'
-  upsertCommand: (command: Omit<Command, 'startedAt'>) => void
-  url?: string
-  urlUUID?: string
+  addGeneratedFiles: (files: string[]) => void;
+  addLog: (data: { sandboxId: string; cmdId: string; log: CommandLog }) => void;
+  addPaths: (paths: string[]) => void;
+  chatStatus: ChatStatus;
+  clearGeneratedFiles: () => void;
+  commands: Command[];
+  generatedFiles: Set<string>;
+  paths: string[];
+  sandboxId?: string;
+  setChatStatus: (status: ChatStatus) => void;
+  setSandboxId: (id: string) => void;
+  setStatus: (status: "running" | "stopped") => void;
+  setUrl: (url: string, uuid: string) => void;
+  status?: "running" | "stopped";
+  upsertCommand: (command: Omit<Command, "startedAt">) => void;
+  url?: string;
+  urlUUID?: string;
 }
 
 function getBackgroundCommandErrorLines(commands: Command[]) {
@@ -31,16 +32,16 @@ function getBackgroundCommandErrorLines(commands: Command[]) {
       logs.map((log) => ({ command, args, background, ...log }))
     )
     .sort((logA, logB) => logA.timestamp - logB.timestamp)
-    .filter((log) => log.stream === 'stderr' && log.background)
+    .filter((log) => log.stream === "stderr" && log.background);
 }
 
 export function useCommandErrorsLogs() {
-  const { commands } = useSandboxStore()
+  const { commands } = useSandboxStore();
   const errors = useMemo(
     () => getBackgroundCommandErrorLines(commands),
     [commands]
-  )
-  return { errors }
+  );
+  return { errors };
 }
 
 export const useSandboxStore = create<SandboxStore>()((set) => ({
@@ -50,22 +51,22 @@ export const useSandboxStore = create<SandboxStore>()((set) => ({
     })),
   addLog: (data) => {
     set((state) => {
-      const idx = state.commands.findIndex((c) => c.cmdId === data.cmdId)
+      const idx = state.commands.findIndex((c) => c.cmdId === data.cmdId);
       if (idx === -1) {
-        console.warn(`Command with ID ${data.cmdId} not found.`)
-        return state
+        console.warn(`Command with ID ${data.cmdId} not found.`);
+        return state;
       }
-      const updatedCmds = [...state.commands]
+      const updatedCmds = [...state.commands];
       updatedCmds[idx] = {
         ...updatedCmds[idx],
         logs: [...(updatedCmds[idx].logs ?? []), data.log],
-      }
-      return { commands: updatedCmds }
-    })
+      };
+      return { commands: updatedCmds };
+    });
   },
   addPaths: (paths) =>
     set((state) => ({ paths: [...new Set([...state.paths, ...paths])] })),
-  chatStatus: 'ready',
+  chatStatus: "ready",
   clearGeneratedFiles: () => set(() => ({ generatedFiles: new Set<string>() })),
   commands: [],
   generatedFiles: new Set<string>(),
@@ -77,7 +78,7 @@ export const useSandboxStore = create<SandboxStore>()((set) => ({
   setSandboxId: (sandboxId) =>
     set(() => ({
       sandboxId,
-      status: 'running',
+      status: "running",
       commands: [],
       paths: [],
       url: undefined,
@@ -87,19 +88,21 @@ export const useSandboxStore = create<SandboxStore>()((set) => ({
   setUrl: (url, urlUUID) => set(() => ({ url, urlUUID })),
   upsertCommand: (cmd) => {
     set((state) => {
-      const existingIdx = state.commands.findIndex((c) => c.cmdId === cmd.cmdId)
-      const idx = existingIdx !== -1 ? existingIdx : state.commands.length
-      const prev = state.commands[idx] ?? { startedAt: Date.now(), logs: [] }
-      const cmds = [...state.commands]
-      cmds[idx] = { ...prev, ...cmd }
-      return { commands: cmds }
-    })
+      const existingIdx = state.commands.findIndex(
+        (c) => c.cmdId === cmd.cmdId
+      );
+      const idx = existingIdx !== -1 ? existingIdx : state.commands.length;
+      const prev = state.commands[idx] ?? { startedAt: Date.now(), logs: [] };
+      const cmds = [...state.commands];
+      cmds[idx] = { ...prev, ...cmd };
+      return { commands: cmds };
+    });
   },
-}))
+}));
 
 interface FileExplorerStore {
-  paths: string[]
-  addPath: (path: string) => void
+  paths: string[];
+  addPath: (path: string) => void;
 }
 
 export const useFileExplorerStore = create<FileExplorerStore>()((set) => ({
@@ -107,54 +110,69 @@ export const useFileExplorerStore = create<FileExplorerStore>()((set) => ({
   addPath: (path) => {
     set((state) => {
       if (!state.paths.includes(path)) {
-        return { paths: [...state.paths, path] }
+        return { paths: [...state.paths, path] };
       }
-      return state
-    })
+      return state;
+    });
   },
-}))
+}));
 
 export function useDataStateMapper() {
   const { addPaths, setSandboxId, setUrl, upsertCommand, addGeneratedFiles } =
-    useSandboxStore()
-  const { errors } = useCommandErrorsLogs()
-  const { setCursor } = useMonitorState()
+    useSandboxStore();
+  const { errors } = useCommandErrorsLogs();
+  const { setCursor } = useMonitorState();
+  const { addApp } = useClerkAppsStore();
 
   return (data: DataUIPart<DataPart>) => {
     switch (data.type) {
-      case 'data-create-sandbox':
+      case "data-create-sandbox":
         if (data.data.sandboxId) {
-          setSandboxId(data.data.sandboxId)
+          setSandboxId(data.data.sandboxId);
         }
-        break
-      case 'data-generating-files':
-        if (data.data.status === 'uploaded') {
-          setCursor(errors.length)
-          addPaths(data.data.paths)
-          addGeneratedFiles(data.data.paths)
+        break;
+      case "data-create-clerk-app":
+        if (
+          data.data.status === "done" &&
+          data.data.applicationId &&
+          data.data.name
+        ) {
+          addApp({
+            applicationId: data.data.applicationId,
+            name: data.data.name,
+            createdAt: Date.now(),
+            publishableKey: data.data.publishableKey,
+          });
         }
-        break
-      case 'data-run-command':
+        break;
+      case "data-generating-files":
+        if (data.data.status === "uploaded") {
+          setCursor(errors.length);
+          addPaths(data.data.paths);
+          addGeneratedFiles(data.data.paths);
+        }
+        break;
+      case "data-run-command":
         if (
           data.data.commandId &&
-          (data.data.status === 'executing' || data.data.status === 'running')
+          (data.data.status === "executing" || data.data.status === "running")
         ) {
           upsertCommand({
-            background: data.data.status === 'running',
+            background: data.data.status === "running",
             sandboxId: data.data.sandboxId,
             cmdId: data.data.commandId,
             command: data.data.command,
             args: data.data.args,
-          })
+          });
         }
-        break
-      case 'data-get-sandbox-url':
+        break;
+      case "data-get-sandbox-url":
         if (data.data.url) {
-          setUrl(data.data.url, crypto.randomUUID())
+          setUrl(data.data.url, crypto.randomUUID());
         }
-        break
+        break;
       default:
-        break
+        break;
     }
-  }
+  };
 }

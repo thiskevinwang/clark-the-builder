@@ -17,6 +17,16 @@ After creation, the sandbox allows you to:
 - Execute shell commands with `Run Command` and `Wait Command`
 - Access running servers through public URLs using `Get Sandbox URL`
 
+## Environment Variables
+
+You can pass environment variables to the sandbox using the `env` parameter. This is essential for:
+
+- **Clerk Authentication**: If you created a Clerk app using `Create Clerk App`, pass the keys:
+  - `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` - The publishable key for client-side Clerk
+  - `CLERK_SECRET_KEY` - The secret key for server-side Clerk operations
+- **API Keys**: Any third-party API keys the application needs
+- **Configuration**: Database URLs, feature flags, etc.
+
 Each sandbox mimics a real-world development environment and supports rapid iteration and testing without polluting the local system. The base system is Amazon Linux 2023 with the following additional packages:
 
 ```

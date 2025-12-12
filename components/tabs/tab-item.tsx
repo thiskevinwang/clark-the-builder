@@ -1,24 +1,28 @@
-'use client'
+"use client";
 
-import type { ReactNode } from 'react'
-import { useTabState } from './use-tab-state'
-import { cn } from '@/lib/utils'
+import type { ReactNode } from "react";
+import { useTabState } from "./use-tab-state";
+import { cn } from "@/lib/utils";
 
 interface Props {
-  children: ReactNode
-  tabId: string
+  children: ReactNode;
+  tabId: string;
 }
 
 export function TabItem({ children, tabId }: Props) {
-  const [activeTabId, setTabId] = useTabState()
+  const [activeTabId, setTabId] = useTabState();
+  const isActive = activeTabId === tabId;
   return (
     <li
       onClick={() => setTabId(tabId)}
-      className={cn('cursor-pointer', {
-        'border-b border-b-black': activeTabId === tabId,
-      })}
+      className={cn(
+        "px-3 py-1.5 rounded-md cursor-pointer text-sm font-medium transition-colors",
+        isActive
+          ? "bg-primary text-primary-foreground"
+          : "text-muted-foreground hover:text-foreground hover:bg-secondary"
+      )}
     >
       {children}
     </li>
-  )
+  );
 }

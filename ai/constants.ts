@@ -1,28 +1,39 @@
-import { type GatewayModelId } from '@ai-sdk/gateway'
+/**
+ * Central model registry.
+ *
+ * We intentionally do NOT use the AI Gateway in this repo; we call Anthropic
+ * directly via `@ai-sdk/anthropic`.
+ */
+export const Models = {
+  /**
+   * Claude Opus 4.5 (Anthropic API model id)
+   *
+   * NOTE: This is the Anthropic model identifier (not the old "provider/id"
+   * gateway format).
+   */
+  AnthropicClaudeOpus45: "claude-opus-4-5-20251101",
+} as const;
 
-export enum Models {
-  AmazonNovaPro = 'amazon/nova-pro',
-  AnthropicClaude4Sonnet = 'anthropic/claude-4-sonnet',
-  AnthropicClaude45Sonnet = 'anthropic/claude-sonnet-4.5',
-  GoogleGeminiFlash = 'google/gemini-2.5-flash',
-  MoonshotKimiK2 = 'moonshotai/kimi-k2',
-  OpenAIGPT5 = 'gpt-5',
-  XaiGrok3Fast = 'xai/grok-3-fast',
-}
+export type ModelId = (typeof Models)[keyof typeof Models];
 
-export const DEFAULT_MODEL = Models.AnthropicClaude45Sonnet
+/**
+ * Back-compat for previously stored/linked gateway-style ids.
+ */
+export const LEGACY_MODEL_ID_MAP: Record<string, ModelId> = {
+  "anthropic/claude-opus-4.5": Models.AnthropicClaudeOpus45,
+  "anthropic/claude-opus-4": Models.AnthropicClaudeOpus45,
+};
 
-export const SUPPORTED_MODELS: GatewayModelId[] = [
-  Models.AmazonNovaPro,
-  Models.AnthropicClaude4Sonnet,
-  Models.AnthropicClaude45Sonnet,
-  Models.GoogleGeminiFlash,
-  Models.MoonshotKimiK2,
-  Models.OpenAIGPT5,
-  Models.XaiGrok3Fast,
-]
+export const MODEL_LABELS: Record<ModelId, string> = {
+  [Models.AnthropicClaudeOpus45]: "Claude Opus 4.5",
+};
+
+export const DEFAULT_MODEL: ModelId = Models.AnthropicClaudeOpus45;
+
+export const SUPPORTED_MODELS: ModelId[] = [DEFAULT_MODEL];
 
 export const TEST_PROMPTS = [
-  'Generate a Next.js app that allows to list and search Pokemons',
-  'Create a `golang` server that responds with "Hello World" to any request',
-]
+  "Generate a Clerk Next.js starter app",
+  "Build a b2b SaaS app. Use the clerk `b2b-saas` template, which has Organizations and Billing enabled. Build a single landing page and render the `<PricingTable for={'organization'}/>` component",
+  "Build a waitlist page. Use the clerk `waitlist` template & `<Waitlist/>` component",
+];

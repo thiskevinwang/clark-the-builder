@@ -1,0 +1,10 @@
+{
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": "always",
+    "source.sortMembers": "explicit"
+  },
+  "workbench.editor.customLabels.patterns": {
+    "**/app/**/{page,layout,index}.{ts,tsx}": "(${dirname}) / ${filename}.${extname}",
+    "**/components/**/*.{ts,tsx}": "(${dirname}) / ${filename}.${extname}"
+  }
+}

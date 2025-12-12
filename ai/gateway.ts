@@ -1,62 +1,57 @@
-import { createGatewayProvider } from '@ai-sdk/gateway'
-import { Models } from './constants'
-import type { JSONValue } from 'ai'
-import type { OpenAIResponsesProviderOptions } from '@ai-sdk/openai'
-import type { LanguageModelV2 } from '@ai-sdk/provider'
+import { anthropic } from "@ai-sdk/anthropic";
+import {
+  LEGACY_MODEL_ID_MAP,
+  MODEL_LABELS,
+  Models,
+  type ModelId,
+} from "./constants";
+import type { JSONValue } from "ai";
+import type { LanguageModelV2 } from "@ai-sdk/provider";
 
 export async function getAvailableModels() {
-  const gateway = gatewayInstance()
-  const response = await gateway.getAvailableModels()
-  return response.models.map((model) => ({ id: model.id, name: model.name }))
+  // We don't call an external "models" endpoint; we publish the supported list
+  // from our local registry.
+  return (Object.values(Models) as ModelId[]).map((id) => ({
+    id,
+    name: MODEL_LABELS[id] ?? id,
+  }));
 }
 
 export interface ModelOptions {
-  model: LanguageModelV2
-  providerOptions?: Record<string, Record<string, JSONValue>>
-  headers?: Record<string, string>
+  model: LanguageModelV2;
+  providerOptions?: Record<string, Record<string, JSONValue>>;
+  headers?: Record<string, string>;
 }
 
 export function getModelOptions(
   modelId: string,
-  options?: { reasoningEffort?: 'minimal' | 'low' | 'medium' }
+  options?: { reasoningEffort?: "minimal" | "low" | "medium" }
 ): ModelOptions {
-  const gateway = gatewayInstance()
-  if (modelId === Models.OpenAIGPT5) {
-    return {
-      model: gateway(modelId),
-      providerOptions: {
-        openai: {
-          include: ['reasoning.encrypted_content'],
-          reasoningEffort: options?.reasoningEffort ?? 'low',
-          reasoningSummary: 'auto',
-          serviceTier: 'priority',
-        } satisfies OpenAIResponsesProviderOptions,
-      },
-    }
-  }
+  // Ignore reasoning effort (OpenAI-only) but keep the signature stable.
+  void options;
 
-  if (
-    modelId === Models.AnthropicClaude4Sonnet ||
-    modelId === Models.AnthropicClaude45Sonnet
-  ) {
-    return {
-      model: gateway(modelId),
-      headers: { 'anthropic-beta': 'fine-grained-tool-streaming-2025-05-14' },
-      providerOptions: {
-        anthropic: {
-          cacheControl: { type: 'ephemeral' },
-        },
-      },
-    }
-  }
+  const normalizedId = normalizeModelId(modelId);
 
+  // Anthropic-specific options used for better tool streaming/caching.
   return {
-    model: gateway(modelId),
-  }
+    model: anthropic(normalizedId),
+    headers: { "anthropic-beta": "fine-grained-tool-streaming-2025-05-14" },
+    providerOptions: {
+      anthropic: {
+        cacheControl: { type: "ephemeral" },
+      },
+    },
+  };
 }
 
-function gatewayInstance() {
-  return createGatewayProvider({
-    baseURL: process.env.AI_GATEWAY_BASE_URL,
-  })
+function normalizeModelId(modelId: string): ModelId {
+  if ((Object.values(Models) as string[]).includes(modelId)) {
+    return modelId as ModelId;
+  }
+
+  const legacy = LEGACY_MODEL_ID_MAP[modelId];
+  if (legacy) return legacy;
+
+  // Fall back to default model for unknown ids.
+  return Models.AnthropicClaudeOpus45;
 }

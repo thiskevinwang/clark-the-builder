@@ -1,45 +1,57 @@
-'use client'
+"use client";
 
-import { Loader2Icon } from 'lucide-react'
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
+  SelectLabel,
   SelectTrigger,
   SelectValue,
-  SelectGroup,
-  SelectLabel,
-} from '@/components/ui/select'
-import { cn } from '@/lib/utils'
-import { useMemo } from 'react'
-import { useAvailableModels } from './use-available-models'
-import { useModelId } from './use-settings'
+} from "@/components/ui/select";
+import { cn } from "@/lib/utils";
+import { Loader2Icon } from "lucide-react";
+import { useMemo } from "react";
+import { useAvailableModels } from "./use-available-models";
+import { useModelId } from "./use-settings";
 
 export function ModelSelector({ className }: { className?: string }) {
-  const [modelId, setModelId] = useModelId()
-  const { models: available, isLoading, error } = useAvailableModels()
+  const [modelId, setModelId] = useModelId();
+  const { models: available, isLoading, error } = useAvailableModels();
   const models = useMemo(
     () => available?.sort((a, b) => a.label.localeCompare(b.label)) || [],
     [available]
-  )
+  );
 
   return (
     <Select
       value={modelId}
-      onValueChange={setModelId}
+      onValueChange={(value) => {
+        // `useQueryState` setters are async; the Select API expects void.
+        void setModelId(value as any);
+      }}
       disabled={isLoading || !!error || !models?.length}
     >
-      <SelectTrigger className={cn('bg-background', className)}>
+      <SelectTrigger
+        size="sm"
+        className={cn(
+          // no line break; truncate if overflow
+          "truncate",
+          "text-xs font-mono",
+          // ghost
+          "border-none shadow-none bg-transparent text-muted-foreground hover:text-foreground hover:bg-accent gap-1.5 px-2",
+
+          className
+        )}
+      >
         {isLoading ? (
-          <div className="flex items-center gap-2">
-            <Loader2Icon className="h-4 w-4 animate-spin" />
-          </div>
+          <Loader2Icon className="h-3.5 w-3.5 animate-spin" />
         ) : error ? (
           <span className="text-red-500">Error</span>
         ) : !models?.length ? (
           <span>No models</span>
         ) : (
-          <SelectValue placeholder="Select a model" />
+          <SelectValue placeholder="Select model" />
         )}
       </SelectTrigger>
 
@@ -54,5 +66,5 @@ export function ModelSelector({ className }: { className?: string }) {
         </SelectGroup>
       </SelectContent>
     </Select>
-  )
+  );
 }

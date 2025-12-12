@@ -21,9 +21,32 @@ Use Generate Files when:
 - File paths must be well-structured and use consistent naming conventions
 - Generated files should assume compatibility with other existing files in the sandbox
 
+## Predefined Files
+
+You can include files with predefined content using the `files` parameter. This is useful for:
+
+- **Environment files (.env)**: Pass secrets from previous tool calls like Clerk keys from `createClerkApp`
+- **Config files**: Files with known content that don't need AI generation
+
+Example: After creating a Clerk app, include the keys in a `.env` file:
+
+```json
+{
+  "files": [
+    {
+      "path": ".env",
+      "content": "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_xxx\nCLERK_SECRET_KEY=sk_test_xxx"
+    }
+  ]
+}
+```
+
+Predefined files are uploaded first, before AI-generated files.
+
 ## Best Practices
 
 - Avoid redundant file generation if the file already exists and is unchanged
+- Use `files` parameter for secrets and environment variables from previous tool calls
 - Use conventional file/folder structures for the tech stack in use
 - If replacing an existing file, ensure the update fully satisfies the user’s request
 

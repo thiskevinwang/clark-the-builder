@@ -3,111 +3,127 @@
 @source "../node_modules/streamdown/dist/*.js";
 
 :root {
-  --background: rgb(255, 255, 255);
-  --foreground: rgb(10, 10, 10);
-  --card: rgb(255, 255, 255);
-  --card-foreground: rgb(10, 10, 10);
-  --popover: rgb(255, 255, 255);
-  --popover-foreground: rgb(10, 10, 10);
-  --primary: rgb(41, 41, 41);
-  --primary-foreground: rgb(250, 250, 250);
-  --secondary: rgb(250, 250, 250);
-  --secondary-foreground: rgb(90, 90, 90);
-  --muted: rgb(240, 240, 240);
-  --muted-foreground: rgb(113, 113, 113);
-  --accent: rgb(245, 245, 245);
-  --accent-foreground: oklch(57.61% 0.2508 258.23);
-  --destructive: rgb(231, 0, 11);
-  --destructive-foreground: rgb(245, 245, 245);
-  --border: rgb(229, 229, 229);
-  --input: rgb(229, 229, 229);
-  --ring: rgb(161, 161, 161);
-  --chart-1: rgb(115, 115, 115);
-  --chart-2: rgb(115, 115, 115);
-  --chart-3: rgb(115, 115, 115);
-  --chart-4: rgb(115, 115, 115);
-  --chart-5: rgb(115, 115, 115);
-  --sidebar: rgb(250, 250, 250);
-  --sidebar-foreground: rgb(10, 10, 10);
-  --sidebar-primary: rgb(23, 23, 23);
-  --sidebar-primary-foreground: rgb(250, 250, 250);
-  --sidebar-accent: rgb(245, 245, 245);
-  --sidebar-accent-foreground: rgb(23, 23, 23);
-  --sidebar-border: rgb(229, 229, 229);
-  --sidebar-ring: rgb(161, 161, 161);
-  --font-sans: Geist, sans-serif;
-  --font-serif: Geist Mono, monospace;
-  --font-mono: Geist Mono, monospace;
-  --radius: 0.75rem;
-  --shadow-2xs: 0px 1px 0px 0px hsl(0 0% 0% / 0);
-  --shadow-xs: 0px 1px 0px 0px hsl(0 0% 0% / 0);
-  --shadow-sm: rgba(0, 0, 0, 0) 0px 0px 0px 0px,
-    rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.08) 0px 0px 0px 1px,
-    rgba(0, 0, 0, 0.04) 0px 2px 2px 0px,
-    rgb(250, 250, 250) 0px 0px 0px 1px box-sizing;
-  --shadow: 0 0 0 1px rgba(0, 0, 0, 0.08), 0px 1px 1px rgba(0, 0, 0, 0.02),
-    0px 8px 16px -4px rgba(0, 0, 0, 0.04),
-    0px 24px 32px -8px rgba(0, 0, 0, 0.06);
-  --shadow-md: 0px 1px 0px 0px hsl(0 0% 0% / 0),
-    0px 2px 4px -1px hsl(0 0% 0% / 0);
-  --shadow-lg: 0px 1px 0px 0px hsl(0 0% 0% / 0),
-    0px 4px 6px -1px hsl(0 0% 0% / 0);
-  --shadow-xl: 0px 1px 0px 0px hsl(0 0% 0% / 0),
-    0px 8px 10px -1px hsl(0 0% 0% / 0);
-  --shadow-2xl: 0px 1px 0px 0px hsl(0 0% 0% / 0);
-  --tracking-normal: 0em;
+  /* Clerk-inspired color palette */
+  --background: #fafafb;
+  --foreground: #212126;
+  --card: #ffffff;
+  --card-foreground: #212126;
+  --popover: #ffffff;
+  --popover-foreground: #212126;
+  --primary: #6c47ff;
+  --primary-foreground: #ffffff;
+  --secondary: #f7f7f8;
+  --secondary-foreground: #747686;
+  --muted: #eeeef0;
+  --muted-foreground: #747686;
+  --accent: #f0edff;
+  --accent-foreground: #6c47ff;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  --border: #e8e8ec;
+  --input: #e8e8ec;
+  --ring: #6c47ff;
+  --chart-1: #6c47ff;
+  --chart-2: #8b6fff;
+  --chart-3: #a78bfa;
+  --chart-4: #c4b5fd;
+  --chart-5: #ddd6fe;
+  --sidebar: #ffffff;
+  --sidebar-foreground: #212126;
+  --sidebar-primary: #6c47ff;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #f0edff;
+  --sidebar-accent-foreground: #6c47ff;
+  --sidebar-border: #e8e8ec;
+  --sidebar-ring: #6c47ff;
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-serif: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
+  --radius: 0.5rem;
+  --shadow-2xs: 0 1px 2px 0 rgb(0 0 0 / 0.03);
+  --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.08), 0 1px 2px -1px rgb(0 0 0 / 0.08);
+  --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.08), 0 2px 4px -2px rgb(0 0 0 / 0.08);
+  --shadow-md: 0 6px 12px -2px rgb(0 0 0 / 0.08), 0 3px 6px -3px rgb(0 0 0 / 0.08);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.08);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.08), 0 8px 10px -6px rgb(0 0 0 / 0.08);
+  --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.15);
+  --tracking-normal: -0.011em;
   --spacing: 0.25rem;
 }
 
 .dark {
-  --background: rgb(10, 10, 10);
-  --foreground: rgb(250, 250, 250);
-  --card: rgb(25, 25, 25);
-  --card-foreground: rgb(250, 250, 250);
-  --popover: rgb(38, 38, 38);
-  --popover-foreground: rgb(250, 250, 250);
-  --primary: rgb(115, 115, 115);
-  --primary-foreground: rgb(250, 250, 250);
-  --secondary: rgb(38, 38, 38);
-  --secondary-foreground: rgb(250, 250, 250);
-  --muted: rgb(38, 38, 38);
-  --muted-foreground: rgb(161, 161, 161);
-  --accent: rgb(64, 64, 64);
-  --accent-foreground: rgb(250, 250, 250);
-  --destructive: rgb(255, 100, 103);
-  --destructive-foreground: rgb(38, 38, 38);
-  --border: rgb(56, 56, 56);
-  --input: rgb(82, 82, 82);
-  --ring: rgb(115, 115, 115);
-  --chart-1: rgb(115, 115, 115);
-  --chart-2: rgb(115, 115, 115);
-  --chart-3: rgb(115, 115, 115);
-  --chart-4: rgb(115, 115, 115);
-  --chart-5: rgb(115, 115, 115);
-  --sidebar: rgb(23, 23, 23);
-  --sidebar-foreground: rgb(250, 250, 250);
-  --sidebar-primary: rgb(250, 250, 250);
-  --sidebar-primary-foreground: rgb(23, 23, 23);
-  --sidebar-accent: rgb(38, 38, 38);
-  --sidebar-accent-foreground: rgb(250, 250, 250);
-  --sidebar-border: rgb(255, 255, 255);
-  --sidebar-ring: rgb(82, 82, 82);
-  --font-sans: Geist, sans-serif;
-  --font-serif: Geist Mono, monospace;
-  --font-mono: Geist Mono, monospace;
-  --radius: 0.75rem;
-  --shadow-2xs: 0px 1px 0px 0px hsl(0 0% 0% / 0);
-  --shadow-xs: 0px 1px 0px 0px hsl(0 0% 0% / 0);
-  --shadow-sm: 0px 1px 0px 0px hsl(0 0% 0% / 0),
-    0px 1px 2px -1px hsl(0 0% 0% / 0);
-  --shadow: 0px 1px 0px 0px hsl(0 0% 0% / 0), 0px 1px 2px -1px hsl(0 0% 0% / 0);
-  --shadow-md: 0px 1px 0px 0px hsl(0 0% 0% / 0),
-    0px 2px 4px -1px hsl(0 0% 0% / 0);
-  --shadow-lg: 0px 1px 0px 0px hsl(0 0% 0% / 0),
-    0px 4px 6px -1px hsl(0 0% 0% / 0);
-  --shadow-xl: 0px 1px 0px 0px hsl(0 0% 0% / 0),
-    0px 8px 10px -1px hsl(0 0% 0% / 0);
-  --shadow-2xl: 0px 1px 0px 0px hsl(0 0% 0% / 0);
+  /* Clerk-inspired dark mode palette */
+  --background: #111116;
+  --foreground: #f7f7f8;
+  --card: #1a1a21;
+  --card-foreground: #f7f7f8;
+  --popover: #1a1a21;
+  --popover-foreground: #f7f7f8;
+  --primary: #8b6fff;
+  --primary-foreground: #ffffff;
+  --secondary: #25252d;
+  --secondary-foreground: #a5a5b5;
+  --muted: #25252d;
+  --muted-foreground: #8b8b9a;
+  --accent: #2d2547;
+  --accent-foreground: #a78bfa;
+  --destructive: #f87171;
+  --destructive-foreground: #1a1a21;
+  --border: #2e2e38;
+  --input: #3a3a47;
+  --ring: #8b6fff;
+  --chart-1: #8b6fff;
+  --chart-2: #a78bfa;
+  --chart-3: #c4b5fd;
+  --chart-4: #ddd6fe;
+  --chart-5: #ede9fe;
+  --sidebar: #1a1a21;
+  --sidebar-foreground: #f7f7f8;
+  --sidebar-primary: #8b6fff;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #2d2547;
+  --sidebar-accent-foreground: #a78bfa;
+  --sidebar-border: #2e2e38;
+  --sidebar-ring: #8b6fff;
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-serif: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
+  --radius: 0.5rem;
+  --shadow-2xs: 0 1px 2px 0 rgb(0 0 0 / 0.2);
+  --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.25);
+  --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.3), 0 1px 2px -1px rgb(0 0 0 / 0.3);
+  --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.3), 0 2px 4px -2px rgb(0 0 0 / 0.3);
+  --shadow-md: 0 6px 12px -2px rgb(0 0 0 / 0.3), 0 3px 6px -3px rgb(0 0 0 / 0.3);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.3), 0 4px 6px -4px rgb(0 0 0 / 0.3);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.3), 0 8px 10px -6px rgb(0 0 0 / 0.3);
+  --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.4);
+}
+
+/* Custom scrollbar styles */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: var(--border);
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: var(--muted-foreground);
 }
 
 @theme inline {
