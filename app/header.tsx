@@ -5,7 +5,7 @@ interface Props {
   className?: string;
 }
 
-export async function Header({ className }: Props) {
+export function Header({ className }: Props) {
   return (
     <header className={cn("flex items-center justify-between py-2", className)}>
       <div className="flex items-center gap-2.5">

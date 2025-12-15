@@ -21,27 +21,12 @@ const monofont = Geist_Mono({
   variable: "--font-mono",
 });
 
-const title = "OSS Vibe Coding Platform";
-const description = `This is a demo of an end-to-end coding platform where the user can enter text prompts, and the agent will create a full stack application. It uses Vercel Sandbox for secure code execution and calls Anthropic directly (Claude Opus 4.5) via the AI SDK.`;
+const title = "Clerk0";
+const description = `This is a demo for a generative AI builder app that provisions Clerk applications through the Clerk Platform API`;
 
 export const metadata: Metadata = {
   title,
   description,
-  openGraph: {
-    images: [
-      {
-        url: "https://assets.vercel.com/image/upload/v1754588799/OSSvibecodingplatform/OG.png",
-      },
-    ],
-  },
-  twitter: {
-    card: "summary_large_image",
-    images: [
-      {
-        url: "https://assets.vercel.com/image/upload/v1754588799/OSSvibecodingplatform/OG.png",
-      },
-    ],
-  },
 };
 
 export default function RootLayout({
