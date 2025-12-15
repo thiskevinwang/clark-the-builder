@@ -1,10 +1,10 @@
-import type { UIMessageStreamWriter, UIMessage } from "ai";
-import type { DataPart } from "../messages/data-parts";
 import { Sandbox } from "@vercel/sandbox";
-import { getRichError } from "./get-rich-error";
+import type { UIMessage, UIMessageStreamWriter } from "ai";
 import { tool } from "ai";
-import description from "./create-sandbox.prompt.md";
 import z from "zod/v3";
+import type { DataPart } from "../messages/data-parts";
+import description from "./create-sandbox.prompt.md";
+import { getRichError } from "./get-rich-error";
 
 interface Params {
   writer: UIMessageStreamWriter<UIMessage<never, DataPart>>;
@@ -49,10 +49,9 @@ export const createSandbox = ({ writer }: Params) =>
           //   url: "https://github.com/clerk/nextjs-auth-starter-template.git",
           //   type: "git",
           // },
-          token: process.env.VERCEL_SANDBOX_TOKEN,
+          token: process.env.VERCEL_SANDBOX_TOKEN ?? "",
           timeout: timeout ?? 600000,
           ports,
-          env,
         });
 
         writer.write({

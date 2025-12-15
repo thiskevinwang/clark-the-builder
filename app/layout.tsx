@@ -16,6 +16,7 @@ const sansfont = Geist({
 });
 
 const monofont = Geist_Mono({
+  subsets: ["latin"],
   weight: ["400", "700"],
   variable: "--font-mono",
 });
