@@ -1,6 +1,7 @@
 import { CommandLogsStream } from "@/components/commands-logs/commands-logs-stream";
 import { ErrorMonitor } from "@/components/error-monitor/error-monitor";
 import { SandboxState } from "@/components/modals/sandbox-state";
+import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { ChatProvider } from "@/lib/chat-context";
 import type { Metadata } from "next";
@@ -33,20 +34,27 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: ReactNode }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${sansfont.variable} ${monofont.variable} font-sans antialiased`}
       >
-        <Suspense fallback={null}>
-          <NuqsAdapter>
-            <ChatProvider>
-              <ErrorMonitor>{children}</ErrorMonitor>
-            </ChatProvider>
-          </NuqsAdapter>
-        </Suspense>
-        <Toaster />
-        <CommandLogsStream />
-        <SandboxState />
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <Suspense fallback={null}>
+            <NuqsAdapter>
+              <ChatProvider>
+                <ErrorMonitor>{children}</ErrorMonitor>
+              </ChatProvider>
+            </NuqsAdapter>
+          </Suspense>
+          <Toaster />
+          <CommandLogsStream />
+          <SandboxState />
+        </ThemeProvider>
       </body>
     </html>
   );

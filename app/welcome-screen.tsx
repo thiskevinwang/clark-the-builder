@@ -1,6 +1,7 @@
 "use client";
 
 import type { ChatUIMessage } from "@/components/chat/types";
+import { ClarkAvatar } from "@/components/clark-avatar";
 import { ModelSelector } from "@/components/settings/model-selector";
 import { Settings } from "@/components/settings/settings";
 import { useSettings } from "@/components/settings/use-settings";
@@ -14,7 +15,6 @@ import { useSharedChatContext } from "@/lib/chat-context";
 import { useLocalStorageValue } from "@/lib/use-local-storage-value";
 import { useChat } from "@ai-sdk/react";
 import { ArrowUpIcon, HistoryIcon, PlusIcon } from "lucide-react";
-import Image from "next/image";
 
 interface Props {
   onMessageSent: () => void;
@@ -48,13 +48,7 @@ export function WelcomeScreen({ onMessageSent }: Props) {
         <div className="flex flex-col items-center mb-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
           <div className="relative mb-6">
             <div className="absolute inset-0 bg-primary/20 blur-xl rounded-full scale-150" />
-            <Image
-              src="/clark.png"
-              alt="Clark the builder"
-              width={64}
-              height={64}
-              className="relative rounded-2xl shadow-lg"
-            />
+            <ClarkAvatar size={64} className="relative rounded-2xl shadow-lg" />
           </div>
           <h1 className="text-4xl font-semibold text-foreground tracking-tight mb-2">
             How can I help you today?
