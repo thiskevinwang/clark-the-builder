@@ -45,11 +45,13 @@ export const createSandbox = ({ writer }: Params) =>
 
       try {
         const sandbox = await Sandbox.create({
+          // TODO(kevin): Support creation from a git repository
           // source: {
           //   url: "https://github.com/clerk/nextjs-auth-starter-template.git",
           //   type: "git",
           // },
-          token: process.env.VERCEL_SANDBOX_TOKEN ?? "",
+          // FUTURE(kevin): Can we require auth & fetch VERCEL_OIDC_TOKEN for the application visitor?
+          // token: ...,
           timeout: timeout ?? 600000,
           ports,
         });
