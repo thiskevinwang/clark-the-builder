@@ -1,11 +1,11 @@
-import type { UIMessageStreamWriter, UIMessage } from "ai";
-import type { DataPart } from "../messages/data-parts";
 import { platformCreateApplication } from "@/lib/api";
 import { createClient, createConfig } from "@/lib/api/client";
-import { getRichError } from "./get-rich-error";
+import type { UIMessage, UIMessageStreamWriter } from "ai";
 import { tool } from "ai";
-import description from "./create-clerk-app.prompt.md";
 import z from "zod/v3";
+import type { DataPart } from "../messages/data-parts";
+import description from "./create-clerk-app.prompt.md";
+import { getRichError } from "./get-rich-error";
 
 interface Params {
   writer: UIMessageStreamWriter<UIMessage<never, DataPart>>;
@@ -103,7 +103,6 @@ export const createClerkApp = ({ writer }: Params) =>
           });
           throw new Error(`Error creating Clerk app: ${errorMessage}`);
         }
-
         writer.write({
           id: toolCallId,
           type: "data-create-clerk-app",

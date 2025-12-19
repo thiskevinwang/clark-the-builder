@@ -2,7 +2,7 @@
 
 import type { Client, Options as Options2, TDataShape } from './client';
 import { client } from './client.gen';
-import type { PlatformCreateApplicationData, PlatformCreateApplicationErrors, PlatformCreateApplicationResponses, PlatformDeleteApplicationData, PlatformDeleteApplicationErrors, PlatformDeleteApplicationResponses, PlatformGetApplicationData, PlatformGetApplicationDomainData, PlatformGetApplicationDomainErrors, PlatformGetApplicationDomainResponses, PlatformGetApplicationDomainStatusData, PlatformGetApplicationDomainStatusErrors, PlatformGetApplicationDomainStatusResponses, PlatformGetApplicationErrors, PlatformGetApplicationResponses, PlatformListApplicationsData, PlatformListApplicationsErrors, PlatformListApplicationsResponses, PlatformTriggerDnsCheckData, PlatformTriggerDnsCheckErrors, PlatformTriggerDnsCheckResponses, PlatformUpdateApplicationData, PlatformUpdateApplicationDomainData, PlatformUpdateApplicationDomainErrors, PlatformUpdateApplicationDomainResponses, PlatformUpdateApplicationErrors, PlatformUpdateApplicationResponses } from './types.gen';
+import type { PlatformCancelApplicationTransferData, PlatformCancelApplicationTransferErrors, PlatformCancelApplicationTransferResponses, PlatformCreateApplicationData, PlatformCreateApplicationErrors, PlatformCreateApplicationResponses, PlatformCreateApplicationTransferData, PlatformCreateApplicationTransferErrors, PlatformCreateApplicationTransferResponses, PlatformDeleteApplicationData, PlatformDeleteApplicationErrors, PlatformDeleteApplicationResponses, PlatformGetApplicationData, PlatformGetApplicationDomainData, PlatformGetApplicationDomainErrors, PlatformGetApplicationDomainResponses, PlatformGetApplicationDomainStatusData, PlatformGetApplicationDomainStatusErrors, PlatformGetApplicationDomainStatusResponses, PlatformGetApplicationErrors, PlatformGetApplicationResponses, PlatformGetApplicationTransferData, PlatformGetApplicationTransferErrors, PlatformGetApplicationTransferResponses, PlatformListApplicationsData, PlatformListApplicationsErrors, PlatformListApplicationsResponses, PlatformTriggerDnsCheckData, PlatformTriggerDnsCheckErrors, PlatformTriggerDnsCheckResponses, PlatformUpdateApplicationData, PlatformUpdateApplicationDomainData, PlatformUpdateApplicationDomainErrors, PlatformUpdateApplicationDomainResponses, PlatformUpdateApplicationErrors, PlatformUpdateApplicationResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
     /**
@@ -140,5 +140,45 @@ export const platformGetApplicationDomainStatus = <ThrowOnError extends boolean 
 export const platformTriggerDnsCheck = <ThrowOnError extends boolean = false>(options: Options<PlatformTriggerDnsCheckData, ThrowOnError>) => (options.client ?? client).post<PlatformTriggerDnsCheckResponses, PlatformTriggerDnsCheckErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
     url: '/platform/applications/{applicationID}/domains/{domainIDOrName}/dns_check',
+    ...options
+});
+
+/**
+ * Create an application transfer
+ *
+ * Create a new transfer request for an application. This initiates the process of
+ * transferring ownership of the application to another workspace.
+ *
+ * Only one pending transfer can exist for an application at a time. The transfer
+ * will expire after 24 hours if not completed.
+ *
+ */
+export const platformCreateApplicationTransfer = <ThrowOnError extends boolean = false>(options: Options<PlatformCreateApplicationTransferData, ThrowOnError>) => (options.client ?? client).post<PlatformCreateApplicationTransferResponses, PlatformCreateApplicationTransferErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/platform/applications/{applicationID}/transfers',
+    ...options
+});
+
+/**
+ * Cancel an application transfer
+ *
+ * Cancel an existing application transfer. Only transfers in 'pending' status can be canceled.
+ *
+ */
+export const platformCancelApplicationTransfer = <ThrowOnError extends boolean = false>(options: Options<PlatformCancelApplicationTransferData, ThrowOnError>) => (options.client ?? client).delete<PlatformCancelApplicationTransferResponses, PlatformCancelApplicationTransferErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/platform/applications/{applicationID}/transfers/{transferID}',
+    ...options
+});
+
+/**
+ * Get an application transfer
+ *
+ * Retrieve details of an application transfer by its ID.
+ *
+ */
+export const platformGetApplicationTransfer = <ThrowOnError extends boolean = false>(options: Options<PlatformGetApplicationTransferData, ThrowOnError>) => (options.client ?? client).get<PlatformGetApplicationTransferResponses, PlatformGetApplicationTransferErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/platform/applications/{applicationID}/transfers/{transferID}',
     ...options
 });

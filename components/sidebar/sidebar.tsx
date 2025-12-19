@@ -1,6 +1,15 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   useClerkAppsInit,
@@ -12,9 +21,11 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
   KeyIcon,
+  Loader2Icon,
   Trash2Icon,
 } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 
 interface SidebarProps {
   className?: string;
@@ -22,7 +33,7 @@ interface SidebarProps {
 
 export function Sidebar({ className }: SidebarProps) {
   const [isCollapsed, setIsCollapsed] = useState(true);
-  const { apps, isLoaded, removeApp } = useClerkAppsStore();
+  const { apps, isLoaded, isSyncing, removeApp } = useClerkAppsStore();
 
   // Initialize the store on mount
   useClerkAppsInit();
@@ -38,7 +49,12 @@ export function Sidebar({ className }: SidebarProps) {
       {/* Header */}
       <div className="flex items-center justify-between border-b border-border p-3">
         {!isCollapsed && (
-          <h2 className="text-sm font-semibold text-foreground">Apps</h2>
+          <div className="flex items-center gap-2">
+            <h2 className="text-sm font-semibold text-foreground">Apps</h2>
+            {isSyncing && (
+              <Loader2Icon className="h-3 w-3 animate-spin text-muted-foreground" />
+            )}
+          </div>
         )}
         <Button
           variant="ghost"
@@ -59,12 +75,28 @@ export function Sidebar({ className }: SidebarProps) {
         <div className="p-2">
           {!isLoaded ? (
             <div className="px-2 py-4 text-center text-sm text-muted-foreground">
-              {isCollapsed ? "..." : "Loading..."}
+              {isCollapsed ? (
+                <Loader2Icon className="mx-auto h-4 w-4 animate-spin" />
+              ) : (
+                <div className="flex items-center justify-center gap-2">
+                  <Loader2Icon className="h-4 w-4 animate-spin" />
+                  <span>Loading...</span>
+                </div>
+              )}
             </div>
           ) : apps.length === 0 ? (
             <div className="px-2 py-4 text-center text-sm text-muted-foreground">
               {isCollapsed ? (
-                <KeyIcon className="mx-auto h-4 w-4 opacity-50" />
+                isSyncing ? (
+                  <Loader2Icon className="mx-auto h-4 w-4 animate-spin" />
+                ) : (
+                  <KeyIcon className="mx-auto h-4 w-4 opacity-50" />
+                )
+              ) : isSyncing ? (
+                <div className="flex items-center justify-center gap-2">
+                  <Loader2Icon className="h-4 w-4 animate-spin" />
+                  <span>Syncing...</span>
+                </div>
               ) : (
                 "No apps yet"
               )}
@@ -104,6 +136,34 @@ interface AppItemProps {
 
 function AppItem({ app, isCollapsed, onRemove }: AppItemProps) {
   const [showDelete, setShowDelete] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleDelete = async () => {
+    setIsDeleting(true);
+    try {
+      const response = await fetch(`/api/applications/${app.applicationId}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || "Failed to delete application");
+      }
+
+      // Remove from local storage after successful API call
+      onRemove();
+      toast.success(`"${app.name}" deleted successfully`);
+      setDialogOpen(false);
+    } catch (error) {
+      console.error("Error deleting application:", error);
+      toast.error(
+        error instanceof Error ? error.message : "Failed to delete application"
+      );
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   if (isCollapsed) {
     return (
@@ -117,34 +177,72 @@ function AppItem({ app, isCollapsed, onRemove }: AppItemProps) {
   }
 
   return (
-    <div
-      className="group flex items-center gap-2 rounded-lg px-2 py-2 text-sm transition-colors hover:bg-accent"
-      onMouseEnter={() => setShowDelete(true)}
-      onMouseLeave={() => setShowDelete(false)}
-    >
-      <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
-        <KeyIcon className="h-3.5 w-3.5" />
+    <>
+      <div
+        className="group flex items-center gap-2 rounded-lg px-2 py-2 text-sm transition-colors hover:bg-accent"
+        onMouseEnter={() => setShowDelete(true)}
+        onMouseLeave={() => setShowDelete(false)}
+      >
+        <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
+          <KeyIcon className="h-3.5 w-3.5" />
+        </div>
+        <div className="flex-1 overflow-hidden">
+          <p className="truncate font-medium text-foreground">{app.name}</p>
+          <div className="flex items-center gap-2">
+            <p className="truncate text-xs text-muted-foreground">
+              {formatDate(app.createdAt)}
+            </p>
+          </div>
+        </div>
+        {showDelete && (
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-6 w-6 p-0 text-muted-foreground hover:text-destructive"
+            onClick={(e) => {
+              e.stopPropagation();
+              setDialogOpen(true);
+            }}
+          >
+            <Trash2Icon className="h-3.5 w-3.5" />
+          </Button>
+        )}
       </div>
-      <div className="flex-1 overflow-hidden">
-        <p className="truncate font-medium text-foreground">{app.name}</p>
-        <p className="truncate text-xs text-muted-foreground">
-          {formatDate(app.createdAt)}
-        </p>
-      </div>
-      {showDelete && (
-        <Button
-          variant="ghost"
-          size="sm"
-          className="h-6 w-6 p-0 text-muted-foreground hover:text-destructive"
-          onClick={(e) => {
-            e.stopPropagation();
-            onRemove();
-          }}
-        >
-          <Trash2Icon className="h-3.5 w-3.5" />
-        </Button>
-      )}
-    </div>
+
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Delete Application</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete <strong>{app.name}</strong>? This
+              action cannot be undone and will permanently remove the
+              application from Clerk.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2 sm:gap-0">
+            <DialogClose asChild>
+              <Button variant="outline" disabled={isDeleting}>
+                Cancel
+              </Button>
+            </DialogClose>
+            <Button
+              variant="destructive"
+              onClick={handleDelete}
+              disabled={isDeleting}
+            >
+              {isDeleting ? (
+                <>
+                  <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
+                  Deleting...
+                </>
+              ) : (
+                "Delete"
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
 

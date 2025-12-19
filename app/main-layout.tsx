@@ -1,19 +1,19 @@
 "use client";
 
+import type { ChatUIMessage } from "@/components/chat/types";
+import { Horizontal, Vertical } from "@/components/layout/panels";
+import { Sidebar } from "@/components/sidebar";
+import { TabContent, TabItem } from "@/components/tabs";
+import { useSharedChatContext } from "@/lib/chat-context";
+import { useChat } from "@ai-sdk/react";
+import { useEffect, useState } from "react";
 import { Chat } from "./chat";
 import { FileExplorer } from "./file-explorer";
 import { Header } from "./header";
-import { Horizontal, Vertical } from "@/components/layout/panels";
 import { Logs } from "./logs";
 import { Preview } from "./preview";
 import { PreviewPanel } from "./preview-panel";
-import { Sidebar } from "@/components/sidebar";
-import { TabContent, TabItem } from "@/components/tabs";
 import { WelcomeScreen } from "./welcome-screen";
-import { useSharedChatContext } from "@/lib/chat-context";
-import { useChat } from "@ai-sdk/react";
-import type { ChatUIMessage } from "@/components/chat/types";
-import { useState, useEffect } from "react";
 
 interface Props {
   horizontalSizes: number[];
@@ -87,4 +87,3 @@ export function MainLayout({ horizontalSizes, verticalSizes }: Props) {
     </div>
   );
 }
-

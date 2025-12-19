@@ -1,8 +1,8 @@
 import type { DataPart } from "@/ai/messages/data-parts";
-import { KeyRoundIcon, CheckIcon, XIcon } from "lucide-react";
-import { Spinner } from "./spinner";
+import { CheckIcon, KeyRoundIcon, XIcon } from "lucide-react";
 import { ToolHeader } from "../tool-header";
 import { ToolMessage } from "../tool-message";
+import { Spinner } from "./spinner";
 
 interface Props {
   message: DataPart["create-clerk-app"];
