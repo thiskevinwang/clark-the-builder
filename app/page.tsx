@@ -1,6 +1,6 @@
-import { MainLayout } from "./main-layout";
-import { cookies } from "next/headers";
 import { getHorizontal, getVertical } from "@/components/layout/sizing";
+import { cookies } from "next/headers";
+import { MainLayout } from "./main-layout";
 
 export default async function Page() {
   const store = await cookies();

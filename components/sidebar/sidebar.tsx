@@ -8,113 +8,95 @@ import {
 } from "@/lib/storage/clerk-apps-store";
 import type { ClerkAppData } from "@/lib/storage/types";
 import { cn } from "@/lib/utils";
-import {
-  ChevronLeftIcon,
-  ChevronRightIcon,
-  KeyIcon,
-  Trash2Icon,
-} from "lucide-react";
+import { KeyIcon, Trash2Icon, XIcon } from "lucide-react";
 import { useState } from "react";
+import { useSidebar } from "./sidebar-state";
 
 interface SidebarProps {
   className?: string;
 }
 
 export function Sidebar({ className }: SidebarProps) {
-  const [isCollapsed, setIsCollapsed] = useState(true);
+  const { isOpen, close } = useSidebar();
   const { apps, isLoaded, removeApp } = useClerkAppsStore();
 
   // Initialize the store on mount
   useClerkAppsInit();
 
   return (
-    <div
-      className={cn(
-        "relative flex flex-col border-r border-border bg-card transition-all duration-300 overflow-hidden",
-        isCollapsed ? "w-12" : "w-64",
-        className
+    <>
+      {/* Backdrop overlay for mobile */}
+      {isOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm md:hidden"
+          onClick={close}
+        />
       )}
-    >
-      {/* Header */}
-      <div className="flex items-center justify-between border-b border-border p-3">
-        {!isCollapsed && (
-          <h2 className="text-sm font-semibold text-foreground">Apps</h2>
+
+      {/* Sidebar panel */}
+      <div
+        className={cn(
+          "fixed left-0 top-0 z-50 flex h-full w-72 flex-col border-r border-border bg-card transition-transform duration-300 ease-out",
+          isOpen ? "translate-x-0" : "-translate-x-full pointer-events-none",
+          className
         )}
-        <Button
-          variant="ghost"
-          size="sm"
-          className={cn("h-7 w-7 p-0", isCollapsed && "mx-auto")}
-          onClick={() => setIsCollapsed(!isCollapsed)}
-        >
-          {isCollapsed ? (
-            <ChevronRightIcon className="h-4 w-4" />
-          ) : (
-            <ChevronLeftIcon className="h-4 w-4" />
-          )}
-        </Button>
-      </div>
-
-      {/* Apps List */}
-      <ScrollArea className="flex-1 min-h-0">
-        <div className="p-2">
-          {!isLoaded ? (
-            <div className="px-2 py-4 text-center text-sm text-muted-foreground">
-              {isCollapsed ? "..." : "Loading..."}
-            </div>
-          ) : apps.length === 0 ? (
-            <div className="px-2 py-4 text-center text-sm text-muted-foreground">
-              {isCollapsed ? (
-                <KeyIcon className="mx-auto h-4 w-4 opacity-50" />
-              ) : (
-                "No apps yet"
-              )}
-            </div>
-          ) : (
-            <div className="space-y-1">
-              {apps.map((app) => (
-                <AppItem
-                  key={app.applicationId}
-                  app={app}
-                  isCollapsed={isCollapsed}
-                  onRemove={() => removeApp(app.applicationId)}
-                />
-              ))}
-            </div>
-          )}
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between border-b border-border p-3">
+          <h2 className="text-sm font-semibold text-foreground">Apps</h2>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-7 w-7 p-0 text-muted-foreground hover:text-foreground"
+            onClick={close}
+          >
+            <XIcon className="h-4 w-4" />
+          </Button>
         </div>
-      </ScrollArea>
 
-      {/* Footer - New App hint */}
-      {!isCollapsed && (
+        {/* Apps List */}
+        <ScrollArea className="flex-1 min-h-0">
+          <div className="p-2">
+            {!isLoaded ? (
+              <div className="px-2 py-4 text-center text-sm text-muted-foreground">
+                Loading...
+              </div>
+            ) : apps.length === 0 ? (
+              <div className="px-2 py-4 text-center text-sm text-muted-foreground">
+                No apps yet
+              </div>
+            ) : (
+              <div className="space-y-1">
+                {apps.map((app) => (
+                  <AppItem
+                    key={app.applicationId}
+                    app={app}
+                    onRemove={() => removeApp(app.applicationId)}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        </ScrollArea>
+
+        {/* Footer - New App hint */}
         <div className="shrink-0 border-t border-border p-3">
           <p className="text-xs text-muted-foreground">
             Ask the assistant to create a new Clerk app
           </p>
         </div>
-      )}
-    </div>
+      </div>
+    </>
   );
 }
 
 interface AppItemProps {
   app: ClerkAppData;
-  isCollapsed: boolean;
   onRemove: () => void;
 }
 
-function AppItem({ app, isCollapsed, onRemove }: AppItemProps) {
+function AppItem({ app, onRemove }: AppItemProps) {
   const [showDelete, setShowDelete] = useState(false);
-
-  if (isCollapsed) {
-    return (
-      <div
-        className="flex h-8 w-8 items-center justify-center rounded-md bg-primary/10 text-primary mx-auto"
-        title={app.name}
-      >
-        <KeyIcon className="h-4 w-4" />
-      </div>
-    );
-  }
 
   return (
     <div

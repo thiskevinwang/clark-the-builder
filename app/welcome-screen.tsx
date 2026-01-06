@@ -5,16 +5,28 @@ import { ClarkAvatar } from "@/components/clark-avatar";
 import { ModelSelector } from "@/components/settings/model-selector";
 import { Settings } from "@/components/settings/settings";
 import { useSettings } from "@/components/settings/use-settings";
+import { Sidebar, useSidebar } from "@/components/sidebar";
+import { Button } from "@/components/ui/button";
 import {
   InputGroup,
   InputGroupAddon,
   InputGroupButton,
   InputGroupTextarea,
 } from "@/components/ui/input-group";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { useSharedChatContext } from "@/lib/chat-context";
 import { useLocalStorageValue } from "@/lib/use-local-storage-value";
 import { useChat } from "@ai-sdk/react";
-import { ArrowUpIcon, HistoryIcon, PlusIcon } from "lucide-react";
+import {
+  ArrowUpIcon,
+  HistoryIcon,
+  PanelLeftIcon,
+  PlusIcon,
+} from "lucide-react";
 
 interface Props {
   onMessageSent: () => void;
@@ -25,6 +37,7 @@ export function WelcomeScreen({ onMessageSent }: Props) {
   const { chat } = useSharedChatContext();
   const { modelId, reasoningEffort } = useSettings();
   const { sendMessage, status } = useChat<ChatUIMessage>({ chat });
+  const { isOpen, toggle } = useSidebar();
 
   const handleSubmit = () => {
     if (input.trim()) {
@@ -36,6 +49,33 @@ export function WelcomeScreen({ onMessageSent }: Props) {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-background via-background to-accent/20 px-4">
+      {/* Sidebar */}
+      <Sidebar />
+
+      {/* Open sidebar button - fixed position top-left */}
+      {!isOpen && (
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggle}
+              className="fixed top-4 left-4 z-30 h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-accent/80 backdrop-blur-sm"
+            >
+              <PanelLeftIcon className="h-4 w-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent side="right">
+            <span className="flex items-center gap-2">
+              Open sidebar
+              <kbd className="inline-flex h-5 items-center gap-0.5 rounded bg-primary-foreground/20 px-1.5 font-mono text-[10px] font-medium">
+                ⌘.
+              </kbd>
+            </span>
+          </TooltipContent>
+        </Tooltip>
+      )}
+
       {/* Decorative background pattern */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
@@ -50,12 +90,17 @@ export function WelcomeScreen({ onMessageSent }: Props) {
             <div className="absolute inset-0 bg-primary/20 blur-xl rounded-full scale-150" />
             <ClarkAvatar size={64} className="relative rounded-2xl shadow-lg" />
           </div>
-          <h1 className="text-4xl font-semibold text-foreground tracking-tight mb-2">
+          <h1
+            className="text-4xl font-semibold text-foreground tracking-tight mb-2 text-center"
+            style={{
+              fontSize: `clamp(1.875rem, 1.2rem + 2vw, 2.5rem)`,
+            }}
+          >
             How can I help you today?
           </h1>
-          <p className="text-muted-foreground text-lg">
+          {/* <p className="text-muted-foreground text-lg">
             Build Clerk-powered apps in seconds
-          </p>
+          </p> */}
         </div>
 
         {/* Chat input */}
