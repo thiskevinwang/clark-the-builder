@@ -209,6 +209,50 @@ export type PlatformDnsCheckResponse = PlatformDomainStatusResponse & {
     last_run_at: number | null;
 };
 
+/**
+ * Application Transfer
+ *
+ * Represents an application transfer request. Application transfers allow transferring ownership of an application from one organization to another.
+ */
+export type PlatformApplicationTransferResponse = {
+    /**
+     * The object type.
+     */
+    object: 'application_transfer';
+    /**
+     * The unique identifier for the application transfer.
+     */
+    id: string;
+    /**
+     * A unique code for the transfer that can be shared with the recipient to claim the application.
+     */
+    code: string;
+    /**
+     * The ID of the application being transferred.
+     */
+    application_id: string;
+    /**
+     * The current status of the transfer.
+     */
+    status: 'pending' | 'completed' | 'canceled' | 'expired';
+    /**
+     * The timestamp when the transfer expires if not completed.
+     */
+    expires_at: string;
+    /**
+     * The timestamp when the transfer was created.
+     */
+    created_at: string;
+    /**
+     * The timestamp when the transfer was canceled, or null if not canceled.
+     */
+    canceled_at: string | null;
+    /**
+     * The timestamp when the transfer was completed, or null if not completed.
+     */
+    completed_at: string | null;
+};
+
 export type PlatformListApplicationsData = {
     body?: never;
     path?: never;
@@ -615,3 +659,129 @@ export type PlatformTriggerDnsCheckResponses = {
 };
 
 export type PlatformTriggerDnsCheckResponse = PlatformTriggerDnsCheckResponses[keyof PlatformTriggerDnsCheckResponses];
+
+export type PlatformCreateApplicationTransferData = {
+    body?: never;
+    path: {
+        /**
+         * Application ID.
+         */
+        applicationID: string;
+    };
+    query?: never;
+    url: '/platform/applications/{applicationID}/transfers';
+};
+
+export type PlatformCreateApplicationTransferErrors = {
+    /**
+     * Authentication invalid
+     */
+    401: ClerkErrors;
+    /**
+     * Authorization invalid
+     */
+    403: ClerkErrors;
+    /**
+     * Conflict
+     */
+    409: ClerkErrors;
+};
+
+export type PlatformCreateApplicationTransferError = PlatformCreateApplicationTransferErrors[keyof PlatformCreateApplicationTransferErrors];
+
+export type PlatformCreateApplicationTransferResponses = {
+    /**
+     * Application transfer created successfully.
+     */
+    201: PlatformApplicationTransferResponse;
+};
+
+export type PlatformCreateApplicationTransferResponse = PlatformCreateApplicationTransferResponses[keyof PlatformCreateApplicationTransferResponses];
+
+export type PlatformCancelApplicationTransferData = {
+    body?: never;
+    path: {
+        /**
+         * Application ID.
+         */
+        applicationID: string;
+        /**
+         * Application Transfer ID.
+         */
+        transferID: string;
+    };
+    query?: never;
+    url: '/platform/applications/{applicationID}/transfers/{transferID}';
+};
+
+export type PlatformCancelApplicationTransferErrors = {
+    /**
+     * Authentication invalid
+     */
+    401: ClerkErrors;
+    /**
+     * Authorization invalid
+     */
+    403: ClerkErrors;
+    /**
+     * Resource not found
+     */
+    404: ClerkErrors;
+    /**
+     * Conflict
+     */
+    409: ClerkErrors;
+};
+
+export type PlatformCancelApplicationTransferError = PlatformCancelApplicationTransferErrors[keyof PlatformCancelApplicationTransferErrors];
+
+export type PlatformCancelApplicationTransferResponses = {
+    /**
+     * Application transfer canceled successfully.
+     */
+    200: PlatformApplicationTransferResponse;
+};
+
+export type PlatformCancelApplicationTransferResponse = PlatformCancelApplicationTransferResponses[keyof PlatformCancelApplicationTransferResponses];
+
+export type PlatformGetApplicationTransferData = {
+    body?: never;
+    path: {
+        /**
+         * Application ID.
+         */
+        applicationID: string;
+        /**
+         * Application Transfer ID.
+         */
+        transferID: string;
+    };
+    query?: never;
+    url: '/platform/applications/{applicationID}/transfers/{transferID}';
+};
+
+export type PlatformGetApplicationTransferErrors = {
+    /**
+     * Authentication invalid
+     */
+    401: ClerkErrors;
+    /**
+     * Authorization invalid
+     */
+    403: ClerkErrors;
+    /**
+     * Resource not found
+     */
+    404: ClerkErrors;
+};
+
+export type PlatformGetApplicationTransferError = PlatformGetApplicationTransferErrors[keyof PlatformGetApplicationTransferErrors];
+
+export type PlatformGetApplicationTransferResponses = {
+    /**
+     * Application transfer retrieved successfully.
+     */
+    200: PlatformApplicationTransferResponse;
+};
+
+export type PlatformGetApplicationTransferResponse = PlatformGetApplicationTransferResponses[keyof PlatformGetApplicationTransferResponses];

@@ -12,7 +12,7 @@
       "name": "Clerk Platform Team",
       "url": "https://clerk.com/support"
     },
-    "description": "The Clerk REST Platform API, for programmatic management of resources of a workspace.\n\n> [!note]\n> This API is currently in private beta. If you'd like access for your workspace, please reach out to [Clerk Support](https://clerk.com/support).",
+    "description": "The Clerk REST Platform API, for programmatic management of resources of a workspace.\n\n> [!note]\n> This API is currently in private beta. If you'd like access for your workspace, please fill out and submit our [request form](https://clerkdev.notion.site/2df2b9ab44fe803f9031e9f3185c5e19).",
     "version": "BETA",
     "termsOfService": "https://clerk.com/terms",
     "license": {
@@ -20,8 +20,16 @@
       "url": "https://github.com/clerk/openapi-specs/blob/main/LICENSE"
     }
   },
-  "servers": [{ "url": "https://api.clerk.com/v1" }],
-  "security": [{ "platform_api_access_token": [] }],
+  "servers": [
+    {
+      "url": "https://api.clerk.com/v1"
+    }
+  ],
+  "security": [
+    {
+      "platform_api_access_token": []
+    }
+  ],
   "tags": [
     {
       "name": "Applications",
@@ -30,9 +38,15 @@
     {
       "name": "Domains",
       "description": "An object representing a domain associated with a Clerk application. In development `instances`, a domain is provided by Clerk. Production `instances` require additional configuration to be set up."
+    },
+    {
+      "name": "Application Transfers",
+      "description": "An object representing a transfer request for an application between workspaces."
     }
   ],
-  "externalDocs": { "url": "https://clerk.com/docs" },
+  "externalDocs": {
+    "url": "https://clerk.com/docs"
+  },
   "paths": {
     "/platform/applications": {
       "get": {
@@ -42,14 +56,21 @@
         "tags": ["Applications"],
         "summary": "List applications",
         "description": "List applications.\n",
-        "security": [{ "platform_api_access_token": [] }],
+        "security": [
+          {
+            "platform_api_access_token": []
+          }
+        ],
         "parameters": [
           {
             "name": "include_secret_keys",
             "in": "query",
             "description": "Whether to include secret keys in the response.",
             "required": false,
-            "schema": { "type": "boolean", "default": false }
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
           }
         ],
         "responses": {
@@ -63,9 +84,15 @@
               }
             }
           },
-          "400": { "$ref": "#/components/responses/ClerkErrors" },
-          "401": { "$ref": "#/components/responses/AuthenticationInvalid" },
-          "403": { "$ref": "#/components/responses/AuthorizationInvalid" }
+          "400": {
+            "$ref": "#/components/responses/ClerkErrors"
+          },
+          "401": {
+            "$ref": "#/components/responses/AuthenticationInvalid"
+          },
+          "403": {
+            "$ref": "#/components/responses/AuthorizationInvalid"
+          }
         }
       },
       "post": {
@@ -75,7 +102,11 @@
         "tags": ["Applications"],
         "summary": "Create an application",
         "description": "Create a new application.\n",
-        "security": [{ "platform_api_access_token": [] }],
+        "security": [
+          {
+            "platform_api_access_token": []
+          }
+        ],
         "requestBody": {
           "description": "Application data to create.",
           "required": true,
@@ -98,10 +129,18 @@
               }
             }
           },
-          "400": { "$ref": "#/components/responses/ClerkErrors" },
-          "401": { "$ref": "#/components/responses/AuthenticationInvalid" },
-          "403": { "$ref": "#/components/responses/AuthorizationInvalid" },
-          "422": { "$ref": "#/components/responses/UnprocessableEntity" }
+          "400": {
+            "$ref": "#/components/responses/ClerkErrors"
+          },
+          "401": {
+            "$ref": "#/components/responses/AuthenticationInvalid"
+          },
+          "403": {
+            "$ref": "#/components/responses/AuthorizationInvalid"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
         }
       }
     },
@@ -113,21 +152,30 @@
         "tags": ["Applications"],
         "summary": "Get an application",
         "description": "Get application details.\n",
-        "security": [{ "platform_api_access_token": [] }],
+        "security": [
+          {
+            "platform_api_access_token": []
+          }
+        ],
         "parameters": [
           {
             "name": "applicationID",
             "in": "path",
             "description": "Application ID.",
             "required": true,
-            "schema": { "type": "string" }
+            "schema": {
+              "type": "string"
+            }
           },
           {
             "name": "include_secret_keys",
             "in": "query",
             "description": "Whether to include secret keys in the response. If 'true', the response will include the secret keys for each instance.",
             "required": false,
-            "schema": { "type": "boolean", "default": false }
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
           }
         ],
         "responses": {
@@ -141,10 +189,18 @@
               }
             }
           },
-          "400": { "$ref": "#/components/responses/ClerkErrors" },
-          "401": { "$ref": "#/components/responses/AuthenticationInvalid" },
-          "403": { "$ref": "#/components/responses/AuthorizationInvalid" },
-          "404": { "$ref": "#/components/responses/ResourceNotFound" }
+          "400": {
+            "$ref": "#/components/responses/ClerkErrors"
+          },
+          "401": {
+            "$ref": "#/components/responses/AuthenticationInvalid"
+          },
+          "403": {
+            "$ref": "#/components/responses/AuthorizationInvalid"
+          },
+          "404": {
+            "$ref": "#/components/responses/ResourceNotFound"
+          }
         }
       },
       "patch": {
@@ -154,14 +210,20 @@
         "tags": ["Applications"],
         "summary": "Update an application",
         "description": "Update an application.\n",
-        "security": [{ "platform_api_access_token": [] }],
+        "security": [
+          {
+            "platform_api_access_token": []
+          }
+        ],
         "parameters": [
           {
             "name": "applicationID",
             "in": "path",
             "description": "Application ID.",
             "required": true,
-            "schema": { "type": "string" }
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "requestBody": {
@@ -186,11 +248,21 @@
               }
             }
           },
-          "400": { "$ref": "#/components/responses/ClerkErrors" },
-          "401": { "$ref": "#/components/responses/AuthenticationInvalid" },
-          "403": { "$ref": "#/components/responses/AuthorizationInvalid" },
-          "404": { "$ref": "#/components/responses/ResourceNotFound" },
-          "422": { "$ref": "#/components/responses/UnprocessableEntity" }
+          "400": {
+            "$ref": "#/components/responses/ClerkErrors"
+          },
+          "401": {
+            "$ref": "#/components/responses/AuthenticationInvalid"
+          },
+          "403": {
+            "$ref": "#/components/responses/AuthorizationInvalid"
+          },
+          "404": {
+            "$ref": "#/components/responses/ResourceNotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
         }
       },
       "delete": {
@@ -200,14 +272,20 @@
         "tags": ["Applications"],
         "summary": "Delete an application",
         "description": "Delete an application.\n",
-        "security": [{ "platform_api_access_token": [] }],
+        "security": [
+          {
+            "platform_api_access_token": []
+          }
+        ],
         "parameters": [
           {
             "name": "applicationID",
             "in": "path",
             "description": "Application ID.",
             "required": true,
-            "schema": { "type": "string" }
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -221,10 +299,18 @@
               }
             }
           },
-          "400": { "$ref": "#/components/responses/ClerkErrors" },
-          "401": { "$ref": "#/components/responses/AuthenticationInvalid" },
-          "403": { "$ref": "#/components/responses/AuthorizationInvalid" },
-          "404": { "$ref": "#/components/responses/ResourceNotFound" }
+          "400": {
+            "$ref": "#/components/responses/ClerkErrors"
+          },
+          "401": {
+            "$ref": "#/components/responses/AuthenticationInvalid"
+          },
+          "403": {
+            "$ref": "#/components/responses/AuthorizationInvalid"
+          },
+          "404": {
+            "$ref": "#/components/responses/ResourceNotFound"
+          }
         }
       }
     },
@@ -236,14 +322,20 @@
         "tags": ["Domains"],
         "summary": "Update application domain",
         "description": "Update the production domain for an application.\n",
-        "security": [{ "platform_api_access_token": [] }],
+        "security": [
+          {
+            "platform_api_access_token": []
+          }
+        ],
         "parameters": [
           {
             "name": "applicationID",
             "in": "path",
             "description": "Application ID.",
             "required": true,
-            "schema": { "type": "string" }
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "requestBody": {
@@ -268,11 +360,21 @@
               }
             }
           },
-          "400": { "$ref": "#/components/responses/ClerkErrors" },
-          "401": { "$ref": "#/components/responses/AuthenticationInvalid" },
-          "403": { "$ref": "#/components/responses/AuthorizationInvalid" },
-          "404": { "$ref": "#/components/responses/ResourceNotFound" },
-          "422": { "$ref": "#/components/responses/UnprocessableEntity" }
+          "400": {
+            "$ref": "#/components/responses/ClerkErrors"
+          },
+          "401": {
+            "$ref": "#/components/responses/AuthenticationInvalid"
+          },
+          "403": {
+            "$ref": "#/components/responses/AuthorizationInvalid"
+          },
+          "404": {
+            "$ref": "#/components/responses/ResourceNotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
         }
       }
     },
@@ -284,14 +386,20 @@
         "tags": ["Domains"],
         "summary": "Get application domain",
         "description": "Get domain information for an application.\n",
-        "security": [{ "platform_api_access_token": [] }],
+        "security": [
+          {
+            "platform_api_access_token": []
+          }
+        ],
         "parameters": [
           {
             "name": "applicationID",
             "in": "path",
             "description": "Application ID.",
             "required": true,
-            "schema": { "type": "string" }
+            "schema": {
+              "type": "string"
+            }
           },
           {
             "name": "domainIDOrName",
@@ -299,7 +407,9 @@
             "description": "Domain ID or domain name.",
             "example": "dmn_abcdefghijklmnopqrstuvwxyz0",
             "required": true,
-            "schema": { "type": "string" }
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -313,10 +423,18 @@
               }
             }
           },
-          "400": { "$ref": "#/components/responses/ClerkErrors" },
-          "401": { "$ref": "#/components/responses/AuthenticationInvalid" },
-          "403": { "$ref": "#/components/responses/AuthorizationInvalid" },
-          "404": { "$ref": "#/components/responses/ResourceNotFound" }
+          "400": {
+            "$ref": "#/components/responses/ClerkErrors"
+          },
+          "401": {
+            "$ref": "#/components/responses/AuthenticationInvalid"
+          },
+          "403": {
+            "$ref": "#/components/responses/AuthorizationInvalid"
+          },
+          "404": {
+            "$ref": "#/components/responses/ResourceNotFound"
+          }
         }
       }
     },
@@ -328,14 +446,20 @@
         "tags": ["Domains"],
         "summary": "Get application domain status",
         "description": "Get the status of a domain for an application.\n",
-        "security": [{ "platform_api_access_token": [] }],
+        "security": [
+          {
+            "platform_api_access_token": []
+          }
+        ],
         "parameters": [
           {
             "name": "applicationID",
             "in": "path",
             "description": "Application ID.",
             "required": true,
-            "schema": { "type": "string" }
+            "schema": {
+              "type": "string"
+            }
           },
           {
             "name": "domainIDOrName",
@@ -343,7 +467,9 @@
             "description": "Domain ID or domain name.",
             "example": "dmn_abcdefghijklmnopqrstuvwxyz0",
             "required": true,
-            "schema": { "type": "string" }
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -357,10 +483,18 @@
               }
             }
           },
-          "400": { "$ref": "#/components/responses/ClerkErrors" },
-          "401": { "$ref": "#/components/responses/AuthenticationInvalid" },
-          "403": { "$ref": "#/components/responses/AuthorizationInvalid" },
-          "404": { "$ref": "#/components/responses/ResourceNotFound" }
+          "400": {
+            "$ref": "#/components/responses/ClerkErrors"
+          },
+          "401": {
+            "$ref": "#/components/responses/AuthenticationInvalid"
+          },
+          "403": {
+            "$ref": "#/components/responses/AuthorizationInvalid"
+          },
+          "404": {
+            "$ref": "#/components/responses/ResourceNotFound"
+          }
         }
       }
     },
@@ -372,14 +506,20 @@
         "tags": ["Domains"],
         "summary": "Trigger DNS check",
         "description": "Triggers a DNS check for a domain and returns the current domain status.\n\nThis endpoint ensures that at most one DNS check job is in-flight at any time.\nIf a check is already running or was recently performed, a 409 Conflict is returned.\n\nUse this endpoint to trigger a new DNS verification check after configuring DNS records.\n",
-        "security": [{ "platform_api_access_token": [] }],
+        "security": [
+          {
+            "platform_api_access_token": []
+          }
+        ],
         "parameters": [
           {
             "name": "applicationID",
             "in": "path",
             "description": "Application ID.",
             "required": true,
-            "schema": { "type": "string" }
+            "schema": {
+              "type": "string"
+            }
           },
           {
             "name": "domainIDOrName",
@@ -387,7 +527,9 @@
             "description": "Domain ID or domain name.",
             "example": "dmn_abcdefghijklmnopqrstuvwxyz0",
             "required": true,
-            "schema": { "type": "string" }
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -401,12 +543,180 @@
               }
             }
           },
-          "400": { "$ref": "#/components/responses/ClerkErrors" },
-          "401": { "$ref": "#/components/responses/AuthenticationInvalid" },
-          "403": { "$ref": "#/components/responses/AuthorizationInvalid" },
-          "404": { "$ref": "#/components/responses/ResourceNotFound" },
+          "400": {
+            "$ref": "#/components/responses/ClerkErrors"
+          },
+          "401": {
+            "$ref": "#/components/responses/AuthenticationInvalid"
+          },
+          "403": {
+            "$ref": "#/components/responses/AuthorizationInvalid"
+          },
+          "404": {
+            "$ref": "#/components/responses/ResourceNotFound"
+          },
           "409": {
             "description": "A DNS check is already in progress or a recent check was performed. Wait for the current check to complete or for the cooldown period to expire before retrying.",
+            "$ref": "#/components/responses/Conflict"
+          }
+        }
+      }
+    },
+    "/platform/applications/{applicationID}/transfers": {
+      "post": {
+        "operationId": "PlatformCreateApplicationTransfer",
+        "x-speakeasy-group": "platform",
+        "x-speakeasy-name-override": "createApplicationTransfer",
+        "tags": ["Application Transfers"],
+        "summary": "Create an application transfer",
+        "description": "Create a new transfer request for an application. This initiates the process of\ntransferring ownership of the application to another workspace.\n\nOnly one pending transfer can exist for an application at a time. The transfer\nwill expire after 24 hours if not completed.\n",
+        "security": [
+          {
+            "platform_api_access_token": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "applicationID",
+            "in": "path",
+            "description": "Application ID.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Application transfer created successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformApplicationTransferResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/AuthenticationInvalid"
+          },
+          "403": {
+            "$ref": "#/components/responses/AuthorizationInvalid"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          }
+        }
+      }
+    },
+    "/platform/applications/{applicationID}/transfers/{transferID}": {
+      "get": {
+        "operationId": "PlatformGetApplicationTransfer",
+        "x-speakeasy-group": "platform",
+        "x-speakeasy-name-override": "getApplicationTransfer",
+        "tags": ["Application Transfers"],
+        "summary": "Get an application transfer",
+        "description": "Retrieve details of an application transfer by its ID.\n",
+        "security": [
+          {
+            "platform_api_access_token": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "applicationID",
+            "in": "path",
+            "description": "Application ID.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "transferID",
+            "in": "path",
+            "description": "Application Transfer ID.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Application transfer retrieved successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformApplicationTransferResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/AuthenticationInvalid"
+          },
+          "403": {
+            "$ref": "#/components/responses/AuthorizationInvalid"
+          },
+          "404": {
+            "$ref": "#/components/responses/ResourceNotFound"
+          }
+        }
+      },
+      "delete": {
+        "operationId": "PlatformCancelApplicationTransfer",
+        "x-speakeasy-group": "platform",
+        "x-speakeasy-name-override": "cancelApplicationTransfer",
+        "tags": ["Application Transfers"],
+        "summary": "Cancel an application transfer",
+        "description": "Cancel an existing application transfer. Only transfers in 'pending' status can be canceled.\n",
+        "security": [
+          {
+            "platform_api_access_token": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "applicationID",
+            "in": "path",
+            "description": "Application ID.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "transferID",
+            "in": "path",
+            "description": "Application Transfer ID.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Application transfer canceled successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformApplicationTransferResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/AuthenticationInvalid"
+          },
+          "403": {
+            "$ref": "#/components/responses/AuthorizationInvalid"
+          },
+          "404": {
+            "$ref": "#/components/responses/ResourceNotFound"
+          },
+          "409": {
             "$ref": "#/components/responses/Conflict"
           }
         }
@@ -473,16 +783,26 @@
       },
       "PlatformListApplicationsResponse": {
         "type": "array",
-        "items": { "$ref": "#/components/schemas/PlatformApplicationResponse" },
+        "items": {
+          "$ref": "#/components/schemas/PlatformApplicationResponse"
+        },
         "minItems": 0
       },
       "ClerkError": {
         "type": "object",
         "properties": {
-          "message": { "type": "string" },
-          "long_message": { "type": "string" },
-          "code": { "type": "string" },
-          "meta": { "type": "object" }
+          "message": {
+            "type": "string"
+          },
+          "long_message": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          },
+          "meta": {
+            "type": "object"
+          }
         },
         "required": ["message", "long_message", "code"]
       },
@@ -491,10 +811,16 @@
         "properties": {
           "errors": {
             "type": "array",
-            "items": { "$ref": "#/components/schemas/ClerkError" }
+            "items": {
+              "$ref": "#/components/schemas/ClerkError"
+            }
           },
-          "meta": { "type": "object" },
-          "clerk_trace_id": { "type": "string" }
+          "meta": {
+            "type": "object"
+          },
+          "clerk_trace_id": {
+            "type": "string"
+          }
         },
         "required": ["errors"]
       },
@@ -533,7 +859,10 @@
             "type": "boolean",
             "description": "Whether the object was deleted."
           },
-          "object": { "type": "string", "example": "deleted" },
+          "object": {
+            "type": "string",
+            "example": "deleted"
+          },
           "id": {
             "type": "string",
             "description": "The ID of the deleted resource."
@@ -555,7 +884,10 @@
         "type": "object",
         "additionalProperties": false,
         "properties": {
-          "name": { "type": "string", "description": "The domain name." }
+          "name": {
+            "type": "string",
+            "description": "The domain name."
+          }
         },
         "required": ["name"]
       },
@@ -563,9 +895,18 @@
         "type": "object",
         "additionalProperties": false,
         "properties": {
-          "object": { "type": "string", "enum": ["domain"] },
-          "id": { "type": "string", "description": "The ID of the domain." },
-          "name": { "type": "string", "description": "The domain name." },
+          "object": {
+            "type": "string",
+            "enum": ["domain"]
+          },
+          "id": {
+            "type": "string",
+            "description": "The ID of the domain."
+          },
+          "name": {
+            "type": "string",
+            "description": "The domain name."
+          },
           "is_satellite": {
             "type": "boolean",
             "description": "Whether this is a satellite domain."
@@ -587,9 +928,15 @@
             "items": {
               "type": "object",
               "properties": {
-                "name": { "type": "string" },
-                "value": { "type": "string" },
-                "required": { "type": "boolean" }
+                "name": {
+                  "type": "string"
+                },
+                "value": {
+                  "type": "string"
+                },
+                "required": {
+                  "type": "boolean"
+                }
               }
             },
             "description": "CNAME targets for the domain."
@@ -608,8 +955,12 @@
       "FailureHint": {
         "type": "object",
         "properties": {
-          "code": { "type": "string" },
-          "message": { "type": "string" }
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
         },
         "required": ["code", "message"]
       },
@@ -617,14 +968,26 @@
         "type": "object",
         "additionalProperties": false,
         "properties": {
-          "clerk_subdomain": { "type": "string" },
-          "from": { "type": "string" },
-          "to": { "type": "string" },
-          "verified": { "type": "boolean" },
-          "required": { "type": "boolean" },
+          "clerk_subdomain": {
+            "type": "string"
+          },
+          "from": {
+            "type": "string"
+          },
+          "to": {
+            "type": "string"
+          },
+          "verified": {
+            "type": "boolean"
+          },
+          "required": {
+            "type": "boolean"
+          },
           "failure_hints": {
             "type": "array",
-            "items": { "$ref": "#/components/schemas/FailureHint" }
+            "items": {
+              "$ref": "#/components/schemas/FailureHint"
+            }
           }
         },
         "required": [
@@ -647,11 +1010,21 @@
           "cnames": {
             "type": "object",
             "properties": {
-              "accounts": { "$ref": "#/components/schemas/CNAMEStatus" },
-              "clerk": { "$ref": "#/components/schemas/CNAMEStatus" },
-              "clk._domainkey": { "$ref": "#/components/schemas/CNAMEStatus" },
-              "clk2._domainkey": { "$ref": "#/components/schemas/CNAMEStatus" },
-              "clkmail": { "$ref": "#/components/schemas/CNAMEStatus" }
+              "accounts": {
+                "$ref": "#/components/schemas/CNAMEStatus"
+              },
+              "clerk": {
+                "$ref": "#/components/schemas/CNAMEStatus"
+              },
+              "clk._domainkey": {
+                "$ref": "#/components/schemas/CNAMEStatus"
+              },
+              "clk2._domainkey": {
+                "$ref": "#/components/schemas/CNAMEStatus"
+              },
+              "clkmail": {
+                "$ref": "#/components/schemas/CNAMEStatus"
+              }
             }
           }
         },
@@ -661,12 +1034,18 @@
         "type": "object",
         "additionalProperties": false,
         "properties": {
-          "status": { "type": "string" },
-          "required": { "type": "boolean" },
+          "status": {
+            "type": "string"
+          },
+          "required": {
+            "type": "boolean"
+          },
           "failure_hints": {
             "type": "array",
             "nullable": true,
-            "items": { "$ref": "#/components/schemas/FailureHint" }
+            "items": {
+              "$ref": "#/components/schemas/FailureHint"
+            }
           }
         },
         "required": ["status", "required", "failure_hints"]
@@ -674,7 +1053,10 @@
       "PlatformDomainStatusResponse": {
         "type": "object",
         "properties": {
-          "dns": { "type": "object", "$ref": "#/components/schemas/DNSStatus" },
+          "dns": {
+            "type": "object",
+            "$ref": "#/components/schemas/DNSStatus"
+          },
           "ssl": {
             "type": "object",
             "properties": {
@@ -688,42 +1070,61 @@
                   "incomplete"
                 ]
               },
-              "required": { "type": "boolean" },
+              "required": {
+                "type": "boolean"
+              },
               "failure_hints": {
                 "type": "array",
                 "nullable": true,
-                "items": { "$ref": "#/components/schemas/FailureHint" }
+                "items": {
+                  "$ref": "#/components/schemas/FailureHint"
+                }
               }
             }
           },
           "ssl_hosts": {
             "type": "object",
-            "additionalProperties": { "$ref": "#/components/schemas/SSLStatus" }
+            "additionalProperties": {
+              "$ref": "#/components/schemas/SSLStatus"
+            }
           },
           "mail": {
             "type": "object",
             "properties": {
-              "status": { "type": "string" },
-              "required": { "type": "boolean" }
+              "status": {
+                "type": "string"
+              },
+              "required": {
+                "type": "boolean"
+              }
             },
             "required": ["status", "required"]
           },
           "proxy": {
             "type": "object",
             "properties": {
-              "status": { "type": "string" },
-              "required": { "type": "boolean" }
+              "status": {
+                "type": "string"
+              },
+              "required": {
+                "type": "boolean"
+              }
             },
             "required": ["status", "required"]
           },
-          "status": { "type": "string", "enum": ["complete", "incomplete"] }
+          "status": {
+            "type": "string",
+            "enum": ["complete", "incomplete"]
+          }
         },
         "required": ["dns", "ssl", "status"]
       },
       "PlatformDNSCheckResponse": {
         "description": "Response from triggering a DNS check. Includes the current domain status\nalong with metadata about the check.\n",
         "allOf": [
-          { "$ref": "#/components/schemas/PlatformDomainStatusResponse" },
+          {
+            "$ref": "#/components/schemas/PlatformDomainStatusResponse"
+          },
           {
             "type": "object",
             "properties": {
@@ -742,6 +1143,77 @@
             "required": ["domain_id", "last_run_at"]
           }
         ]
+      },
+      "PlatformApplicationTransferResponse": {
+        "title": "Application Transfer",
+        "description": "Represents an application transfer request. Application transfers allow transferring ownership of an application from one organization to another.",
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "object": {
+            "type": "string",
+            "enum": ["application_transfer"],
+            "description": "The object type."
+          },
+          "id": {
+            "type": "string",
+            "description": "The unique identifier for the application transfer.",
+            "example": "appxfr_2abc123def456"
+          },
+          "code": {
+            "type": "string",
+            "description": "A unique code for the transfer that can be shared with the recipient to claim the application.",
+            "example": "550e8400-e29b-41d4-a716-446655440000"
+          },
+          "application_id": {
+            "type": "string",
+            "description": "The ID of the application being transferred.",
+            "example": "app_2abc123def456"
+          },
+          "status": {
+            "type": "string",
+            "description": "The current status of the transfer.",
+            "enum": ["pending", "completed", "canceled", "expired"],
+            "example": "pending"
+          },
+          "expires_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "The timestamp when the transfer expires if not completed.",
+            "example": "2024-01-16T12:00:00Z"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "The timestamp when the transfer was created.",
+            "example": "2024-01-15T12:00:00Z"
+          },
+          "canceled_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "The timestamp when the transfer was canceled, or null if not canceled.",
+            "example": null
+          },
+          "completed_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "The timestamp when the transfer was completed, or null if not completed.",
+            "example": null
+          }
+        },
+        "required": [
+          "object",
+          "id",
+          "code",
+          "application_id",
+          "status",
+          "expires_at",
+          "created_at",
+          "canceled_at",
+          "completed_at"
+        ]
       }
     },
     "responses": {
@@ -749,7 +1221,9 @@
         "description": "Request was not successful",
         "content": {
           "application/json": {
-            "schema": { "$ref": "#/components/schemas/ClerkErrors" }
+            "schema": {
+              "$ref": "#/components/schemas/ClerkErrors"
+            }
           }
         }
       },
@@ -757,7 +1231,9 @@
         "description": "Authentication invalid",
         "content": {
           "application/json": {
-            "schema": { "$ref": "#/components/schemas/ClerkErrors" }
+            "schema": {
+              "$ref": "#/components/schemas/ClerkErrors"
+            }
           }
         }
       },
@@ -765,7 +1241,9 @@
         "description": "Authorization invalid",
         "content": {
           "application/json": {
-            "schema": { "$ref": "#/components/schemas/ClerkErrors" }
+            "schema": {
+              "$ref": "#/components/schemas/ClerkErrors"
+            }
           }
         }
       },
@@ -773,7 +1251,9 @@
         "description": "Invalid request parameters",
         "content": {
           "application/json": {
-            "schema": { "$ref": "#/components/schemas/ClerkErrors" }
+            "schema": {
+              "$ref": "#/components/schemas/ClerkErrors"
+            }
           }
         }
       },
@@ -781,7 +1261,9 @@
         "description": "Resource not found",
         "content": {
           "application/json": {
-            "schema": { "$ref": "#/components/schemas/ClerkErrors" }
+            "schema": {
+              "$ref": "#/components/schemas/ClerkErrors"
+            }
           }
         }
       },
@@ -789,13 +1271,18 @@
         "description": "Conflict",
         "content": {
           "application/json": {
-            "schema": { "$ref": "#/components/schemas/ClerkErrors" }
+            "schema": {
+              "$ref": "#/components/schemas/ClerkErrors"
+            }
           }
         }
       }
     }
   },
   "x-tagGroups": [
-    { "name": "Core Resources", "tags": ["Applications", "Domains"] }
+    {
+      "name": "Core Resources",
+      "tags": ["Applications", "Domains", "Application Transfers"]
+    }
   ]
 }
