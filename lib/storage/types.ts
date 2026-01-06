@@ -17,4 +17,8 @@ export interface ClerkAppData {
   name: string;
   createdAt: number;
   publishableKey?: string;
+  /** Whether the app has been claimed (transferred to user's Clerk account) */
+  claimed?: boolean;
+  /** The transfer code used to claim the app */
+  transferCode?: string;
 }

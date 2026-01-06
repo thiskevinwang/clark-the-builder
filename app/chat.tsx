@@ -53,14 +53,6 @@ export function Chat({ className }: Props) {
 
   return (
     <Panel className={className} variant="ghost">
-      {/* <PanelHeader>
-        <div className="flex items-center font-medium">
-          <MessageCircleIcon className="mr-2 w-4 text-primary" />
-          Chat
-        </div>
-        <div className="ml-auto text-xs text-muted-foreground">{status}</div>
-      </PanelHeader> */}
-
       {/* Messages Area */}
       {messages.length === 0 ? (
         <div className="flex-1 min-h-0">

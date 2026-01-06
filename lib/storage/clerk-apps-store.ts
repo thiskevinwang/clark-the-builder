@@ -1,9 +1,9 @@
 "use client";
 
-import type { ClerkAppData } from "./types";
-import { storage } from "./local-storage";
-import { create } from "zustand";
 import { useEffect } from "react";
+import { create } from "zustand";
+import { storage } from "./local-storage";
+import type { ClerkAppData } from "./types";
 
 const CLERK_APPS_KEY = "clerk-apps";
 
@@ -13,6 +13,7 @@ interface ClerkAppsStore {
   loadApps: () => Promise<void>;
   addApp: (app: ClerkAppData) => Promise<void>;
   removeApp: (applicationId: string) => Promise<void>;
+  claimApp: (applicationId: string, transferCode: string) => Promise<void>;
 }
 
 export const useClerkAppsStore = create<ClerkAppsStore>()((set, get) => ({
@@ -39,6 +40,17 @@ export const useClerkAppsStore = create<ClerkAppsStore>()((set, get) => ({
     const currentApps = get().apps;
     const updatedApps = currentApps.filter(
       (app) => app.applicationId !== applicationId
+    );
+    await storage.set(CLERK_APPS_KEY, updatedApps);
+    set({ apps: updatedApps });
+  },
+
+  claimApp: async (applicationId: string, transferCode: string) => {
+    const currentApps = get().apps;
+    const updatedApps = currentApps.map((app) =>
+      app.applicationId === applicationId
+        ? { ...app, claimed: true, transferCode }
+        : app
     );
     await storage.set(CLERK_APPS_KEY, updatedApps);
     set({ apps: updatedApps });

@@ -1,14 +1,29 @@
+"use client";
+
 import type { DataPart } from "@/ai/messages/data-parts";
-import { KeyRoundIcon, CheckIcon, XIcon } from "lucide-react";
-import { Spinner } from "./spinner";
+import { ClaimAppModal } from "@/components/modals/claim-app-modal";
+import { Button } from "@/components/ui/button";
+import { useClerkAppsStore } from "@/lib/storage/clerk-apps-store";
+import { CheckIcon, GiftIcon, KeyRoundIcon, XIcon } from "lucide-react";
+import { useState } from "react";
 import { ToolHeader } from "../tool-header";
 import { ToolMessage } from "../tool-message";
+import { Spinner } from "./spinner";
 
 interface Props {
   message: DataPart["create-clerk-app"];
 }
 
 export function CreateClerkApp({ message }: Props) {
+  const [claimModalOpen, setClaimModalOpen] = useState(false);
+  const { apps } = useClerkAppsStore();
+
+  // Check if this app has already been claimed
+  const claimedApp = message.applicationId
+    ? apps.find((app) => app.applicationId === message.applicationId)
+    : null;
+  const isClaimed = claimedApp?.claimed ?? false;
+
   return (
     <ToolMessage>
       <ToolHeader>
@@ -26,14 +41,44 @@ export function CreateClerkApp({ message }: Props) {
             <CheckIcon className="w-4 h-4" />
           )}
         </Spinner>
-        <span>
-          {message.status === "done" && `Clerk app created: "${message.name}"`}
-          {message.status === "loading" &&
-            `Creating Clerk app "${message.name}"`}
-          {message.status === "error" &&
-            `Failed to create Clerk app "${message.name}"`}
-        </span>
+        <div className="flex items-center gap-3">
+          <span>
+            {message.status === "done" &&
+              `Clerk app created: "${message.name}"`}
+            {message.status === "loading" &&
+              `Creating Clerk app "${message.name}"`}
+            {message.status === "error" &&
+              `Failed to create Clerk app "${message.name}"`}
+          </span>
+          {message.status === "done" &&
+            message.applicationId &&
+            (isClaimed ? (
+              <span className="inline-flex items-center gap-1 text-xs text-muted-foreground bg-secondary px-2 py-1 rounded-md">
+                <CheckIcon className="w-3 h-3" />
+                Claimed
+              </span>
+            ) : (
+              <Button
+                variant="default"
+                size="sm"
+                onClick={() => setClaimModalOpen(true)}
+                className="h-7 text-xs gap-1.5"
+              >
+                <GiftIcon className="w-3 h-3" />
+                Claim
+              </Button>
+            ))}
+        </div>
       </div>
+
+      {message.applicationId && (
+        <ClaimAppModal
+          open={claimModalOpen}
+          onOpenChange={setClaimModalOpen}
+          applicationId={message.applicationId}
+          appName={message.name}
+        />
+      )}
     </ToolMessage>
   );
 }
