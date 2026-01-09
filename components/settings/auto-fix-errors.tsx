@@ -13,15 +13,10 @@ export function AutoFixErrors() {
         id="auto-fix"
         className="mt-0.5 pointer-events-none"
         checked={fixErrors}
-        onCheckedChange={(checked) =>
-          setFixErrors(checked === "indeterminate" ? false : checked)
-        }
+        onCheckedChange={(checked) => setFixErrors(checked === "indeterminate" ? false : checked)}
       />
       <div className="space-y-0.5 flex-1 pointer-events-none">
-        <Label
-          className="text-sm font-medium text-foreground"
-          htmlFor="auto-fix"
-        >
+        <Label className="text-sm font-medium text-foreground" htmlFor="auto-fix">
           Auto-fix errors
         </Label>
         <p className="text-xs text-muted-foreground leading-relaxed">

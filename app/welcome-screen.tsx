@@ -1,5 +1,8 @@
 "use client";
 
+import { useChat } from "@ai-sdk/react";
+import { ArrowUpIcon, HistoryIcon, PanelLeftIcon, PlusIcon } from "lucide-react";
+
 import type { ChatUIMessage } from "@/components/chat/types";
 import { ClarkAvatar } from "@/components/clark-avatar";
 import { ModelSelector } from "@/components/settings/model-selector";
@@ -13,20 +16,9 @@ import {
   InputGroupButton,
   InputGroupTextarea,
 } from "@/components/ui/input-group";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useSharedChatContext } from "@/lib/chat-context";
 import { useLocalStorageValue } from "@/lib/use-local-storage-value";
-import { useChat } from "@ai-sdk/react";
-import {
-  ArrowUpIcon,
-  HistoryIcon,
-  PanelLeftIcon,
-  PlusIcon,
-} from "lucide-react";
 
 interface Props {
   onMessageSent: () => void;
@@ -126,10 +118,7 @@ export function WelcomeScreen({ onMessageSent }: Props) {
                 value={input}
                 className="text-base"
               />
-              <InputGroupAddon
-                align="block-end"
-                className="border-t border-border/30"
-              >
+              <InputGroupAddon align="block-end" className="border-t border-border/30">
                 <div className="flex items-center gap-1">
                   <InputGroupButton
                     type="button"
@@ -175,9 +164,7 @@ export function WelcomeScreen({ onMessageSent }: Props) {
 
         {/* Quick prompts */}
         <div className="mt-8 w-full animate-in fade-in slide-in-from-bottom-8 duration-700 delay-300">
-          <p className="text-sm text-muted-foreground text-center mb-4">
-            Try one of these
-          </p>
+          <p className="text-sm text-muted-foreground text-center mb-4">Try one of these</p>
           <div className="grid gap-3 md:grid-cols-2">
             <QuickPromptCard
               title="Next.js Starter"
@@ -191,7 +178,7 @@ export function WelcomeScreen({ onMessageSent }: Props) {
               description="Build with Organizations and Billing"
               onClick={() => {
                 setInput(
-                  "Build a b2b SaaS app. Use the clerk `b2b-saas` template, which has Organizations and Billing enabled. Build a single landing page and render the `<PricingTable for={'organization'}/>` component"
+                  "Build a b2b SaaS app. Use the clerk `b2b-saas` template, which has Organizations and Billing enabled. Build a single landing page and render the `<PricingTable for={'organization'}/>` component",
                 );
               }}
             />
@@ -200,7 +187,7 @@ export function WelcomeScreen({ onMessageSent }: Props) {
               description="Create a waitlist with Clerk's component"
               onClick={() => {
                 setInput(
-                  "Build a waitlist page. Use the clerk `waitlist` template & `<Waitlist/>` component"
+                  "Build a waitlist page. Use the clerk `waitlist` template & `<Waitlist/>` component",
                 );
               }}
             />
@@ -217,11 +204,7 @@ interface QuickPromptCardProps {
   onClick: () => void;
 }
 
-function QuickPromptCard({
-  title,
-  description,
-  onClick,
-}: QuickPromptCardProps) {
+function QuickPromptCard({ title, description, onClick }: QuickPromptCardProps) {
   return (
     <button
       type="button"

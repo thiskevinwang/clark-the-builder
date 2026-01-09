@@ -1,17 +1,14 @@
 "use client";
 
-import {
-  ChevronRightIcon,
-  ChevronDownIcon,
-  FolderIcon,
-  FileIcon,
-} from "lucide-react";
+import { ChevronRightIcon, ChevronDownIcon, FolderIcon, FileIcon } from "lucide-react";
+import { useState, useMemo, useEffect, useCallback, memo } from "react";
+
 import { FileContent } from "@/components/file-explorer/file-content";
 import { Panel, PanelHeader } from "@/components/panels/panels";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import { buildFileTree, type FileNode } from "./build-file-tree";
-import { useState, useMemo, useEffect, useCallback, memo } from "react";
 import { cn } from "@/lib/utils";
+
+import { buildFileTree, type FileNode } from "./build-file-tree";
 
 interface Props {
   className: string;
@@ -70,7 +67,7 @@ export const FileExplorer = memo(function FileExplorer({
         />
       ));
     },
-    [selected, toggleFolder, selectFile]
+    [selected, toggleFolder, selectFile],
   );
 
   return (
@@ -79,9 +76,7 @@ export const FileExplorer = memo(function FileExplorer({
         <FileIcon className="w-4 mr-2 text-primary" />
         <span className="font-medium">Files</span>
         {selected && !disabled && (
-          <span className="ml-auto text-xs text-muted-foreground font-mono">
-            {selected.path}
-          </span>
+          <span className="ml-auto text-xs text-muted-foreground font-mono">{selected.path}</span>
         )}
       </PanelHeader>
 
@@ -91,10 +86,7 @@ export const FileExplorer = memo(function FileExplorer({
         </ScrollArea>
         {selected && sandboxId && !disabled && (
           <ScrollArea className="w-3/4 shrink-0">
-            <FileContent
-              sandboxId={sandboxId}
-              path={selected.path.substring(1)}
-            />
+            <FileContent sandboxId={sandboxId} path={selected.path.substring(1)} />
             <ScrollBar orientation="horizontal" />
           </ScrollArea>
         )}
@@ -135,7 +127,7 @@ const FileTreeNode = memo(function FileTreeNode({
           "hover:bg-accent",
           selected?.path === node.path
             ? "bg-accent text-accent-foreground"
-            : "text-muted-foreground"
+            : "text-muted-foreground",
         )}
         style={{ paddingLeft: `${depth * 16 + 8}px` }}
         onClick={handleClick}

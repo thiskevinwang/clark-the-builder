@@ -55,9 +55,6 @@ Run the app
 bun run dev
 ```
 
-
-
-
 ---
 
 This project was cloned from https://oss-vibe-coding-platform.vercel.app/

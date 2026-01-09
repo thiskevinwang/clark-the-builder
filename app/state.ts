@@ -1,10 +1,12 @@
-import type { Command, CommandLog } from "@/components/commands-logs/types";
-import type { DataPart } from "@/ai/messages/data-parts";
 import type { ChatStatus, DataUIPart } from "ai";
-import { useClerkAppsStore } from "@/lib/storage/clerk-apps-store";
-import { useMonitorState } from "@/components/error-monitor/state";
 import { useMemo } from "react";
 import { create } from "zustand";
+
+import type { DataPart } from "@/ai/messages/data-parts";
+
+import type { Command, CommandLog } from "@/components/commands-logs/types";
+import { useMonitorState } from "@/components/error-monitor/state";
+import { useClerkAppsStore } from "@/lib/storage/clerk-apps-store";
 
 interface SandboxStore {
   addGeneratedFiles: (files: string[]) => void;
@@ -29,7 +31,7 @@ interface SandboxStore {
 function getBackgroundCommandErrorLines(commands: Command[]) {
   return commands
     .flatMap(({ command, args, background, logs = [] }) =>
-      logs.map((log) => ({ command, args, background, ...log }))
+      logs.map((log) => ({ command, args, background, ...log })),
     )
     .sort((logA, logB) => logA.timestamp - logB.timestamp)
     .filter((log) => log.stream === "stderr" && log.background);
@@ -37,10 +39,7 @@ function getBackgroundCommandErrorLines(commands: Command[]) {
 
 export function useCommandErrorsLogs() {
   const { commands } = useSandboxStore();
-  const errors = useMemo(
-    () => getBackgroundCommandErrorLines(commands),
-    [commands]
-  );
+  const errors = useMemo(() => getBackgroundCommandErrorLines(commands), [commands]);
   return { errors };
 }
 
@@ -64,17 +63,14 @@ export const useSandboxStore = create<SandboxStore>()((set) => ({
       return { commands: updatedCmds };
     });
   },
-  addPaths: (paths) =>
-    set((state) => ({ paths: [...new Set([...state.paths, ...paths])] })),
+  addPaths: (paths) => set((state) => ({ paths: [...new Set([...state.paths, ...paths])] })),
   chatStatus: "ready",
   clearGeneratedFiles: () => set(() => ({ generatedFiles: new Set<string>() })),
   commands: [],
   generatedFiles: new Set<string>(),
   paths: [],
   setChatStatus: (status) =>
-    set((state) =>
-      state.chatStatus === status ? state : { chatStatus: status }
-    ),
+    set((state) => (state.chatStatus === status ? state : { chatStatus: status })),
   setSandboxId: (sandboxId) =>
     set(() => ({
       sandboxId,
@@ -88,9 +84,7 @@ export const useSandboxStore = create<SandboxStore>()((set) => ({
   setUrl: (url, urlUUID) => set(() => ({ url, urlUUID })),
   upsertCommand: (cmd) => {
     set((state) => {
-      const existingIdx = state.commands.findIndex(
-        (c) => c.cmdId === cmd.cmdId
-      );
+      const existingIdx = state.commands.findIndex((c) => c.cmdId === cmd.cmdId);
       const idx = existingIdx !== -1 ? existingIdx : state.commands.length;
       const prev = state.commands[idx] ?? { startedAt: Date.now(), logs: [] };
       const cmds = [...state.commands];
@@ -118,8 +112,7 @@ export const useFileExplorerStore = create<FileExplorerStore>()((set) => ({
 }));
 
 export function useDataStateMapper() {
-  const { addPaths, setSandboxId, setUrl, upsertCommand, addGeneratedFiles } =
-    useSandboxStore();
+  const { addPaths, setSandboxId, setUrl, upsertCommand, addGeneratedFiles } = useSandboxStore();
   const { errors } = useCommandErrorsLogs();
   const { setCursor } = useMonitorState();
   const { addApp } = useClerkAppsStore();
@@ -132,11 +125,7 @@ export function useDataStateMapper() {
         }
         break;
       case "data-create-clerk-app":
-        if (
-          data.data.status === "done" &&
-          data.data.applicationId &&
-          data.data.name
-        ) {
+        if (data.data.status === "done" && data.data.applicationId && data.data.name) {
           addApp({
             applicationId: data.data.applicationId,
             name: data.data.name,

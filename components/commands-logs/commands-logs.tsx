@@ -1,10 +1,12 @@
 "use client";
 
-import type { Command } from "./types";
-import { Panel, PanelHeader } from "@/components/panels/panels";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { SquareChevronRight } from "lucide-react";
 import { useEffect, useRef } from "react";
+
+import { Panel, PanelHeader } from "@/components/panels/panels";
+import { ScrollArea } from "@/components/ui/scroll-area";
+
+import type { Command } from "./types";
 
 interface Props {
   className?: string;
@@ -28,15 +30,12 @@ export function CommandsLogs(props: Props) {
         <ScrollArea className="h-full">
           <div className="p-3 space-y-3">
             {props.commands.map((command) => {
-              const date = new Date(command.startedAt).toLocaleTimeString(
-                "en-US",
-                {
-                  hour12: false,
-                  hour: "2-digit",
-                  minute: "2-digit",
-                  second: "2-digit",
-                }
-              );
+              const date = new Date(command.startedAt).toLocaleTimeString("en-US", {
+                hour12: false,
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit",
+              });
 
               const line = `${command.command} ${command.args.join(" ")}`;
               const body = command.logs?.map((log) => log.data).join("") || "";
@@ -46,9 +45,7 @@ export function CommandsLogs(props: Props) {
                   className="whitespace-pre-wrap font-mono text-xs text-muted-foreground bg-secondary/50 rounded-md p-2"
                 >
                   <span className="text-primary">[{date}]</span> {line}
-                  {body && (
-                    <span className="block mt-1 text-foreground">{body}</span>
-                  )}
+                  {body && <span className="block mt-1 text-foreground">{body}</span>}
                 </pre>
               );
             })}

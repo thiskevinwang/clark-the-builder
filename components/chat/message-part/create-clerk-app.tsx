@@ -1,11 +1,14 @@
 "use client";
 
+import { CheckIcon, GiftIcon, XIcon } from "lucide-react";
+import { useState } from "react";
+
 import type { DataPart } from "@/ai/messages/data-parts";
+
 import { ClaimAppModal } from "@/components/modals/claim-app-modal";
 import { Button } from "@/components/ui/button";
 import { useClerkAppsStore } from "@/lib/storage/clerk-apps-store";
-import { CheckIcon, GiftIcon, KeyRoundIcon, XIcon } from "lucide-react";
-import { useState } from "react";
+
 import { ToolHeader } from "../tool-header";
 import { ToolMessage } from "../tool-message";
 import { Spinner } from "./spinner";
@@ -26,13 +29,10 @@ export function CreateClerkApp({ message }: Props) {
 
   return (
     <ToolMessage>
-      <ToolHeader>
-        <KeyRoundIcon className="w-3.5 h-3.5" />
-        Create Clerk App
-      </ToolHeader>
+      <ToolHeader>Create Clerk App</ToolHeader>
       <div className="relative pl-6 min-h-5">
         <Spinner
-          className="absolute left-0 top-0"
+          className="absolute left-0 top-1/2 -translate-y-1/2"
           loading={message.status === "loading"}
         >
           {message.status === "error" ? (
@@ -43,17 +43,14 @@ export function CreateClerkApp({ message }: Props) {
         </Spinner>
         <div className="flex items-center gap-3">
           <span>
-            {message.status === "done" &&
-              `Clerk app created: "${message.name}"`}
-            {message.status === "loading" &&
-              `Creating Clerk app "${message.name}"`}
-            {message.status === "error" &&
-              `Failed to create Clerk app "${message.name}"`}
+            {message.status === "done" && `Clerk app created: "${message.name}"`}
+            {message.status === "loading" && `Creating Clerk app "${message.name}"`}
+            {message.status === "error" && `Failed to create Clerk app "${message.name}"`}
           </span>
           {message.status === "done" &&
             message.applicationId &&
             (isClaimed ? (
-              <span className="inline-flex items-center gap-1 text-xs text-muted-foreground bg-secondary px-2 py-1 rounded-md">
+              <span className="ml-auto inline-flex items-center gap-1 text-xs text-muted-foreground bg-secondary px-2 py-1 rounded-md">
                 <CheckIcon className="w-3 h-3" />
                 Claimed
               </span>
@@ -62,7 +59,7 @@ export function CreateClerkApp({ message }: Props) {
                 variant="default"
                 size="sm"
                 onClick={() => setClaimModalOpen(true)}
-                className="h-7 text-xs gap-1.5"
+                className="ml-auto h-7 text-xs gap-1.5"
               >
                 <GiftIcon className="w-3 h-3" />
                 Claim

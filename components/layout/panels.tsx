@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useRef,
-  useState,
-} from "react";
+import { createContext, useCallback, useContext, useRef, useState } from "react";
 import {
   Panel,
   PanelGroup,
@@ -14,6 +8,7 @@ import {
   type ImperativePanelGroupHandle,
   type ImperativePanelHandle,
 } from "react-resizable-panels";
+
 import { HORIZONTAL_COOKIE, VERTICAL_COOKIE } from "./sizing";
 
 interface ChatPanelContextValue {

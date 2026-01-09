@@ -1,17 +1,16 @@
-import type { UIMessageStreamWriter, UIMessage } from "ai";
-import type { DataPart } from "../messages/data-parts";
 import { Sandbox } from "@vercel/sandbox";
-import { getContents, type File } from "./generate-files/get-contents";
-import { getRichError } from "./get-rich-error";
-import { getWriteFiles } from "./generate-files/get-write-files";
+import type { UIMessageStreamWriter, UIMessage } from "ai";
 import { tool } from "ai";
-import description from "./generate-files.prompt.md";
 import z from "zod/v3";
 
+import type { DataPart } from "../messages/data-parts";
+import description from "./generate-files.prompt.md";
+import { getContents, type File } from "./generate-files/get-contents";
+import { getWriteFiles } from "./generate-files/get-write-files";
+import { getRichError } from "./get-rich-error";
+
 const fileSchema = z.object({
-  path: z
-    .string()
-    .describe("Path to the file in the sandbox (e.g., '.env', 'config.json')"),
+  path: z.string().describe("Path to the file in the sandbox (e.g., '.env', 'config.json')"),
   content: z.string().describe("The content of the file"),
 });
 
@@ -30,13 +29,10 @@ export const generateFiles = ({ writer, modelId }: Params) =>
         .array(fileSchema)
         .optional()
         .describe(
-          "Array of files with predefined content to upload directly without AI generation. Use this for files like .env that contain secrets from previous tool calls (e.g., Clerk keys from createClerkApp). These files are uploaded first, before the AI-generated files."
+          "Array of files with predefined content to upload directly without AI generation. Use this for files like .env that contain secrets from previous tool calls (e.g., Clerk keys from createClerkApp). These files are uploaded first, before the AI-generated files.",
         ),
     }),
-    execute: async (
-      { sandboxId, paths, files: predefinedFiles },
-      { toolCallId, messages }
-    ) => {
+    execute: async ({ sandboxId, paths, files: predefinedFiles }, { toolCallId, messages }) => {
       writer.write({
         id: toolCallId,
         type: "data-generating-files",
@@ -156,8 +152,6 @@ export const generateFiles = ({ writer, modelId }: Params) =>
       return `Successfully generated and uploaded ${
         uploaded.length
       } files. Their paths and contents are as follows:
-        ${uploaded
-          .map((file) => `Path: ${file.path}\nContent: ${file.content}\n`)
-          .join("\n")}`;
+        ${uploaded.map((file) => `Path: ${file.path}\nContent: ${file.content}\n`).join("\n")}`;
     },
   });

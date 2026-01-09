@@ -1,6 +1,11 @@
 "use client";
 
+import { useChat } from "@ai-sdk/react";
+import { ArrowUpIcon } from "lucide-react";
+import { useCallback, useEffect } from "react";
+
 import { TEST_PROMPTS } from "@/ai/constants";
+
 import {
   Conversation,
   ConversationContent,
@@ -20,9 +25,7 @@ import {
 } from "@/components/ui/input-group";
 import { useSharedChatContext } from "@/lib/chat-context";
 import { useLocalStorageValue } from "@/lib/use-local-storage-value";
-import { useChat } from "@ai-sdk/react";
-import { ArrowUpIcon } from "lucide-react";
-import { useCallback, useEffect } from "react";
+
 import { useSandboxStore } from "./state";
 
 interface Props {
@@ -44,7 +47,7 @@ export function Chat({ className }: Props) {
         setInput("");
       }
     },
-    [sendMessage, modelId, setInput, reasoningEffort]
+    [sendMessage, modelId, setInput, reasoningEffort],
   );
 
   useEffect(() => {

@@ -1,20 +1,6 @@
 "use client";
 
 import {
-  buildFileTree,
-  type FileNode,
-} from "@/components/file-explorer/build-file-tree";
-import { FileContent } from "@/components/file-explorer/file-content";
-import { useChatPanel } from "@/components/layout/panels";
-import { Panel } from "@/components/panels/panels";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { cn } from "@/lib/utils";
-import {
   ChevronDownIcon,
   ChevronRightIcon,
   Code2Icon,
@@ -29,6 +15,14 @@ import {
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { BarLoader } from "react-spinners";
 
+import { buildFileTree, type FileNode } from "@/components/file-explorer/build-file-tree";
+import { FileContent } from "@/components/file-explorer/file-content";
+import { useChatPanel } from "@/components/layout/panels";
+import { Panel } from "@/components/panels/panels";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { cn } from "@/lib/utils";
+
 type ViewMode = "preview" | "files";
 
 interface Props {
@@ -39,13 +33,7 @@ interface Props {
   sandboxId?: string;
 }
 
-export function PreviewPanel({
-  className,
-  disabled,
-  url,
-  paths,
-  sandboxId,
-}: Props) {
+export function PreviewPanel({ className, disabled, url, paths, sandboxId }: Props) {
   const [viewMode, setViewMode] = useState<ViewMode>("preview");
   const [currentUrl, setCurrentUrl] = useState(url);
   const [error, setError] = useState<string | null>(null);
@@ -141,7 +129,7 @@ export function PreviewPanel({
         />
       ));
     },
-    [selected, toggleFolder, selectFile]
+    [selected, toggleFolder, selectFile],
   );
 
   return (
@@ -162,7 +150,7 @@ export function PreviewPanel({
                     "p-1.5 transition-colors border-r border-border",
                     viewMode === "preview"
                       ? "text-primary bg-primary/10"
-                      : "text-muted-foreground hover:text-foreground"
+                      : "text-muted-foreground hover:text-foreground",
                   )}
                 >
                   <EyeIcon className="w-3.5 h-3.5" />
@@ -179,7 +167,7 @@ export function PreviewPanel({
                     "p-1.5 transition-colors",
                     viewMode === "files"
                       ? "text-primary bg-primary/10"
-                      : "text-muted-foreground hover:text-foreground"
+                      : "text-muted-foreground hover:text-foreground",
                   )}
                 >
                   <Code2Icon className="w-3.5 h-3.5" />
@@ -223,7 +211,7 @@ export function PreviewPanel({
                 type="button"
                 className={cn(
                   "p-1.5 text-muted-foreground hover:text-foreground transition-colors border-r border-border",
-                  { "animate-spin": isLoading }
+                  { "animate-spin": isLoading },
                 )}
                 title="Refresh"
               >
@@ -260,17 +248,13 @@ export function PreviewPanel({
                 {isLoading && !error && (
                   <div className="absolute inset-0 bg-card/90 flex items-center justify-center flex-col gap-3 z-10">
                     <BarLoader color="var(--primary)" />
-                    <span className="text-muted-foreground text-sm">
-                      Loading...
-                    </span>
+                    <span className="text-muted-foreground text-sm">Loading...</span>
                   </div>
                 )}
 
                 {error && (
                   <div className="absolute inset-0 bg-card flex items-center justify-center flex-col gap-3 z-10">
-                    <span className="text-destructive font-medium">
-                      Failed to load page
-                    </span>
+                    <span className="text-destructive font-medium">Failed to load page</span>
                     <button
                       className="text-primary hover:underline text-sm font-medium"
                       type="button"
@@ -298,10 +282,7 @@ export function PreviewPanel({
             </ScrollArea>
             {selected && sandboxId && !disabled && (
               <ScrollArea className="w-3/4 shrink-0">
-                <FileContent
-                  sandboxId={sandboxId}
-                  path={selected.path.substring(1)}
-                />
+                <FileContent sandboxId={sandboxId} path={selected.path.substring(1)} />
                 <ScrollBar orientation="horizontal" />
               </ScrollArea>
             )}
@@ -332,9 +313,7 @@ function ChatPanelToggle() {
             )}
           </button>
         </TooltipTrigger>
-        <TooltipContent>
-          {isCollapsed ? "Show chat" : "Hide chat"}
-        </TooltipContent>
+        <TooltipContent>{isCollapsed ? "Show chat" : "Hide chat"}</TooltipContent>
       </Tooltip>
     </div>
   );
@@ -372,7 +351,7 @@ const FileTreeNode = memo(function FileTreeNode({
           "hover:bg-accent",
           selected?.path === node.path
             ? "bg-accent text-accent-foreground"
-            : "text-muted-foreground"
+            : "text-muted-foreground",
         )}
         style={{ paddingLeft: `${depth * 16 + 8}px` }}
         onClick={handleClick}

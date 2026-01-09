@@ -1,5 +1,8 @@
 "use client";
 
+import { Loader2Icon } from "lucide-react";
+import { useMemo } from "react";
+
 import {
   Select,
   SelectContent,
@@ -10,8 +13,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
-import { Loader2Icon } from "lucide-react";
-import { useMemo } from "react";
+
 import { useAvailableModels } from "./use-available-models";
 import { useModelId } from "./use-settings";
 
@@ -20,7 +22,7 @@ export function ModelSelector({ className }: { className?: string }) {
   const { models: available, isLoading, error } = useAvailableModels();
   const models = useMemo(
     () => available?.sort((a, b) => a.label.localeCompare(b.label)) || [],
-    [available]
+    [available],
   );
 
   return (
@@ -41,7 +43,7 @@ export function ModelSelector({ className }: { className?: string }) {
           // ghost
           "border-none shadow-none bg-transparent text-muted-foreground hover:text-foreground hover:bg-accent gap-1.5 px-2",
 
-          className
+          className,
         )}
       >
         {isLoading ? (

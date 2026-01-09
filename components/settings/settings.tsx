@@ -1,12 +1,10 @@
-import { AutoFixErrors } from "./auto-fix-errors";
-import { Button } from "@/components/ui/button";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { ReasoningEffort } from "./reasoning-effort";
 import { SlidersVerticalIcon } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+
+import { AutoFixErrors } from "./auto-fix-errors";
+import { ReasoningEffort } from "./reasoning-effort";
 
 export function Settings() {
   return (
@@ -23,9 +21,7 @@ export function Settings() {
       <PopoverContent className="w-80 p-0" align="start">
         <div className="p-4 border-b border-border">
           <h4 className="text-sm font-medium text-foreground">Settings</h4>
-          <p className="text-xs text-muted-foreground mt-0.5">
-            Configure your chat preferences
-          </p>
+          <p className="text-xs text-muted-foreground mt-0.5">Configure your chat preferences</p>
         </div>
         <div className="p-4 space-y-5">
           <AutoFixErrors />

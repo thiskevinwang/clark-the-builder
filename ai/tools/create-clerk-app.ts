@@ -1,11 +1,13 @@
 import type { UIMessageStreamWriter, UIMessage } from "ai";
-import type { DataPart } from "../messages/data-parts";
+import { tool } from "ai";
+import z from "zod/v3";
+
 import { platformCreateApplication } from "@/lib/api";
 import { createClient, createConfig } from "@/lib/api/client";
-import { getRichError } from "./get-rich-error";
-import { tool } from "ai";
+
+import type { DataPart } from "../messages/data-parts";
 import description from "./create-clerk-app.prompt.md";
-import z from "zod/v3";
+import { getRichError } from "./get-rich-error";
 
 interface Params {
   writer: UIMessageStreamWriter<UIMessage<never, DataPart>>;
@@ -18,7 +20,7 @@ export const createClerkApp = ({ writer }: Params) =>
       name: z
         .string()
         .describe(
-          "The name for the Clerk application. This should be descriptive of the project being built."
+          "The name for the Clerk application. This should be descriptive of the project being built.",
         ),
       template: z
         .enum(["b2b-saas", "waitlist"])
@@ -35,8 +37,7 @@ export const createClerkApp = ({ writer }: Params) =>
       const clerkPlatformToken = process.env.CLERK_PLATFORM_ACCESS_TOKEN;
 
       if (!clerkPlatformToken) {
-        const errorMessage =
-          "CLERK_PLATFORM_ACCESS_TOKEN environment variable is not set";
+        const errorMessage = "CLERK_PLATFORM_ACCESS_TOKEN environment variable is not set";
         writer.write({
           id: toolCallId,
           type: "data-create-clerk-app",
@@ -56,7 +57,7 @@ export const createClerkApp = ({ writer }: Params) =>
             headers: {
               Authorization: `Bearer ${clerkPlatformToken}`,
             },
-          })
+          }),
         );
 
         const response = await platformCreateApplication({
@@ -70,8 +71,7 @@ export const createClerkApp = ({ writer }: Params) =>
 
         if (response.error) {
           const errorMessage =
-            response.error.errors?.[0]?.message ??
-            "Unknown error creating Clerk app";
+            response.error.errors?.[0]?.message ?? "Unknown error creating Clerk app";
           writer.write({
             id: toolCallId,
             type: "data-create-clerk-app",
@@ -85,13 +85,10 @@ export const createClerkApp = ({ writer }: Params) =>
         }
 
         const application = response.data;
-        const devInstance = application.instances.find(
-          (i) => i.environment_type === "development"
-        );
+        const devInstance = application.instances.find((i) => i.environment_type === "development");
 
         if (!devInstance) {
-          const errorMessage =
-            "No development instance found in created application";
+          const errorMessage = "No development instance found in created application";
           writer.write({
             id: toolCallId,
             type: "data-create-clerk-app",

@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { create } from "zustand";
+
 import { storage } from "./local-storage";
 import type { ClerkAppData } from "./types";
 
@@ -38,9 +39,7 @@ export const useClerkAppsStore = create<ClerkAppsStore>()((set, get) => ({
 
   removeApp: async (applicationId: string) => {
     const currentApps = get().apps;
-    const updatedApps = currentApps.filter(
-      (app) => app.applicationId !== applicationId
-    );
+    const updatedApps = currentApps.filter((app) => app.applicationId !== applicationId);
     await storage.set(CLERK_APPS_KEY, updatedApps);
     set({ apps: updatedApps });
   },
@@ -48,9 +47,7 @@ export const useClerkAppsStore = create<ClerkAppsStore>()((set, get) => ({
   claimApp: async (applicationId: string, transferCode: string) => {
     const currentApps = get().apps;
     const updatedApps = currentApps.map((app) =>
-      app.applicationId === applicationId
-        ? { ...app, claimed: true, transferCode }
-        : app
+      app.applicationId === applicationId ? { ...app, claimed: true, transferCode } : app,
     );
     await storage.set(CLERK_APPS_KEY, updatedApps);
     set({ apps: updatedApps });

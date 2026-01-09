@@ -1,5 +1,8 @@
 "use client";
 
+import { CheckCircle2Icon, ExternalLinkIcon, KeyRoundIcon, Loader2Icon } from "lucide-react";
+import { useCallback, useState } from "react";
+
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -11,13 +14,6 @@ import {
 } from "@/components/ui/dialog";
 import type { PlatformApplicationTransferResponse } from "@/lib/api";
 import { useClerkAppsStore } from "@/lib/storage/clerk-apps-store";
-import {
-  CheckCircle2Icon,
-  ExternalLinkIcon,
-  KeyRoundIcon,
-  Loader2Icon,
-} from "lucide-react";
-import { useCallback, useState } from "react";
 
 type ClaimStep = "initial" | "loading" | "success" | "error";
 
@@ -28,12 +24,7 @@ interface Props {
   appName: string;
 }
 
-export function ClaimAppModal({
-  open,
-  onOpenChange,
-  applicationId,
-  appName,
-}: Props) {
+export function ClaimAppModal({ open, onOpenChange, applicationId, appName }: Props) {
   const [step, setStep] = useState<ClaimStep>("initial");
   const [transferCode, setTransferCode] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -44,27 +35,21 @@ export function ClaimAppModal({
     setError(null);
 
     try {
-      const response = await fetch(
-        `/api/applications/${applicationId}/transfer`,
-        {
-          method: "POST",
-        }
-      );
+      const response = await fetch(`/api/applications/${applicationId}/transfer`, {
+        method: "POST",
+      });
 
       if (!response.ok) {
         const data = await response.json();
         throw new Error(data.error || "Failed to create transfer");
       }
 
-      const transfer: PlatformApplicationTransferResponse =
-        await response.json();
+      const transfer: PlatformApplicationTransferResponse = await response.json();
       setTransferCode(transfer.code);
       await claimApp(applicationId, transfer.code);
       setStep("success");
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "An unexpected error occurred"
-      );
+      setError(err instanceof Error ? err.message : "An unexpected error occurred");
       setStep("error");
     }
   }, [applicationId, claimApp]);
@@ -95,10 +80,8 @@ export function ClaimAppModal({
             {step === "initial" && (
               <>
                 Transfer{" "}
-                <span className="font-medium text-foreground">
-                  &ldquo;{appName}&rdquo;
-                </span>{" "}
-                to your own Clerk account.
+                <span className="font-medium text-foreground">&ldquo;{appName}&rdquo;</span> to your
+                own Clerk account.
               </>
             )}
             {step === "loading" && "Creating transfer request..."}
@@ -111,9 +94,8 @@ export function ClaimAppModal({
           {step === "initial" && (
             <div className="space-y-3 text-sm text-muted-foreground">
               <p>
-                Claiming this app will transfer it to your Clerk account. Once
-                transferred, Clerk0 will no longer have access to manage this
-                app.
+                Claiming this app will transfer it to your Clerk account. Once transferred, Clerk0
+                will no longer have access to manage this app.
               </p>
               <p>Your app&apos;s configuration and data will be preserved.</p>
             </div>
@@ -130,22 +112,16 @@ export function ClaimAppModal({
               <div className="flex items-start gap-3 rounded-lg border border-green-500/20 bg-green-500/10 p-4">
                 <CheckCircle2Icon className="size-5 shrink-0 text-green-500" />
                 <div className="space-y-1">
-                  <p className="text-sm font-medium text-foreground">
-                    Transfer code generated
-                  </p>
+                  <p className="text-sm font-medium text-foreground">Transfer code generated</p>
                   <p className="text-sm text-muted-foreground">
-                    Visit the Clerk dashboard to complete the transfer and add
-                    this app to your account.
+                    Visit the Clerk dashboard to complete the transfer and add this app to your
+                    account.
                   </p>
                 </div>
               </div>
 
               <Button asChild className="w-full" size="lg">
-                <a
-                  href={dashboardUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
+                <a href={dashboardUrl} target="_blank" rel="noopener noreferrer">
                   Open Clerk Dashboard
                   <ExternalLinkIcon className="size-4" />
                 </a>

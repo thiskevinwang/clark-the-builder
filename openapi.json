@@ -990,14 +990,7 @@
             }
           }
         },
-        "required": [
-          "clerk_subdomain",
-          "from",
-          "to",
-          "verified",
-          "required",
-          "failure_hints"
-        ]
+        "required": ["clerk_subdomain", "from", "to", "verified", "required", "failure_hints"]
       },
       "DNSStatus": {
         "type": "object",
@@ -1062,13 +1055,7 @@
             "properties": {
               "status": {
                 "type": "string",
-                "enum": [
-                  "complete",
-                  "in_process",
-                  "not_started",
-                  "failed",
-                  "incomplete"
-                ]
+                "enum": ["complete", "in_process", "not_started", "failed", "incomplete"]
               },
               "required": {
                 "type": "boolean"

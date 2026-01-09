@@ -1,8 +1,11 @@
-import type { ChatUIMessage } from "./types";
-import { MessagePart } from "./message-part";
 import { BotIcon, UserIcon } from "lucide-react";
-import { memo, createContext, useContext, useState, useEffect } from "react";
+import { createContext, memo, useContext, useEffect, useState } from "react";
+
 import { cn } from "@/lib/utils";
+
+import { ResponseMessagePart } from "./message-part";
+import { TextPart } from "./message-part/text";
+import type { ChatUIMessage } from "./types";
 
 interface Props {
   message: ChatUIMessage;
@@ -21,9 +24,7 @@ export const useReasoningContext = () => {
 };
 
 export const Message = memo(function Message({ message }: Props) {
-  const [expandedReasoningIndex, setExpandedReasoningIndex] = useState<
-    number | null
-  >(null);
+  const [expandedReasoningIndex, setExpandedReasoningIndex] = useState<number | null>(null);
 
   const reasoningParts = message.parts
     .map((part, index) => ({ part, index }))
@@ -31,20 +32,19 @@ export const Message = memo(function Message({ message }: Props) {
 
   useEffect(() => {
     if (reasoningParts.length > 0) {
-      const latestReasoningIndex =
-        reasoningParts[reasoningParts.length - 1].index;
+      const latestReasoningIndex = reasoningParts[reasoningParts.length - 1].index;
       setExpandedReasoningIndex(latestReasoningIndex);
     }
   }, [reasoningParts]);
 
+  const isUserMessage = message.role === "user";
+
   return (
-    <ReasoningContext.Provider
-      value={{ expandedReasoningIndex, setExpandedReasoningIndex }}
-    >
+    <ReasoningContext.Provider value={{ expandedReasoningIndex, setExpandedReasoningIndex }}>
       <div
-        className={cn({
-          "mr-20": message.role === "assistant",
-          "ml-20": message.role === "user",
+        className={cn("flex flex-col", {
+          "": message.role === "assistant",
+          "ml-20 items-end": message.role === "user",
         })}
       >
         {/* Message Header */}
@@ -73,9 +73,13 @@ export const Message = memo(function Message({ message }: Props) {
 
         {/* Message Content */}
         <div className="space-y-1.5">
-          {message.parts.map((part, index) => (
-            <MessagePart key={index} part={part} partIndex={index} />
-          ))}
+          {message.role === "assistant" &&
+            message.parts.map((part, index) => (
+              <ResponseMessagePart key={index} part={part} partIndex={index} />
+            ))}
+          {message.role === "user" && (
+            <TextPart part={message.parts[0]} className="border border-border bg-muted max-w-96" />
+          )}
         </div>
       </div>
     </ReasoningContext.Provider>

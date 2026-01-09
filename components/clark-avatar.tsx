@@ -1,9 +1,10 @@
 "use client";
 
-import { cn } from "@/lib/utils";
 import { useTheme } from "next-themes";
 import Image from "next/image";
 import { useEffect, useState } from "react";
+
+import { cn } from "@/lib/utils";
 
 interface ClarkAvatarProps {
   size?: number;

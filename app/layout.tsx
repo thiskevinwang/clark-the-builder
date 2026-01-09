@@ -1,14 +1,16 @@
+import type { Metadata } from "next";
+import { Geist, Geist_Mono } from "next/font/google";
+import { NuqsAdapter } from "nuqs/adapters/next/app";
+import type { ReactNode } from "react";
+import { Suspense } from "react";
+
 import { CommandLogsStream } from "@/components/commands-logs/commands-logs-stream";
 import { ErrorMonitor } from "@/components/error-monitor/error-monitor";
 import { SandboxState } from "@/components/modals/sandbox-state";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { ChatProvider } from "@/lib/chat-context";
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import { NuqsAdapter } from "nuqs/adapters/next/app";
-import type { ReactNode } from "react";
-import { Suspense } from "react";
+
 import "./globals.css";
 
 const sansfont = Geist({
@@ -30,14 +32,10 @@ export const metadata: Metadata = {
   description,
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{ children: ReactNode }>) {
+export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body
-        className={`${sansfont.variable} ${monofont.variable} font-sans antialiased`}
-      >
+      <body className={`${sansfont.variable} ${monofont.variable} font-sans antialiased`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

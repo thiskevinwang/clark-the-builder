@@ -1,12 +1,8 @@
 import { anthropic } from "@ai-sdk/anthropic";
-import {
-  LEGACY_MODEL_ID_MAP,
-  MODEL_LABELS,
-  Models,
-  type ModelId,
-} from "./constants";
-import type { JSONValue } from "ai";
 import type { LanguageModelV2 } from "@ai-sdk/provider";
+import type { JSONValue } from "ai";
+
+import { LEGACY_MODEL_ID_MAP, MODEL_LABELS, Models, type ModelId } from "./constants";
 
 export async function getAvailableModels() {
   // We don't call an external "models" endpoint; we publish the supported list
@@ -25,7 +21,7 @@ export interface ModelOptions {
 
 export function getModelOptions(
   modelId: string,
-  options?: { reasoningEffort?: "minimal" | "low" | "medium" }
+  options?: { reasoningEffort?: "minimal" | "low" | "medium" },
 ): ModelOptions {
   // Ignore reasoning effort (OpenAI-only) but keep the signature stable.
   void options;

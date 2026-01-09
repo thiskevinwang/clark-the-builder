@@ -1,6 +1,8 @@
-'use client'
+"use client";
 
-import { Loader2Icon } from 'lucide-react'
+import { Loader2Icon } from "lucide-react";
+import { memo } from "react";
+
 import {
   Select,
   SelectContent,
@@ -9,20 +11,17 @@ import {
   SelectValue,
   SelectGroup,
   SelectLabel,
-} from '@/components/ui/select'
-import { memo } from 'react'
-import { useAvailableModels } from './use-available-models'
+} from "@/components/ui/select";
+
+import { useAvailableModels } from "./use-available-models";
 
 interface Props {
-  modelId: string
-  onModelChange: (modelId: string) => void
+  modelId: string;
+  onModelChange: (modelId: string) => void;
 }
 
-export const ModelSelector = memo(function ModelSelector({
-  modelId,
-  onModelChange,
-}: Props) {
-  const { models, isLoading, error } = useAvailableModels()
+export const ModelSelector = memo(function ModelSelector({ modelId, onModelChange }: Props) {
+  const { models, isLoading, error } = useAvailableModels();
   return (
     <Select
       value={modelId}
@@ -57,5 +56,5 @@ export const ModelSelector = memo(function ModelSelector({
         </SelectGroup>
       </SelectContent>
     </Select>
-  )
-})
+  );
+});

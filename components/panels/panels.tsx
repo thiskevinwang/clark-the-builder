@@ -1,5 +1,6 @@
-import { cn } from "@/lib/utils";
 import type { ReactNode } from "react";
+
+import { cn } from "@/lib/utils";
 
 interface Props {
   className?: string;
@@ -14,7 +15,7 @@ export function Panel({ className, children, variant = "default" }: Props) {
         "flex flex-col relative w-full h-full rounded-lg overflow-hidden",
         variant === "default" && "border border-border bg-card shadow-sm",
         variant === "ghost" && "bg-transparent border-none shadow-none",
-        className
+        className,
       )}
     >
       {children}
@@ -27,7 +28,7 @@ export function PanelHeader({ className, children }: Props) {
     <div
       className={cn(
         "text-sm flex items-center border-b border-border px-3 py-2 text-foreground bg-secondary/50",
-        className
+        className,
       )}
     >
       {children}

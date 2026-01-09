@@ -1,6 +1,7 @@
+import { NextResponse } from "next/server";
+
 import { platformCreateApplicationTransfer } from "@/lib/api";
 import { createClient, createConfig } from "@/lib/api/client";
-import { NextResponse } from "next/server";
 
 interface Params {
   params: Promise<{ applicationId: string }>;
@@ -13,7 +14,7 @@ export async function POST(_req: Request, { params }: Params) {
   if (!clerkPlatformToken) {
     return NextResponse.json(
       { error: "CLERK_PLATFORM_ACCESS_TOKEN environment variable is not set" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 
@@ -25,7 +26,7 @@ export async function POST(_req: Request, { params }: Params) {
           Authorization: `Bearer ${clerkPlatformToken}`,
           "Content-Type": "application/json",
         },
-      })
+      }),
     );
 
     const response = await platformCreateApplicationTransfer({
@@ -40,18 +41,13 @@ export async function POST(_req: Request, { params }: Params) {
     });
 
     if (response.error) {
-      const errorMessage =
-        response.error.errors?.[0]?.message ??
-        "Unknown error creating transfer";
+      const errorMessage = response.error.errors?.[0]?.message ?? "Unknown error creating transfer";
       return NextResponse.json({ error: errorMessage }, { status: 400 });
     }
 
     return NextResponse.json(response.data, { status: 201 });
   } catch (error) {
     console.error("Error creating transfer:", error);
-    return NextResponse.json(
-      { error: "Failed to create transfer" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to create transfer" }, { status: 500 });
   }
 }

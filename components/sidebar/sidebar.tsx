@@ -1,15 +1,14 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import {
-  useClerkAppsInit,
-  useClerkAppsStore,
-} from "@/lib/storage/clerk-apps-store";
-import type { ClerkAppData } from "@/lib/storage/types";
-import { cn } from "@/lib/utils";
 import { KeyIcon, Trash2Icon, XIcon } from "lucide-react";
 import { useState } from "react";
+
+import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { useClerkAppsInit, useClerkAppsStore } from "@/lib/storage/clerk-apps-store";
+import type { ClerkAppData } from "@/lib/storage/types";
+import { cn } from "@/lib/utils";
+
 import { useSidebar } from "./sidebar-state";
 
 interface SidebarProps {
@@ -38,7 +37,7 @@ export function Sidebar({ className }: SidebarProps) {
         className={cn(
           "fixed left-0 top-0 z-50 flex h-full w-72 flex-col border-r border-border bg-card transition-transform duration-300 ease-out",
           isOpen ? "translate-x-0" : "-translate-x-full pointer-events-none",
-          className
+          className,
         )}
       >
         {/* Header */}
@@ -58,13 +57,9 @@ export function Sidebar({ className }: SidebarProps) {
         <ScrollArea className="flex-1 min-h-0">
           <div className="p-2">
             {!isLoaded ? (
-              <div className="px-2 py-4 text-center text-sm text-muted-foreground">
-                Loading...
-              </div>
+              <div className="px-2 py-4 text-center text-sm text-muted-foreground">Loading...</div>
             ) : apps.length === 0 ? (
-              <div className="px-2 py-4 text-center text-sm text-muted-foreground">
-                No apps yet
-              </div>
+              <div className="px-2 py-4 text-center text-sm text-muted-foreground">No apps yet</div>
             ) : (
               <div className="space-y-1">
                 {apps.map((app) => (
@@ -109,9 +104,7 @@ function AppItem({ app, onRemove }: AppItemProps) {
       </div>
       <div className="flex-1 overflow-hidden">
         <p className="truncate font-medium text-foreground">{app.name}</p>
-        <p className="truncate text-xs text-muted-foreground">
-          {formatDate(app.createdAt)}
-        </p>
+        <p className="truncate text-xs text-muted-foreground">{formatDate(app.createdAt)}</p>
       </div>
       {showDelete && (
         <Button

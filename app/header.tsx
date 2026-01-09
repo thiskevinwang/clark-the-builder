@@ -1,15 +1,12 @@
 "use client";
 
+import { PanelLeftIcon } from "lucide-react";
+
 import { ClarkAvatar } from "@/components/clark-avatar";
 import { useSidebar } from "@/components/sidebar";
 import { Button } from "@/components/ui/button";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
-import { PanelLeftIcon } from "lucide-react";
 
 interface Props {
   className?: string;

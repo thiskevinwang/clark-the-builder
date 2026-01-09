@@ -1,10 +1,18 @@
-import type { TextUIPart } from 'ai'
-import { Streamdown } from 'streamdown'
+import type { TextUIPart } from "ai";
+import { Streamdown } from "streamdown";
 
-export function Text({ part }: { part: TextUIPart }) {
+import { cn } from "@/lib/utils";
+
+/**
+ * A text part
+ */
+export function TextPart({ className, part }: { className?: string; part: TextUIPart }) {
   return (
-    <div className="text-sm px-3.5 py-3 border bg-secondary/90 text-secondary-foreground border-gray-300 rounded-md font-mono">
+    <div
+      data-component={"Text"}
+      className={cn("text-sm px-3.5 py-3 bg-background rounded-md overflow-x-auto", className)}
+    >
       <Streamdown>{part.text}</Streamdown>
     </div>
-  )
+  );
 }

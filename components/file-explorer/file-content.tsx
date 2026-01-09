@@ -1,10 +1,12 @@
 "use client";
 
-import { cn } from "@/lib/utils";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
 import { memo, useCallback, useMemo, useState } from "react";
 import { PulseLoader } from "react-spinners";
 import useSWR from "swr";
+
+import { cn } from "@/lib/utils";
+
 import { SyntaxHighlighter } from "./syntax-highlighter";
 
 interface Props {
@@ -45,10 +47,7 @@ function maskEnvContent(content: string): string {
     .join("\n");
 }
 
-export const FileContent = memo(function FileContent({
-  sandboxId,
-  path,
-}: Props) {
+export const FileContent = memo(function FileContent({ sandboxId, path }: Props) {
   const [showSensitive, setShowSensitive] = useState(false);
   const isEnv = isEnvFile(path);
 
@@ -60,7 +59,7 @@ export const FileContent = memo(function FileContent({
       const text = await response.text();
       return text;
     },
-    { refreshInterval: 1000 }
+    { refreshInterval: 1000 },
   );
 
   const toggleVisibility = useCallback(() => {
@@ -93,17 +92,11 @@ export const FileContent = memo(function FileContent({
           className={cn(
             "absolute top-2 right-4 z-10 p-1.5 rounded-md transition-colors",
             "bg-secondary/80 hover:bg-secondary border border-border",
-            "text-muted-foreground hover:text-foreground"
+            "text-muted-foreground hover:text-foreground",
           )}
-          title={
-            showSensitive ? "Hide sensitive values" : "Show sensitive values"
-          }
+          title={showSensitive ? "Hide sensitive values" : "Show sensitive values"}
         >
-          {showSensitive ? (
-            <EyeOffIcon className="size-4" />
-          ) : (
-            <EyeIcon className="size-4" />
-          )}
+          {showSensitive ? <EyeOffIcon className="size-4" /> : <EyeIcon className="size-4" />}
         </button>
       )}
       <SyntaxHighlighter path={path} code={displayContent} />

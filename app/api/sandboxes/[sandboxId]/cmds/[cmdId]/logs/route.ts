@@ -1,19 +1,16 @@
-import { NextResponse, type NextRequest } from 'next/server'
-import { Sandbox } from '@vercel/sandbox'
+import { Sandbox } from "@vercel/sandbox";
+import { NextResponse, type NextRequest } from "next/server";
 
 interface Params {
-  sandboxId: string
-  cmdId: string
+  sandboxId: string;
+  cmdId: string;
 }
 
-export async function GET(
-  _request: NextRequest,
-  { params }: { params: Promise<Params> }
-) {
-  const logParams = await params
-  const encoder = new TextEncoder()
-  const sandbox = await Sandbox.get(logParams)
-  const command = await sandbox.getCommand(logParams.cmdId)
+export async function GET(_request: NextRequest, { params }: { params: Promise<Params> }) {
+  const logParams = await params;
+  const encoder = new TextEncoder();
+  const sandbox = await Sandbox.get(logParams);
+  const command = await sandbox.getCommand(logParams.cmdId);
 
   return new NextResponse(
     new ReadableStream({
@@ -25,13 +22,13 @@ export async function GET(
                 data: logline.data,
                 stream: logline.stream,
                 timestamp: Date.now(),
-              }) + '\n'
-            )
-          )
+              }) + "\n",
+            ),
+          );
         }
-        controller.close()
+        controller.close();
       },
     }),
-    { headers: { 'Content-Type': 'application/x-ndjson' } }
-  )
+    { headers: { "Content-Type": "application/x-ndjson" } },
+  );
 }

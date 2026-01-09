@@ -1,10 +1,10 @@
-import { create } from 'zustand'
+import { create } from "zustand";
 
 interface State {
-  cursor: number
-  scheduled: boolean
-  setCursor: (cursor: number) => void
-  setScheduled: (scheduled: boolean) => void
+  cursor: number;
+  scheduled: boolean;
+  setCursor: (cursor: number) => void;
+  setScheduled: (scheduled: boolean) => void;
 }
 
 export const useMonitorState = create<State>((set) => ({
@@ -12,4 +12,4 @@ export const useMonitorState = create<State>((set) => ({
   scheduled: false,
   setCursor: (cursor) => set({ cursor }),
   setScheduled: (scheduled) => set({ scheduled }),
-}))
+}));
