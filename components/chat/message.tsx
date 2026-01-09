@@ -78,7 +78,10 @@ export const Message = memo(function Message({ message }: Props) {
               <ResponseMessagePart key={index} part={part} partIndex={index} />
             ))}
           {message.role === "user" && (
-            <TextPart part={message.parts[0]} className="border border-border bg-muted max-w-96" />
+            <TextPart
+              part={message.parts[0]}
+              className="border border-border bg-accent max-w-96 [&_code]:bg-primary-foreground!"
+            />
           )}
         </div>
       </div>

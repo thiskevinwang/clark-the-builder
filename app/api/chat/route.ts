@@ -1,5 +1,4 @@
-// /api/chat is the default route that the useChat hook uses
-import { anthropic, type AnthropicProviderOptions } from "@ai-sdk/anthropic";
+import { anthropic } from "@ai-sdk/anthropic";
 import {
   convertToModelMessages,
   createUIMessageStream,
@@ -12,10 +11,11 @@ import { NextResponse } from "next/server";
 
 import { DEFAULT_MODEL } from "@/ai/constants";
 import { getAvailableModels, getModelOptions } from "@/ai/gateway";
-import { getClerkMCPTools } from "@/ai/mcp-client";
+import { getMCPClient } from "@/ai/mcp-client";
 import { tools } from "@/ai/tools";
 
 import { type ChatUIMessage } from "@/components/chat/types";
+import { type MCPConnector } from "@/components/connectors/use-mcp-connectors";
 
 import prompt from "./prompt.md";
 
@@ -23,6 +23,7 @@ interface BodyData {
   messages: ChatUIMessage[];
   modelId?: string;
   reasoningEffort?: "low" | "medium";
+  connectors?: MCPConnector[];
 }
 
 export async function POST(req: Request) {
@@ -31,19 +32,34 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: `Bot detected` }, { status: 403 });
   }
 
-  const [
-    models,
-    { messages, modelId = DEFAULT_MODEL, reasoningEffort },
-    { tools: mcpTools, close: closeMCPClient },
-  ] = await Promise.all([
+  const [models, reqBody] = await Promise.all([
     getAvailableModels(),
     req.json() as Promise<BodyData>,
-    getClerkMCPTools(),
   ]);
+
+  const { messages, modelId = DEFAULT_MODEL, reasoningEffort, connectors } = reqBody;
 
   const model = models.find((model) => model.id === modelId);
   if (!model) {
     return NextResponse.json({ error: `Model ${modelId} not found.` }, { status: 400 });
+  }
+
+  // dynamic list of MCP clients
+  const clients = await Promise.all(
+    connectors?.map(async (connector) => {
+      return await getMCPClient(connector.url);
+    }) || [],
+  );
+
+  const dynamicTools = clients.reduce((acc, client) => {
+    return {
+      ...acc,
+      ...client.tools,
+    };
+  }, {});
+
+  function closeMCPClients() {
+    return Promise.all(clients?.map((client) => client.close()) || []);
   }
 
   return createUIMessageStreamResponse({
@@ -53,18 +69,13 @@ export async function POST(req: Request) {
         const result = streamText({
           ...getModelOptions(modelId, { reasoningEffort }),
           system: prompt,
+          tools: {
+            code_execution: anthropic.tools.codeExecution_20250825(),
+            ...tools({ modelId, writer }),
+            ...dynamicTools,
+          },
           providerOptions: {
-            anthropic: {
-              // container: {
-              //   skills: [
-              //     {
-              //       skillId: "kevin-skill",
-              //       type: "custom",
-              //       version: "1.0.0",
-              //     },
-              //   ],
-              // },
-            } satisfies AnthropicProviderOptions,
+            // anthropic: {} satisfies AnthropicProviderOptions,
           },
           messages: convertToModelMessages(
             messages.map((message) => {
@@ -88,21 +99,17 @@ export async function POST(req: Request) {
             }),
           ),
           onStepFinish: (step) => {
-            console.log(JSON.stringify(step, null, 2));
+            // console.log(JSON.stringify(step, null, 2));
           },
           stopWhen: stepCountIs(20),
-          tools: {
-            code_execution: anthropic.tools.codeExecution_20250825(),
-            ...tools({ modelId, writer }),
-            ...mcpTools,
-          },
+
           onError: async (error) => {
             console.error("Error communicating with AI");
             console.error(JSON.stringify(error, null, 2));
-            await closeMCPClient();
+            await closeMCPClients();
           },
           onFinish: async () => {
-            await closeMCPClient();
+            await closeMCPClients();
           },
         });
 

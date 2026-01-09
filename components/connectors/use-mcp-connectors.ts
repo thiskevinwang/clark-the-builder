@@ -19,6 +19,7 @@ export interface MCPServerAuth {
 export interface MCPServer {
   url: string;
   auth?: MCPServerAuth;
+  enabled?: boolean;
 }
 
 export interface MCPConnector extends MCPServer {
@@ -76,6 +77,23 @@ export function useMCPConnectors() {
     [config, saveConfig],
   );
 
+  const toggleConnector = useCallback(
+    (name: string, enabled: boolean) => {
+      const server = config.mcpServers[name];
+      if (!server) return;
+
+      const newConfig = {
+        ...config,
+        mcpServers: {
+          ...config.mcpServers,
+          [name]: { ...server, enabled },
+        },
+      };
+      saveConfig(newConfig);
+    },
+    [config, saveConfig],
+  );
+
   const connectors = Object.entries(config.mcpServers).map(([name, server]) => ({
     name,
     ...server,
@@ -87,5 +105,6 @@ export function useMCPConnectors() {
     isLoaded,
     addConnector,
     removeConnector,
+    toggleConnector,
   };
 }

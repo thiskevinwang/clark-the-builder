@@ -21,24 +21,33 @@ interface Props {
 }
 
 export const ResponseMessagePart = memo(function MessagePart({ part, partIndex }: Props) {
-  if (part.type === "data-create-clerk-app") {
-    return <CreateClerkApp message={part.data} />;
-  } else if (part.type === "data-generating-files") {
-    return <GenerateFiles message={part.data} />;
-  } else if (part.type === "data-create-sandbox") {
-    return <CreateSandbox message={part.data} />;
-  } else if (part.type === "data-get-sandbox-url") {
-    return <GetSandboxURL message={part.data} />;
-  } else if (part.type === "data-run-command") {
-    return <RunCommand message={part.data} />;
-  } else if (part.type === "reasoning") {
-    return <Reasoning part={part} partIndex={partIndex} />;
-  } else if (part.type === "data-report-errors") {
-    return <ReportErrors message={part.data} />;
-  } else if (part.type === "text") {
-    return <TextPart part={part} />;
-  } else if (part.type === "dynamic-tool") {
-    return <ToolInvocation part={part} />;
+  switch (part.type) {
+    case "step-start" /* https://ai-sdk.dev/docs/ai-sdk-ui/chatbot-tool-usage#step-start-parts */:
+      // show step boundaries as horizontal lines:
+      return partIndex > 0 ? (
+        <div key={partIndex}>
+          <hr className="my-2 border-border border-dashed" />
+        </div>
+      ) : null;
+    case "data-create-clerk-app":
+      return <CreateClerkApp message={part.data} />;
+    case "data-generating-files":
+      return <GenerateFiles message={part.data} />;
+    case "data-create-sandbox":
+      return <CreateSandbox message={part.data} />;
+    case "data-get-sandbox-url":
+      return <GetSandboxURL message={part.data} />;
+    case "data-run-command":
+      return <RunCommand message={part.data} />;
+    case "reasoning":
+      return <Reasoning part={part} partIndex={partIndex} />;
+    case "data-report-errors":
+      return <ReportErrors message={part.data} />;
+    case "text":
+      return <TextPart part={part} />;
+    case "dynamic-tool":
+      return <ToolInvocation part={part} />;
+    default:
+      return null;
   }
-  return null;
 });

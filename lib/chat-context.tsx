@@ -1,9 +1,8 @@
 "use client";
 
 import { Chat } from "@ai-sdk/react";
-import { DataUIPart } from "ai";
-import { type ReactNode } from "react";
-import { createContext, useContext, useMemo, useRef } from "react";
+import { DataUIPart, DefaultChatTransport } from "ai";
+import { createContext, useContext, useMemo, useRef, type ReactNode } from "react";
 import { toast } from "sonner";
 import { mutate } from "swr";
 
@@ -11,6 +10,7 @@ import { DataPart } from "@/ai/messages/data-parts";
 
 import { useDataStateMapper } from "@/app/state";
 import { type ChatUIMessage } from "@/components/chat/types";
+import { useMCPConnectors } from "@/components/connectors/use-mcp-connectors";
 
 interface ChatContextValue {
   chat: Chat<ChatUIMessage>;
@@ -19,13 +19,24 @@ interface ChatContextValue {
 const ChatContext = createContext<ChatContextValue | undefined>(undefined);
 
 export function ChatProvider({ children }: { children: ReactNode }) {
+  const { connectors } = useMCPConnectors();
   const mapDataToState = useDataStateMapper();
   const mapDataToStateRef = useRef(mapDataToState);
   mapDataToStateRef.current = mapDataToState;
 
+  const transport = useMemo(() => {
+    return new DefaultChatTransport({
+      api: "/api/chat",
+      body: {
+        connectors,
+      },
+    });
+  }, [JSON.stringify(connectors)]);
+
   const chat = useMemo(
     () =>
       new Chat<ChatUIMessage>({
+        transport,
         onToolCall: () => mutate("/api/auth/info"),
         onData: (data) => mapDataToStateRef.current(data as DataUIPart<DataPart>),
         onError: (error) => {
@@ -33,7 +44,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
           console.error("Error sending message:", error);
         },
       }),
-    [],
+    [transport],
   );
 
   return <ChatContext.Provider value={{ chat }}>{children}</ChatContext.Provider>;

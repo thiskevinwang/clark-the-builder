@@ -1,10 +1,11 @@
 "use client";
 
 import { useChat } from "@ai-sdk/react";
-import { ArrowUpIcon, HistoryIcon, PanelLeftIcon, PlusIcon } from "lucide-react";
+import { ArrowUpIcon, PanelLeftIcon } from "lucide-react";
 
 import type { ChatUIMessage } from "@/components/chat/types";
 import { ClarkAvatar } from "@/components/clark-avatar";
+import { ConnectorsMenu } from "@/components/connectors/connectors-menu";
 import { ModelSelector } from "@/components/settings/model-selector";
 import { Settings } from "@/components/settings/settings";
 import { useSettings } from "@/components/settings/use-settings";
@@ -120,27 +121,9 @@ export function WelcomeScreen({ onMessageSent }: Props) {
               />
               <InputGroupAddon align="block-end" className="border-t border-border/30">
                 <div className="flex items-center gap-1">
-                  <InputGroupButton
-                    type="button"
-                    size="sm"
-                    variant="ghost"
-                    className="h-8 w-8 p-0 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted"
-                    title="New chat"
-                  >
-                    <PlusIcon className="w-4 h-4" />
-                  </InputGroupButton>
-
                   <Settings />
 
-                  <InputGroupButton
-                    type="button"
-                    size="sm"
-                    variant="ghost"
-                    className="h-8 w-8 p-0 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted"
-                    title="History"
-                  >
-                    <HistoryIcon className="w-4 h-4" />
-                  </InputGroupButton>
+                  <ConnectorsMenu />
                 </div>
 
                 <div className="ml-auto flex items-center gap-2">

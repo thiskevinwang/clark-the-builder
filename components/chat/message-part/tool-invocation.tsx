@@ -47,7 +47,7 @@ export function ToolInvocation({ part }: Props) {
         </div>
 
         <CollapsibleContent>
-          <Streamdown className="max-w-full overflow-x-auto">
+          <Streamdown className="max-w-full overflow-auto max-h-96">
             {part.output?.content?.[0].text}
           </Streamdown>
         </CollapsibleContent>
