@@ -1,3 +1,4 @@
+import type { TextUIPart } from "ai";
 import { BotIcon, UserIcon } from "lucide-react";
 import { createContext, memo, useContext, useEffect, useState } from "react";
 
@@ -79,7 +80,7 @@ export const Message = memo(function Message({ message }: Props) {
             ))}
           {message.role === "user" && (
             <TextPart
-              part={message.parts[0]}
+              part={message.parts[0] as TextUIPart}
               className="border border-border bg-accent max-w-96 [&_code]:bg-primary-foreground!"
             />
           )}
