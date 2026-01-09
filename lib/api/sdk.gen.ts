@@ -29,6 +29,9 @@ import type {
   PlatformListApplicationsData,
   PlatformListApplicationsErrors,
   PlatformListApplicationsResponses,
+  PlatformListApplicationTransfersData,
+  PlatformListApplicationTransfersErrors,
+  PlatformListApplicationTransfersResponses,
   PlatformTriggerDnsCheckData,
   PlatformTriggerDnsCheckErrors,
   PlatformTriggerDnsCheckResponses,
@@ -242,6 +245,28 @@ export const platformTriggerDnsCheck = <ThrowOnError extends boolean = false>(
   >({
     security: [{ scheme: "bearer", type: "http" }],
     url: "/platform/applications/{applicationID}/domains/{domainIDOrName}/dns_check",
+    ...options,
+  });
+
+/**
+ * List application transfers
+ *
+ * List all transfer requests created by the authenticated workspace. Returns
+ * transfers sorted by creation date in descending order (most recent first).
+ *
+ * Use the `status` parameter to filter by transfer status.
+ *
+ */
+export const platformListApplicationTransfers = <ThrowOnError extends boolean = false>(
+  options?: Options<PlatformListApplicationTransfersData, ThrowOnError>,
+) =>
+  (options?.client ?? client).get<
+    PlatformListApplicationTransfersResponses,
+    PlatformListApplicationTransfersErrors,
+    ThrowOnError
+  >({
+    security: [{ scheme: "bearer", type: "http" }],
+    url: "/platform/application_transfers",
     ...options,
   });
 

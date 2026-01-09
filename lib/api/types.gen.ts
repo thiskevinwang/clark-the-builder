@@ -253,6 +253,22 @@ export type PlatformApplicationTransferResponse = {
   completed_at: string | null;
 };
 
+/**
+ * List Application Transfers Response
+ *
+ * A paginated list of application transfers.
+ */
+export type PlatformListApplicationTransfersResponse = {
+  /**
+   * The list of application transfers.
+   */
+  data: Array<PlatformApplicationTransferResponse>;
+  /**
+   * The total number of application transfers matching the query.
+   */
+  total_count: number;
+};
+
 export type PlatformListApplicationsData = {
   body?: never;
   path?: never;
@@ -677,6 +693,64 @@ export type PlatformTriggerDnsCheckResponses = {
 
 export type PlatformTriggerDnsCheckResponse =
   PlatformTriggerDnsCheckResponses[keyof PlatformTriggerDnsCheckResponses];
+
+export type PlatformListApplicationTransfersData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Filter by transfer status. Multiple values can be provided by repeating
+     * the parameter (e.g., `?status=pending&status=canceled`).
+     *
+     */
+    status?: Array<"pending" | "completed" | "canceled" | "expired">;
+    /**
+     * Number of results to return per page (1-500, default 10).
+     */
+    limit?: number;
+    /**
+     * Cursor for pagination. Provide the ID of the last transfer from the
+     * previous page to get the next page of results.
+     *
+     */
+    starting_after?: string;
+    /**
+     * Cursor for pagination. Provide the ID of the first transfer from the
+     * previous page to get the previous page of results.
+     *
+     */
+    ending_before?: string;
+  };
+  url: "/platform/application_transfers";
+};
+
+export type PlatformListApplicationTransfersErrors = {
+  /**
+   * Authentication invalid
+   */
+  401: ClerkErrors;
+  /**
+   * Authorization invalid
+   */
+  403: ClerkErrors;
+  /**
+   * Invalid request parameters
+   */
+  422: ClerkErrors;
+};
+
+export type PlatformListApplicationTransfersError =
+  PlatformListApplicationTransfersErrors[keyof PlatformListApplicationTransfersErrors];
+
+export type PlatformListApplicationTransfersResponses = {
+  /**
+   * Application transfers retrieved successfully.
+   */
+  200: PlatformListApplicationTransfersResponse;
+};
+
+export type PlatformListApplicationTransfersResponse2 =
+  PlatformListApplicationTransfersResponses[keyof PlatformListApplicationTransfersResponses];
 
 export type PlatformCreateApplicationTransferData = {
   body?: never;
