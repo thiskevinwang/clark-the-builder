@@ -1,13 +1,6 @@
-"use client";
-
-import { useChat } from "@ai-sdk/react";
-import { useEffect, useState } from "react";
-
-import type { ChatUIMessage } from "@/components/chat/types";
 import { Horizontal, Vertical } from "@/components/layout/panels";
 import { Sidebar, SidebarProvider } from "@/components/sidebar";
 import { TabContent, TabItem } from "@/components/tabs";
-import { useSharedChatContext } from "@/lib/chat-context";
 
 import { Chat } from "./chat";
 import { FileExplorer } from "./file-explorer";
@@ -15,7 +8,6 @@ import { Header } from "./header";
 import { Logs } from "./logs";
 import { Preview } from "./preview";
 import { PreviewPanel } from "./preview-panel";
-import { WelcomeScreen } from "./welcome-screen";
 
 interface Props {
   horizontalSizes: number[];
@@ -23,27 +15,6 @@ interface Props {
 }
 
 export function MainLayout({ horizontalSizes, verticalSizes }: Props) {
-  const { chat } = useSharedChatContext();
-  const { messages } = useChat<ChatUIMessage>({ chat });
-  const [hasStarted, setHasStarted] = useState(false);
-
-  // Track if conversation has started (messages exist or user explicitly started)
-  useEffect(() => {
-    if (messages.length > 0) {
-      setHasStarted(true);
-    }
-  }, [messages.length]);
-
-  // Show welcome screen if no conversation has started
-  if (!hasStarted) {
-    return (
-      <SidebarProvider>
-        <WelcomeScreen onMessageSent={() => setHasStarted(true)} />
-      </SidebarProvider>
-    );
-  }
-
-  // Show full layout once conversation has started
   return (
     <SidebarProvider>
       <div className="flex h-screen max-h-screen overflow-hidden bg-background">

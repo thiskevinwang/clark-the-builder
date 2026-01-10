@@ -23,6 +23,7 @@ Populate environment variables
 
 ```env
 #.env
+OPEAI_API_KEY=
 ANTHROPIC_API_KEY=
 CLERK_PLATFORM_API_BASE_URL=
 CLERK_PLATFORM_ACCESS_TOKEN=

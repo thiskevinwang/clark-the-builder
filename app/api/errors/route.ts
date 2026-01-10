@@ -1,4 +1,4 @@
-import { generateObject } from "ai";
+import { generateText, Output } from "ai";
 import { checkBotId } from "botid/server";
 import { NextResponse } from "next/server";
 
@@ -21,14 +21,14 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: `Invalid request` }, { status: 400 });
   }
 
-  const result = await generateObject({
+  const result = await generateText({
     system: prompt,
     ...getModelOptions(DEFAULT_MODEL),
     messages: [{ role: "user", content: JSON.stringify(parsedBody.data) }],
-    schema: resultSchema,
+    output: Output.object({ schema: resultSchema }),
   });
 
-  return NextResponse.json(result.object, {
+  return NextResponse.json(result.output, {
     status: 200,
   });
 }

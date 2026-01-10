@@ -1,6 +1,7 @@
 "use client";
 
 import { PanelLeftIcon } from "lucide-react";
+import Link from "next/link";
 
 import { ClarkAvatar } from "@/components/clark-avatar";
 import { useSidebar } from "@/components/sidebar";
@@ -44,9 +45,11 @@ export function Header({ className }: Props) {
         )}
 
         <ClarkAvatar size={28} className="rounded-md" />
-        <span className="font-mono hidden md:inline text-sm font-semibold text-foreground tracking-tight">
-          Clerk0
-        </span>
+        <Link href="/" className="hover:underline">
+          <span className="font-mono hidden md:inline text-sm font-semibold text-foreground tracking-tight">
+            Clerk0
+          </span>
+        </Link>
       </div>
     </header>
   );

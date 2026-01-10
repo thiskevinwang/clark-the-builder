@@ -2,6 +2,8 @@
 
 import { useChat } from "@ai-sdk/react";
 import { ArrowUpIcon, PanelLeftIcon } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 import type { ChatUIMessage } from "@/components/chat/types";
 import { ClarkAvatar } from "@/components/clark-avatar";
@@ -21,43 +23,50 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { useSharedChatContext } from "@/lib/chat-context";
 import { useLocalStorageValue } from "@/lib/use-local-storage-value";
 
-interface Props {
-  onMessageSent: () => void;
-}
-
 const PROMPTS = [
   {
     title: "Next.js Starter",
-    content: "Generate a Clerk Next.js starter app",
+    description: "Basic Next.js app with Clerk authentication",
+    prompt: "Build a Next.js app with `@clerk/nextjs` authentication.",
   },
   {
-    title: "Checkout Page",
-    content: "Build a two panel checkout page",
+    title: "Kanban Board",
+    description: "A task management app with a Kanban board",
+    prompt:
+      "Generate a Kanban board with a protected API route that uses the user's public_metadata to store their tasks. Tasks should have (todo, in-progress, done) statuses, and a title and optional description.",
   },
   {
     title: "B2B SaaS App",
-    content: `Build a b2b SaaS app. Use the clerk \`b2b-saas\` template, which has Organizations and Billing enabled. Build a single landing page and render the \`<PricingTable for={'organization'}/>\` component`,
+    description: "An app with Organizations and Billing using Clerk",
+    prompt: `Build a b2b SaaS app. Use the clerk \`b2b-saas\` template, which has Organizations and Billing enabled. Build a single landing page and render the \`<PricingTable for={'organization'}/>\` component`,
   },
   {
     title: "Waitlist Page",
-    content: "Create a waitlist with Clerk's component",
+    description: "Create a waitlist page using Clerk",
+    prompt: "Create a waitlist with the `<Waitlist />` component from Clerk.",
   },
 ];
 
-export function WelcomeScreen({ onMessageSent }: Props) {
+export function WelcomeScreen() {
   const [input, setInput] = useLocalStorageValue("prompt-input");
   const { chat } = useSharedChatContext();
   const { modelId, reasoningEffort } = useSettings();
-  const { sendMessage, status } = useChat<ChatUIMessage>({ chat });
+  const { sendMessage, status, id, messages } = useChat<ChatUIMessage>({ chat });
   const { isOpen, toggle } = useSidebar();
+  const router = useRouter();
 
   const handleSubmit = () => {
     if (input.trim()) {
       sendMessage({ text: input }, { body: { modelId, reasoningEffort } });
       setInput("");
-      onMessageSent();
     }
   };
+
+  useEffect(() => {
+    if (messages.length > 0 && id) {
+      router.replace(`/chats/${id}`);
+    }
+  }, [id, messages.length, router]);
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-background via-background to-accent/20 px-4">
@@ -172,9 +181,9 @@ export function WelcomeScreen({ onMessageSent }: Props) {
               <QuickPromptCard
                 key={prompt.title}
                 title={prompt.title}
-                description={prompt.content}
+                description={prompt.description}
                 onClick={() => {
-                  setInput(prompt.content);
+                  setInput(prompt.prompt);
                 }}
               />
             ))}

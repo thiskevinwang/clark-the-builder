@@ -1,6 +1,7 @@
 import { Output, streamText, type ModelMessage } from "ai";
 import z from "zod";
 
+import { ModelId } from "@/ai/constants";
 import { getModelOptions } from "@/ai/gateway";
 
 import { Deferred } from "@/lib/deferred";
@@ -22,7 +23,7 @@ const fileSchema = z.object({
 
 interface Params {
   messages: ModelMessage[];
-  modelId: string;
+  modelId: ModelId;
   paths: string[];
 }
 
@@ -36,7 +37,8 @@ export async function* getContents(params: Params): AsyncGenerator<FileContentCh
   const generated: z.infer<typeof fileSchema>[] = [];
   const deferred = new Deferred<void>();
   const result = streamText({
-    ...getModelOptions(params.modelId, { reasoningEffort: "minimal" }),
+    // gpt-5.2:  'none', 'low', 'medium', 'high', and 'xhigh'
+    ...getModelOptions(params.modelId, { reasoningEffort: "low" }),
     maxOutputTokens: 64000,
     system:
       "You are a file content generator. You must generate files based on the conversation history and the provided paths. NEVER generate lock files (pnpm-lock.yaml, package-lock.json, yarn.lock) - these are automatically created by package managers.",
@@ -51,9 +53,9 @@ export async function* getContents(params: Params): AsyncGenerator<FileContentCh
     ],
     output: Output.object({ schema: z.object({ files: z.array(fileSchema) }) }),
     onError: (error) => {
-      deferred.reject(error);
       console.error("Error communicating with AI");
       console.error(JSON.stringify(error, null, 2));
+      deferred.reject(error);
     },
   });
 
@@ -63,12 +65,14 @@ export async function* getContents(params: Params): AsyncGenerator<FileContentCh
     }
 
     const written = generated.map((file) => file.path);
+    // Skip the trailing in-flight entries so we don't emit incomplete files.
     const paths = written.concat(
       items.files
         .slice(generated.length, items.files.length - 1)
         .flatMap((f) => (f?.path ? [f.path] : [])),
     );
 
+    // Parse only the settled files beyond what we've already yielded.
     const files = items.files
       .slice(generated.length, items.files.length - 2)
       .map((file) => fileSchema.parse(file));
@@ -81,7 +85,8 @@ export async function* getContents(params: Params): AsyncGenerator<FileContentCh
     }
   }
 
-  const raceResult = await Promise.race([result.object, deferred.promise]);
+  // Wait for either completion or an error; then flush the remaining files.
+  const raceResult = await Promise.race([result.output, deferred.promise]);
   if (!raceResult) {
     throw new Error("Unexpected Error: Deferred was resolved before the result");
   }

@@ -1,16 +1,15 @@
-import { anthropic } from "@ai-sdk/anthropic";
 import {
-  ToolLoopAgent,
   convertToModelMessages,
   createUIMessageStream,
   createUIMessageStreamResponse,
   stepCountIs,
+  streamText,
   type ModelMessage,
 } from "ai";
 import { checkBotId } from "botid/server";
 import { NextResponse } from "next/server";
 
-import { DEFAULT_MODEL } from "@/ai/constants";
+import { DEFAULT_MODEL, ModelId } from "@/ai/constants";
 import { getAvailableModels, getModelOptions } from "@/ai/gateway";
 import { getMCPClient } from "@/ai/mcp-client";
 import { tools } from "@/ai/tools";
@@ -27,7 +26,7 @@ const systemMessage: ModelMessage = {
 
 interface BodyData {
   messages: ChatUIMessage[];
-  modelId?: string;
+  modelId?: ModelId;
   reasoningEffort?: "low" | "medium";
   connectors?: MCPConnector[];
 }
@@ -71,51 +70,52 @@ export async function POST(req: Request) {
   }
 
   const modelOptions = getModelOptions(modelId, { reasoningEffort });
+  // const { tools: bashTools } = await createBashTool();
 
   return createUIMessageStreamResponse({
     stream: createUIMessageStream({
       originalMessages: messages,
       execute: async ({ writer }) => {
-        const agent = new ToolLoopAgent({
-          model: modelOptions.model,
-          headers: modelOptions.headers,
-          providerOptions: modelOptions.providerOptions,
+        const result = streamText({
+          ...modelOptions,
+          system: systemMessage.content as string,
+          messages: await convertToModelMessages(
+            messages.map((message) => {
+              message.parts = message.parts.map((part) => {
+                if (part.type === "data-report-errors") {
+                  return {
+                    type: "text",
+                    text:
+                      `There are errors in the generated code. This is the summary of the errors we have:\n` +
+                      `\`\`\`${part.data.summary}\`\`\`\n` +
+                      (part.data.paths?.length
+                        ? `The following files may contain errors:\n` +
+                          `\`\`\`${part.data.paths?.join("\n")}\`\`\`\n`
+                        : "") +
+                      `Fix the errors reported.`,
+                  };
+                }
+                return part;
+              });
+              return message;
+            }),
+          ),
+          onStepFinish: async (step) => {},
           stopWhen: stepCountIs(20),
-          onFinish: async () => {
-            await closeMCPClients();
-          },
           tools: {
-            code_execution: anthropic.tools.codeExecution_20250825(),
             ...tools({ modelId, writer }),
             ...dynamicTools,
           },
+          onError: async (error) => {
+            console.error("Error during agent execution:", error);
+            await closeMCPClients();
+          },
+          onFinish: async () => {
+            await closeMCPClients();
+          },
         });
 
-        const result = await agent.stream({
-          messages: [systemMessage].concat(
-            await convertToModelMessages(
-              messages.map((message) => {
-                message.parts = message.parts.map((part) => {
-                  if (part.type === "data-report-errors") {
-                    return {
-                      type: "text",
-                      text:
-                        `There are errors in the generated code. This is the summary of the errors we have:\n` +
-                        `\`\`\`${part.data.summary}\`\`\`\n` +
-                        (part.data.paths?.length
-                          ? `The following files may contain errors:\n` +
-                            `\`\`\`${part.data.paths?.join("\n")}\`\`\`\n`
-                          : "") +
-                        `Fix the errors reported.`,
-                    };
-                  }
-                  return part;
-                });
-                return message;
-              }),
-            ),
-          ),
-        });
+        result.consumeStream();
 
         writer.merge(
           result.toUIMessageStream({
