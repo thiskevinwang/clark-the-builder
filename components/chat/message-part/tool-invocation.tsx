@@ -1,4 +1,4 @@
-import type { DynamicToolUIPart } from "ai";
+import type { DynamicToolUIPart, TextUIPart } from "ai";
 import { CheckIcon, ChevronsUpDown, XIcon } from "lucide-react";
 import { Streamdown } from "streamdown";
 
@@ -13,11 +13,16 @@ interface Props {
   part: DynamicToolUIPart;
 }
 
+type Content = {
+  content: [TextUIPart];
+};
+
 export function ToolInvocation({ part }: Props) {
   const toolName = part.toolName;
   const isLoading = part.state === "input-streaming" || part.state === "input-available";
   const isError = part.state === "output-error";
 
+  const text = (part.output as Content)?.content?.[0].text;
   return (
     <ToolMessage>
       <Collapsible className="w-full">
@@ -47,9 +52,7 @@ export function ToolInvocation({ part }: Props) {
         </div>
 
         <CollapsibleContent>
-          <Streamdown className="max-w-full overflow-x-auto">
-            {part.output?.content?.[0].text}
-          </Streamdown>
+          {text && <Streamdown className="max-w-full overflow-auto max-h-96">{text}</Streamdown>}
         </CollapsibleContent>
       </Collapsible>
     </ToolMessage>

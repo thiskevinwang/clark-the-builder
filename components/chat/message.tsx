@@ -1,4 +1,4 @@
-import { BotIcon, UserIcon } from "lucide-react";
+import type { TextUIPart } from "ai";
 import { createContext, memo, useContext, useEffect, useState } from "react";
 
 import { cn } from "@/lib/utils";
@@ -37,30 +37,21 @@ export const Message = memo(function Message({ message }: Props) {
     }
   }, [reasoningParts]);
 
-  const isUserMessage = message.role === "user";
-
   return (
     <ReasoningContext.Provider value={{ expandedReasoningIndex, setExpandedReasoningIndex }}>
       <div
         className={cn("flex flex-col", {
-          "": message.role === "assistant",
           "ml-20 items-end": message.role === "user",
         })}
       >
         {/* Message Header */}
-        <div className="flex items-center gap-2 text-sm font-medium text-foreground mb-2">
+        <div className="hidden">
           {message.role === "user" ? (
             <>
-              <div className="ml-auto flex items-center justify-center w-6 h-6 rounded-full bg-secondary">
-                <UserIcon className="w-3.5 h-3.5 text-muted-foreground" />
-              </div>
-              <span>You</span>
+              <span>User</span>
             </>
           ) : (
             <>
-              <div className="flex items-center justify-center w-6 h-6 rounded-full bg-primary/10">
-                <BotIcon className="w-3.5 h-3.5 text-primary" />
-              </div>
               <span>Assistant</span>
               {message.metadata?.model && (
                 <span className="text-xs text-muted-foreground font-normal">
@@ -78,7 +69,10 @@ export const Message = memo(function Message({ message }: Props) {
               <ResponseMessagePart key={index} part={part} partIndex={index} />
             ))}
           {message.role === "user" && (
-            <TextPart part={message.parts[0]} className="border border-border bg-muted max-w-96" />
+            <TextPart
+              part={message.parts[0] as TextUIPart}
+              className="border border-border bg-accent max-w-96 [&_code]:bg-primary-foreground!"
+            />
           )}
         </div>
       </div>

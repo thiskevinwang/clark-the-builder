@@ -21,11 +21,11 @@ export function CreateClerkApp({ message }: Props) {
   const [claimModalOpen, setClaimModalOpen] = useState(false);
   const { apps } = useClerkAppsStore();
 
-  // Check if this app has already been claimed
-  const claimedApp = message.applicationId
-    ? apps.find((app) => app.applicationId === message.applicationId)
+  // Check if this app has already been transferred/claimed
+  const app = message.applicationId
+    ? apps.find((a) => a.applicationId === message.applicationId)
     : null;
-  const isClaimed = claimedApp?.claimed ?? false;
+  const isTransferred = app?.ownership === "transferred";
 
   return (
     <ToolMessage>
@@ -49,7 +49,7 @@ export function CreateClerkApp({ message }: Props) {
           </span>
           {message.status === "done" &&
             message.applicationId &&
-            (isClaimed ? (
+            (isTransferred ? (
               <span className="ml-auto inline-flex items-center gap-1 text-xs text-muted-foreground bg-secondary px-2 py-1 rounded-md">
                 <CheckIcon className="w-3 h-3" />
                 Claimed

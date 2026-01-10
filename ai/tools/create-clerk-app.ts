@@ -1,6 +1,6 @@
-import type { UIMessageStreamWriter, UIMessage } from "ai";
+import type { UIMessage, UIMessageStreamWriter } from "ai";
 import { tool } from "ai";
-import z from "zod/v3";
+import z from "zod";
 
 import { platformCreateApplication } from "@/lib/api";
 import { createClient, createConfig } from "@/lib/api/client";

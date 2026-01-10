@@ -1,6 +1,6 @@
-import type { Sandbox } from "@vercel/sandbox";
-import type { UIMessageStreamWriter, UIMessage } from "ai";
+import type { UIMessage, UIMessageStreamWriter } from "ai";
 
+import type { Sandbox } from "../../../lib/sandbox";
 import type { DataPart } from "../../messages/data-parts";
 import { getRichError } from "../get-rich-error";
 import type { File } from "./get-contents";
@@ -11,6 +11,9 @@ interface Params {
   writer: UIMessageStreamWriter<UIMessage<never, DataPart>>;
 }
 
+/**
+ * Factory function to create a function that writes files to a sandbox.
+ */
 export function getWriteFiles({ sandbox, toolCallId, writer }: Params) {
   return async function writeFiles(params: { written: string[]; files: File[]; paths: string[] }) {
     const paths = params.written.concat(params.files.map((file) => file.path));

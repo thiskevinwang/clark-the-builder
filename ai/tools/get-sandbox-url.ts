@@ -1,8 +1,8 @@
-import { Sandbox } from "@vercel/sandbox";
 import type { UIMessage, UIMessageStreamWriter } from "ai";
 import { tool } from "ai";
-import z from "zod/v3";
+import z from "zod";
 
+import { sandboxProvider } from "../../lib/sandbox";
 import type { DataPart } from "../messages/data-parts";
 import description from "./get-sandbox-url.md";
 
@@ -32,7 +32,7 @@ export const getSandboxURL = ({ writer }: Params) =>
         data: { status: "loading" },
       });
 
-      const sandbox = await Sandbox.get({ sandboxId });
+      const sandbox = await sandboxProvider.get({ sandboxId });
       const url = sandbox.domain(port);
 
       writer.write({

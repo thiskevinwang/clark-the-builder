@@ -1,3 +1,9 @@
+import { type anthropic } from "@ai-sdk/anthropic";
+import { type openai } from "@ai-sdk/openai";
+
+export type AnthropicModels = Parameters<typeof anthropic>[0];
+export type OpenAIModels = Parameters<typeof openai>[0];
+
 /**
  * Central model registry.
  *
@@ -12,28 +18,17 @@ export const Models = {
    * gateway format).
    */
   AnthropicClaudeOpus45: "claude-opus-4-5-20251101",
-} as const;
+
+  OpenAIGpt52: "gpt-5.2",
+} satisfies Record<string, AnthropicModels | OpenAIModels>;
 
 export type ModelId = (typeof Models)[keyof typeof Models];
 
-/**
- * Back-compat for previously stored/linked gateway-style ids.
- */
-export const LEGACY_MODEL_ID_MAP: Record<string, ModelId> = {
-  "anthropic/claude-opus-4.5": Models.AnthropicClaudeOpus45,
-  "anthropic/claude-opus-4": Models.AnthropicClaudeOpus45,
-};
-
 export const MODEL_LABELS: Record<ModelId, string> = {
   [Models.AnthropicClaudeOpus45]: "Claude Opus 4.5",
+  [Models.OpenAIGpt52]: "GPT-5.2",
 };
 
-export const DEFAULT_MODEL: ModelId = Models.AnthropicClaudeOpus45;
+export const DEFAULT_MODEL: ModelId = Models.OpenAIGpt52;
 
-export const SUPPORTED_MODELS: ModelId[] = [DEFAULT_MODEL];
-
-export const TEST_PROMPTS = [
-  "Generate a Clerk Next.js starter app",
-  "Build a b2b SaaS app. Use the clerk `b2b-saas` template, which has Organizations and Billing enabled. Build a single landing page and render the `<PricingTable for={'organization'}/>` component",
-  "Build a waitlist page. Use the clerk `waitlist` template & `<Waitlist/>` component",
-];
+export const SUPPORTED_MODELS: ModelId[] = Object.values(Models);

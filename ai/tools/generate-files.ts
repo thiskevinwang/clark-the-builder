@@ -1,8 +1,8 @@
-import { Sandbox } from "@vercel/sandbox";
-import type { UIMessageStreamWriter, UIMessage } from "ai";
+import type { UIMessage, UIMessageStreamWriter } from "ai";
 import { tool } from "ai";
-import z from "zod/v3";
+import z from "zod";
 
+import { sandboxProvider, type Sandbox } from "../../lib/sandbox";
 import type { DataPart } from "../messages/data-parts";
 import description from "./generate-files.prompt.md";
 import { getContents, type File } from "./generate-files/get-contents";
@@ -42,7 +42,7 @@ export const generateFiles = ({ writer, modelId }: Params) =>
       let sandbox: Sandbox | null = null;
 
       try {
-        sandbox = await Sandbox.get({ sandboxId });
+        sandbox = await sandboxProvider.get({ sandboxId });
       } catch (error) {
         const richError = getRichError({
           action: "get sandbox by id",

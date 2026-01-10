@@ -1,10 +1,13 @@
 "use client";
 
 import { useChat } from "@ai-sdk/react";
-import { ArrowUpIcon, HistoryIcon, PanelLeftIcon, PlusIcon } from "lucide-react";
+import { ArrowUpIcon, PanelLeftIcon } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 import type { ChatUIMessage } from "@/components/chat/types";
 import { ClarkAvatar } from "@/components/clark-avatar";
+import { ConnectorsMenu } from "@/components/connectors/connectors-menu";
 import { ModelSelector } from "@/components/settings/model-selector";
 import { Settings } from "@/components/settings/settings";
 import { useSettings } from "@/components/settings/use-settings";
@@ -20,24 +23,50 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { useSharedChatContext } from "@/lib/chat-context";
 import { useLocalStorageValue } from "@/lib/use-local-storage-value";
 
-interface Props {
-  onMessageSent: () => void;
-}
+const PROMPTS = [
+  {
+    title: "Next.js Starter",
+    description: "Basic Next.js app with Clerk authentication",
+    prompt: "Build a Next.js app with `@clerk/nextjs` authentication.",
+  },
+  {
+    title: "Kanban Board",
+    description: "A task management app with a Kanban board",
+    prompt:
+      "Generate a Kanban board with a protected API route that uses the user's public_metadata to store their tasks. Tasks should have (todo, in-progress, done) statuses, and a title and optional description.",
+  },
+  {
+    title: "B2B SaaS App",
+    description: "An app with Organizations and Billing using Clerk",
+    prompt: `Build a b2b SaaS app. Use the clerk \`b2b-saas\` template, which has Organizations and Billing enabled. Build a single landing page and render the \`<PricingTable for={'organization'}/>\` component`,
+  },
+  {
+    title: "Waitlist Page",
+    description: "Create a waitlist page using Clerk",
+    prompt: "Create a waitlist with the `<Waitlist />` component from Clerk.",
+  },
+];
 
-export function WelcomeScreen({ onMessageSent }: Props) {
+export function WelcomeScreen() {
   const [input, setInput] = useLocalStorageValue("prompt-input");
   const { chat } = useSharedChatContext();
   const { modelId, reasoningEffort } = useSettings();
-  const { sendMessage, status } = useChat<ChatUIMessage>({ chat });
+  const { sendMessage, status, id, messages } = useChat<ChatUIMessage>({ chat });
   const { isOpen, toggle } = useSidebar();
+  const router = useRouter();
 
   const handleSubmit = () => {
     if (input.trim()) {
       sendMessage({ text: input }, { body: { modelId, reasoningEffort } });
       setInput("");
-      onMessageSent();
     }
   };
+
+  useEffect(() => {
+    if (messages.length > 0 && id) {
+      router.replace(`/chats/${id}`);
+    }
+  }, [id, messages.length, router]);
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-background via-background to-accent/20 px-4">
@@ -120,27 +149,9 @@ export function WelcomeScreen({ onMessageSent }: Props) {
               />
               <InputGroupAddon align="block-end" className="border-t border-border/30">
                 <div className="flex items-center gap-1">
-                  <InputGroupButton
-                    type="button"
-                    size="sm"
-                    variant="ghost"
-                    className="h-8 w-8 p-0 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted"
-                    title="New chat"
-                  >
-                    <PlusIcon className="w-4 h-4" />
-                  </InputGroupButton>
-
                   <Settings />
 
-                  <InputGroupButton
-                    type="button"
-                    size="sm"
-                    variant="ghost"
-                    className="h-8 w-8 p-0 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted"
-                    title="History"
-                  >
-                    <HistoryIcon className="w-4 h-4" />
-                  </InputGroupButton>
+                  <ConnectorsMenu />
                 </div>
 
                 <div className="ml-auto flex items-center gap-2">
@@ -166,31 +177,16 @@ export function WelcomeScreen({ onMessageSent }: Props) {
         <div className="mt-8 w-full animate-in fade-in slide-in-from-bottom-8 duration-700 delay-300">
           <p className="text-sm text-muted-foreground text-center mb-4">Try one of these</p>
           <div className="grid gap-3 md:grid-cols-2">
-            <QuickPromptCard
-              title="Next.js Starter"
-              description="Generate a Clerk Next.js starter app"
-              onClick={() => {
-                setInput("Generate a Clerk Next.js starter app");
-              }}
-            />
-            <QuickPromptCard
-              title="B2B SaaS App"
-              description="Build with Organizations and Billing"
-              onClick={() => {
-                setInput(
-                  "Build a b2b SaaS app. Use the clerk `b2b-saas` template, which has Organizations and Billing enabled. Build a single landing page and render the `<PricingTable for={'organization'}/>` component",
-                );
-              }}
-            />
-            <QuickPromptCard
-              title="Waitlist Page"
-              description="Create a waitlist with Clerk's component"
-              onClick={() => {
-                setInput(
-                  "Build a waitlist page. Use the clerk `waitlist` template & `<Waitlist/>` component",
-                );
-              }}
-            />
+            {PROMPTS.map((prompt) => (
+              <QuickPromptCard
+                key={prompt.title}
+                title={prompt.title}
+                description={prompt.description}
+                onClick={() => {
+                  setInput(prompt.prompt);
+                }}
+              />
+            ))}
           </div>
         </div>
       </div>

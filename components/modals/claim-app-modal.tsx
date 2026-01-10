@@ -28,7 +28,7 @@ export function ClaimAppModal({ open, onOpenChange, applicationId, appName }: Pr
   const [step, setStep] = useState<ClaimStep>("initial");
   const [transferCode, setTransferCode] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const { claimApp } = useClerkAppsStore();
+  const { loadApps } = useClerkAppsStore();
 
   const handleClaimNow = useCallback(async () => {
     setStep("loading");
@@ -46,13 +46,14 @@ export function ClaimAppModal({ open, onOpenChange, applicationId, appName }: Pr
 
       const transfer: PlatformApplicationTransferResponse = await response.json();
       setTransferCode(transfer.code);
-      await claimApp(applicationId, transfer.code);
+      // Reload apps to get updated transfer state from API
+      await loadApps();
       setStep("success");
     } catch (err) {
       setError(err instanceof Error ? err.message : "An unexpected error occurred");
       setStep("error");
     }
-  }, [applicationId, claimApp]);
+  }, [applicationId, loadApps]);
 
   const handleClose = useCallback(() => {
     onOpenChange(false);

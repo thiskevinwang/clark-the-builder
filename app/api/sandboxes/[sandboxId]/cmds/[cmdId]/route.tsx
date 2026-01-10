@@ -1,5 +1,6 @@
-import { Sandbox } from "@vercel/sandbox";
 import { NextResponse, type NextRequest } from "next/server";
+
+import { sandboxProvider } from "../../../../../../lib/sandbox";
 
 interface Params {
   sandboxId: string;
@@ -8,7 +9,7 @@ interface Params {
 
 export async function GET(_request: NextRequest, { params }: { params: Promise<Params> }) {
   const cmdParams = await params;
-  const sandbox = await Sandbox.get(cmdParams);
+  const sandbox = await sandboxProvider.get(cmdParams);
   const command = await sandbox.getCommand(cmdParams.cmdId);
 
   /**

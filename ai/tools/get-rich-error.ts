@@ -1,4 +1,4 @@
-import { APIError } from "@vercel/sandbox/dist/api-client/api-error";
+import { isVercelAPIError, getVercelErrorFields } from "../../lib/sandbox";
 
 interface Params {
   args?: Record<string, unknown>;
@@ -28,12 +28,8 @@ function getErrorFields(error: unknown) {
       message: String(error),
       json: error,
     };
-  } else if (error instanceof APIError) {
-    return {
-      message: error.message,
-      json: error.json,
-      text: error.text,
-    };
+  } else if (isVercelAPIError(error)) {
+    return getVercelErrorFields(error);
   } else {
     return {
       message: error.message,

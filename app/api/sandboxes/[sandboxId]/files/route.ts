@@ -1,6 +1,7 @@
-import { Sandbox } from "@vercel/sandbox";
 import { NextResponse, type NextRequest } from "next/server";
-import z from "zod/v3";
+import z from "zod";
+
+import { sandboxProvider } from "../../../../../lib/sandbox";
 
 const FileParamsSchema = z.object({
   sandboxId: z.string(),
@@ -24,7 +25,7 @@ export async function GET(
     );
   }
 
-  const sandbox = await Sandbox.get(fileParams.data);
+  const sandbox = await sandboxProvider.get(fileParams.data);
   const stream = await sandbox.readFile(fileParams.data);
   if (!stream) {
     return NextResponse.json({ error: "File not found in the Sandbox" }, { status: 404 });

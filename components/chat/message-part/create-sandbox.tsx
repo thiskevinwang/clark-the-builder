@@ -29,6 +29,8 @@ export function CreateSandbox({ message }: Props) {
           {message.status === "error" && "Failed to create sandbox"}
         </span>
       </div>
+
+      <small className="text-muted-foreground">{message.sandboxId}</small>
     </ToolMessage>
   );
 }

@@ -1,8 +1,9 @@
 import { anthropic } from "@ai-sdk/anthropic";
-import type { LanguageModelV2 } from "@ai-sdk/provider";
+import { openai } from "@ai-sdk/openai";
+import type { LanguageModelV3 } from "@ai-sdk/provider";
 import type { JSONValue } from "ai";
 
-import { LEGACY_MODEL_ID_MAP, MODEL_LABELS, Models, type ModelId } from "./constants";
+import { MODEL_LABELS, Models, type ModelId } from "./constants";
 
 export async function getAvailableModels() {
   // We don't call an external "models" endpoint; we publish the supported list
@@ -14,40 +15,40 @@ export async function getAvailableModels() {
 }
 
 export interface ModelOptions {
-  model: LanguageModelV2;
+  model: LanguageModelV3;
   providerOptions?: Record<string, Record<string, JSONValue>>;
   headers?: Record<string, string>;
 }
 
 export function getModelOptions(
-  modelId: string,
-  options?: { reasoningEffort?: "minimal" | "low" | "medium" },
+  modelId: ModelId,
+  options?: {
+    // gpt-5.2:  'none', 'low', 'medium', 'high', and 'xhigh'
+    reasoningEffort?: "minimal" | "low" | "medium";
+  },
 ): ModelOptions {
-  // Ignore reasoning effort (OpenAI-only) but keep the signature stable.
-  void options;
+  let v3Model;
+  switch (modelId) {
+    case Models.AnthropicClaudeOpus45:
+      v3Model = anthropic(modelId);
+      break;
+    case Models.OpenAIGpt52:
+      v3Model = openai(modelId);
+      break;
+    default:
+      throw new Error(`Unsupported model id: ${modelId}`);
+  }
 
-  const normalizedId = normalizeModelId(modelId);
-
-  // Anthropic-specific options used for better tool streaming/caching.
   return {
-    model: anthropic(normalizedId),
+    model: v3Model,
     headers: { "anthropic-beta": "fine-grained-tool-streaming-2025-05-14" },
     providerOptions: {
       anthropic: {
         cacheControl: { type: "ephemeral" },
       },
+      openai: {
+        ...options,
+      },
     },
   };
-}
-
-function normalizeModelId(modelId: string): ModelId {
-  if ((Object.values(Models) as string[]).includes(modelId)) {
-    return modelId as ModelId;
-  }
-
-  const legacy = LEGACY_MODEL_ID_MAP[modelId];
-  if (legacy) return legacy;
-
-  // Fall back to default model for unknown ids.
-  return Models.AnthropicClaudeOpus45;
 }

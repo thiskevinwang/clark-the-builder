@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import z from "zod/v3";
+import z from "zod";
 
 import { cn } from "@/lib/utils";
 

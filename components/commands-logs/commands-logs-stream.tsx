@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import stripAnsi from "strip-ansi";
-import z from "zod/v3";
+import z from "zod";
 
 import { useSandboxStore } from "@/app/state";
 

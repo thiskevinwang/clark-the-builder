@@ -4,8 +4,6 @@ import { useChat } from "@ai-sdk/react";
 import { ArrowUpIcon } from "lucide-react";
 import { useCallback, useEffect } from "react";
 
-import { TEST_PROMPTS } from "@/ai/constants";
-
 import {
   Conversation,
   ConversationContent,
@@ -13,6 +11,7 @@ import {
 } from "@/components/ai-elements/conversation";
 import { Message } from "@/components/chat/message";
 import type { ChatUIMessage } from "@/components/chat/types";
+import { ConnectorsMenu } from "@/components/connectors/connectors-menu";
 import { Panel } from "@/components/panels/panels";
 import { ModelSelector } from "@/components/settings/model-selector";
 import { Settings } from "@/components/settings/settings";
@@ -57,35 +56,14 @@ export function Chat({ className }: Props) {
   return (
     <Panel className={className} variant="ghost">
       {/* Messages Area */}
-      {messages.length === 0 ? (
-        <div className="flex-1 min-h-0">
-          <div className="flex flex-col justify-center items-center h-full text-sm text-muted-foreground">
-            <p className="flex items-center font-medium text-foreground mb-3">
-              Try one of these prompts:
-            </p>
-            <ul className="p-4 space-y-2 text-center max-w-md">
-              {TEST_PROMPTS.map((prompt, idx) => (
-                <li
-                  key={idx}
-                  className="px-4 py-2.5 rounded-lg border border-border bg-card shadow-sm cursor-pointer transition-colors hover:bg-accent hover:text-accent-foreground hover:border-primary/30"
-                  onClick={() => validateAndSubmitMessage(prompt)}
-                >
-                  {prompt}
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      ) : (
-        <Conversation className="relative w-full">
-          <ConversationContent className="space-y-4">
-            {messages.map((message) => (
-              <Message key={message.id} message={message} />
-            ))}
-          </ConversationContent>
-          <ConversationScrollButton />
-        </Conversation>
-      )}
+      <Conversation className="relative w-full">
+        <ConversationContent className="space-y-4">
+          {messages.map((message) => (
+            <Message key={message.id} message={message} />
+          ))}
+        </ConversationContent>
+        <ConversationScrollButton />
+      </Conversation>
 
       <form
         className="m-2"
@@ -107,24 +85,29 @@ export function Chat({ className }: Props) {
             placeholder="Ask a follow-up..."
             rows={2}
             value={input}
+            className="text-base max-h-[200px] overflow-y-auto"
           />
           <InputGroupAddon align="block-end">
-            <Settings />
+            <div className="flex items-center gap-1">
+              <Settings />
 
-            <ModelSelector />
+              <ConnectorsMenu />
+            </div>
 
-            {/* <Separator orientation="vertical" className="h-4!" /> */}
+            <div className="ml-auto flex items-center gap-2">
+              <ModelSelector />
 
-            <InputGroupButton
-              type="submit"
-              size="sm"
-              variant="ghost"
-              disabled={status !== "ready" || !input.trim()}
-              className="ml-auto h-8 w-8 p-0 rounded-lg border border-border text-muted-foreground hover:text-foreground disabled:opacity-40"
-            >
-              <ArrowUpIcon className="w-4 h-4" />
-              <span className="sr-only">Send</span>
-            </InputGroupButton>
+              <InputGroupButton
+                type="submit"
+                size="sm"
+                variant="ghost"
+                disabled={status !== "ready" || !input.trim()}
+                className="h-9 w-9 p-0 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground disabled:opacity-40 disabled:bg-muted disabled:text-muted-foreground transition-all"
+              >
+                <ArrowUpIcon className="w-4 h-4" />
+                <span className="sr-only">Send</span>
+              </InputGroupButton>
+            </div>
           </InputGroupAddon>
         </InputGroup>
       </form>

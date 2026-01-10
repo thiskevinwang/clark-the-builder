@@ -130,7 +130,6 @@ export function useDataStateMapper() {
             applicationId: data.data.applicationId,
             name: data.data.name,
             createdAt: Date.now(),
-            publishableKey: data.data.publishableKey,
           });
         }
         break;

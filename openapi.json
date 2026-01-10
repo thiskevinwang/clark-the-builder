@@ -562,6 +562,89 @@
         }
       }
     },
+    "/platform/application_transfers": {
+      "get": {
+        "operationId": "PlatformListApplicationTransfers",
+        "x-speakeasy-group": "platform",
+        "x-speakeasy-name-override": "listApplicationTransfers",
+        "tags": ["Application Transfers"],
+        "summary": "List application transfers",
+        "description": "List all transfer requests created by the authenticated workspace. Returns\ntransfers sorted by creation date in descending order (most recent first).\n\nUse the `status` parameter to filter by transfer status.\n",
+        "security": [
+          {
+            "platform_api_access_token": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "description": "Filter by transfer status. Multiple values can be provided by repeating\nthe parameter (e.g., `?status=pending&status=canceled`).\n",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["pending", "completed", "canceled", "expired"]
+              }
+            },
+            "style": "form",
+            "explode": true
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Number of results to return per page (1-500, default 10).",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 500,
+              "default": 10
+            }
+          },
+          {
+            "name": "starting_after",
+            "in": "query",
+            "description": "Cursor for pagination. Provide the ID of the last transfer from the\nprevious page to get the next page of results.\n",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "ending_before",
+            "in": "query",
+            "description": "Cursor for pagination. Provide the ID of the first transfer from the\nprevious page to get the previous page of results.\n",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Application transfers retrieved successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformListApplicationTransfersResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/AuthenticationInvalid"
+          },
+          "403": {
+            "$ref": "#/components/responses/AuthorizationInvalid"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        }
+      }
+    },
     "/platform/applications/{applicationID}/transfers": {
       "post": {
         "operationId": "PlatformCreateApplicationTransfer",
@@ -1201,6 +1284,28 @@
           "canceled_at",
           "completed_at"
         ]
+      },
+      "PlatformListApplicationTransfersResponse": {
+        "title": "List Application Transfers Response",
+        "description": "A paginated list of application transfers.",
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "data": {
+            "type": "array",
+            "description": "The list of application transfers.",
+            "items": {
+              "$ref": "#/components/schemas/PlatformApplicationTransferResponse"
+            }
+          },
+          "total_count": {
+            "type": "integer",
+            "format": "int64",
+            "description": "The total number of application transfers matching the query.",
+            "example": 5
+          }
+        },
+        "required": ["data", "total_count"]
       }
     },
     "responses": {
