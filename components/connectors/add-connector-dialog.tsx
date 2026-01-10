@@ -65,7 +65,12 @@ export function AddConnectorDialog({ onAdd }: AddConnectorDialogProps) {
         type: "headers",
         headers: { [headerKey.trim()]: headerValue.trim() },
       };
-    } else if (authType === "oauth" && oauthClientId.trim() && oauthClientSecret.trim() && oauthTokenUrl.trim()) {
+    } else if (
+      authType === "oauth" &&
+      oauthClientId.trim() &&
+      oauthClientSecret.trim() &&
+      oauthTokenUrl.trim()
+    ) {
       auth = {
         type: "oauth",
         oauth: {
@@ -93,7 +98,11 @@ export function AddConnectorDialog({ onAdd }: AddConnectorDialogProps) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="ghost" size="sm" className="w-full justify-start gap-2 text-muted-foreground hover:text-foreground">
+        <Button
+          variant="ghost"
+          size="sm"
+          className="w-full justify-start gap-2 text-muted-foreground hover:text-foreground"
+        >
           <Plus className="w-4 h-4" />
           Add connector
         </Button>

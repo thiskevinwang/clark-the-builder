@@ -24,7 +24,7 @@ export function RunCommand({ message }: { message: DataPart["run-command"] }) {
         </Spinner>
         <Streamdown>{`\`${message.command} ${message.args.join(" ")}\``}</Streamdown>
       </div>
-      <code className="text-xs text-muted-foreground">{message.status}</code>
+      <small className="text-xs text-muted-foreground">{message.status}</small>
     </ToolMessage>
   );
 }

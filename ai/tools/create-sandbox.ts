@@ -1,8 +1,8 @@
-import { Sandbox } from "@vercel/sandbox";
 import type { UIMessage, UIMessageStreamWriter } from "ai";
 import { tool } from "ai";
-import z from "zod/v3";
+import z from "zod";
 
+import { sandboxProvider } from "../../lib/sandbox";
 import type { DataPart } from "../messages/data-parts";
 import description from "./create-sandbox.prompt.md";
 import { getRichError } from "./get-rich-error";
@@ -45,7 +45,7 @@ export const createSandbox = ({ writer }: Params) =>
       });
 
       try {
-        const sandbox = await Sandbox.create({
+        const sandbox = await sandboxProvider.create({
           // TODO(kevin): Support creation from a git repository
           // source: {
           //   url: "https://github.com/clerk/nextjs-auth-starter-template.git",
@@ -53,7 +53,7 @@ export const createSandbox = ({ writer }: Params) =>
           // },
           // FUTURE(kevin): Can we require auth & fetch VERCEL_OIDC_TOKEN for the application visitor?
           // token: ...,
-          timeout: timeout ?? 600000,
+          timeout: timeout ?? 1800000, // 30 minutes
           ports,
         });
 

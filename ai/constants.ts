@@ -31,9 +31,3 @@ export const MODEL_LABELS: Record<ModelId, string> = {
 export const DEFAULT_MODEL: ModelId = Models.AnthropicClaudeOpus45;
 
 export const SUPPORTED_MODELS: ModelId[] = [DEFAULT_MODEL];
-
-export const TEST_PROMPTS = [
-  "Generate a Clerk Next.js starter app",
-  "Build a b2b SaaS app. Use the clerk `b2b-saas` template, which has Organizations and Billing enabled. Build a single landing page and render the `<PricingTable for={'organization'}/>` component",
-  "Build a waitlist page. Use the clerk `waitlist` template & `<Waitlist/>` component",
-];

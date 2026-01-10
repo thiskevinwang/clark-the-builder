@@ -10,6 +10,7 @@ export function GenerateFiles(props: {
   className?: string;
   message: DataPart["generating-files"];
 }) {
+  // console.log("GenerateFiles", props.message);
   const lastInProgress = ["error", "uploading", "generating"].includes(props.message.status);
 
   const generated = lastInProgress
@@ -26,8 +27,8 @@ export function GenerateFiles(props: {
         <span>Generate files</span>
       </ToolHeader>
       <div className="text-sm relative min-h-5">
-        {generated.map((path) => (
-          <div className="flex items-center" key={"gen" + path}>
+        {generated.map((path, index) => (
+          <div className="flex items-center" key={"GENERATED_FILE_" + path + index}>
             <CheckIcon className="w-4 h-4 mx-1" />
             <span className="whitespace-pre-wrap">{path}</span>
           </div>

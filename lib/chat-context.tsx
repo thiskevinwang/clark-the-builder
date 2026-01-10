@@ -18,8 +18,12 @@ interface ChatContextValue {
 
 const ChatContext = createContext<ChatContextValue | undefined>(undefined);
 
+/**
+ * https://ai-sdk.dev/cookbook/next/use-shared-chat-context
+ */
 export function ChatProvider({ children }: { children: ReactNode }) {
   const { connectors } = useMCPConnectors();
+
   const mapDataToState = useDataStateMapper();
   const mapDataToStateRef = useRef(mapDataToState);
   mapDataToStateRef.current = mapDataToState;

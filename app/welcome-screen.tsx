@@ -25,6 +25,25 @@ interface Props {
   onMessageSent: () => void;
 }
 
+const PROMPTS = [
+  {
+    title: "Next.js Starter",
+    content: "Generate a Clerk Next.js starter app",
+  },
+  {
+    title: "Checkout Page",
+    content: "Build a two panel checkout page",
+  },
+  {
+    title: "B2B SaaS App",
+    content: `Build a b2b SaaS app. Use the clerk \`b2b-saas\` template, which has Organizations and Billing enabled. Build a single landing page and render the \`<PricingTable for={'organization'}/>\` component`,
+  },
+  {
+    title: "Waitlist Page",
+    content: "Create a waitlist with Clerk's component",
+  },
+];
+
 export function WelcomeScreen({ onMessageSent }: Props) {
   const [input, setInput] = useLocalStorageValue("prompt-input");
   const { chat } = useSharedChatContext();
@@ -149,31 +168,16 @@ export function WelcomeScreen({ onMessageSent }: Props) {
         <div className="mt-8 w-full animate-in fade-in slide-in-from-bottom-8 duration-700 delay-300">
           <p className="text-sm text-muted-foreground text-center mb-4">Try one of these</p>
           <div className="grid gap-3 md:grid-cols-2">
-            <QuickPromptCard
-              title="Next.js Starter"
-              description="Generate a Clerk Next.js starter app"
-              onClick={() => {
-                setInput("Generate a Clerk Next.js starter app");
-              }}
-            />
-            <QuickPromptCard
-              title="B2B SaaS App"
-              description="Build with Organizations and Billing"
-              onClick={() => {
-                setInput(
-                  "Build a b2b SaaS app. Use the clerk `b2b-saas` template, which has Organizations and Billing enabled. Build a single landing page and render the `<PricingTable for={'organization'}/>` component",
-                );
-              }}
-            />
-            <QuickPromptCard
-              title="Waitlist Page"
-              description="Create a waitlist with Clerk's component"
-              onClick={() => {
-                setInput(
-                  "Build a waitlist page. Use the clerk `waitlist` template & `<Waitlist/>` component",
-                );
-              }}
-            />
+            {PROMPTS.map((prompt) => (
+              <QuickPromptCard
+                key={prompt.title}
+                title={prompt.title}
+                description={prompt.content}
+                onClick={() => {
+                  setInput(prompt.content);
+                }}
+              />
+            ))}
           </div>
         </div>
       </div>

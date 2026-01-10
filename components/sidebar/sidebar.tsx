@@ -1,12 +1,27 @@
 "use client";
 
-import { KeyIcon, Trash2Icon, XIcon } from "lucide-react";
+import {
+  AlertTriangleIcon,
+  CheckCircleIcon,
+  KeyIcon,
+  LoaderIcon,
+  Trash2Icon,
+  XIcon,
+} from "lucide-react";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useClerkAppsInit, useClerkAppsStore } from "@/lib/storage/clerk-apps-store";
-import type { ClerkAppData } from "@/lib/storage/types";
+import type { ClerkAppData, ClerkAppOwnership } from "@/lib/storage/types";
 import { cn } from "@/lib/utils";
 
 import { useSidebar } from "./sidebar-state";
@@ -17,10 +32,16 @@ interface SidebarProps {
 
 export function Sidebar({ className }: SidebarProps) {
   const { isOpen, close } = useSidebar();
-  const { apps, isLoaded, removeApp } = useClerkAppsStore();
+  const { apps, isLoaded, isLoading, removeApp } = useClerkAppsStore();
 
   // Initialize the store on mount
   useClerkAppsInit();
+
+  // Separate apps by ownership
+  const ownedApps = apps.filter((app) => app.ownership === "owned");
+  const transferredApps = apps.filter((app) => app.ownership === "transferred");
+
+  const hasAnyApps = apps.length > 0;
 
   return (
     <>
@@ -56,19 +77,29 @@ export function Sidebar({ className }: SidebarProps) {
         {/* Apps List */}
         <ScrollArea className="flex-1 min-h-0">
           <div className="p-2">
-            {!isLoaded ? (
-              <div className="px-2 py-4 text-center text-sm text-muted-foreground">Loading...</div>
-            ) : apps.length === 0 ? (
+            {isLoading && !isLoaded ? (
+              <div className="flex items-center justify-center gap-2 px-2 py-4 text-sm text-muted-foreground">
+                <LoaderIcon className="h-4 w-4 animate-spin" />
+                Loading...
+              </div>
+            ) : !hasAnyApps ? (
               <div className="px-2 py-4 text-center text-sm text-muted-foreground">No apps yet</div>
             ) : (
-              <div className="space-y-1">
-                {apps.map((app) => (
-                  <AppItem
-                    key={app.applicationId}
-                    app={app}
-                    onRemove={() => removeApp(app.applicationId)}
+              <div className="space-y-4">
+                {/* Owned apps */}
+                {ownedApps.length > 0 && (
+                  <AppSection title="Your Apps" apps={ownedApps} onRemove={removeApp} />
+                )}
+
+                {/* Transferred apps */}
+                {transferredApps.length > 0 && (
+                  <AppSection
+                    title="Transferred"
+                    description="Claimed by another account"
+                    apps={transferredApps}
+                    onRemove={removeApp}
                   />
-                ))}
+                )}
               </div>
             )}
           </div>
@@ -85,42 +116,175 @@ export function Sidebar({ className }: SidebarProps) {
   );
 }
 
+interface AppSectionProps {
+  title: string;
+  description?: string;
+  apps: ClerkAppData[];
+  onRemove: (applicationId: string) => Promise<void>;
+}
+
+function AppSection({ title, description, apps, onRemove }: AppSectionProps) {
+  return (
+    <div>
+      <div className="px-2 mb-1">
+        <p className="text-xs font-medium text-muted-foreground">{title}</p>
+        {description && <p className="text-xs text-muted-foreground/70">{description}</p>}
+      </div>
+      <div className="space-y-1">
+        {apps.map((app) => (
+          <AppItem key={app.applicationId} app={app} onRemove={() => onRemove(app.applicationId)} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
 interface AppItemProps {
   app: ClerkAppData;
-  onRemove: () => void;
+  onRemove: () => Promise<void>;
 }
 
 function AppItem({ app, onRemove }: AppItemProps) {
   const [showDelete, setShowDelete] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+
+  const { icon: StatusIcon } = getOwnershipIcon(app.ownership);
+  const hasPendingTransfer = app.transfer?.status === "pending";
+
+  const handleDeleteClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setDeleteError(null);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    setIsDeleting(true);
+    setDeleteError(null);
+
+    try {
+      await onRemove();
+      setDeleteDialogOpen(false);
+    } catch (error) {
+      setDeleteError(error instanceof Error ? error.message : "Failed to delete app");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const handleDialogClose = (open: boolean) => {
+    if (!isDeleting) {
+      setDeleteDialogOpen(open);
+      if (!open) {
+        setDeleteError(null);
+      }
+    }
+  };
 
   return (
-    <div
-      className="group flex items-center gap-2 rounded-lg px-2 py-2 text-sm transition-colors hover:bg-accent"
-      onMouseEnter={() => setShowDelete(true)}
-      onMouseLeave={() => setShowDelete(false)}
-    >
-      <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
-        <KeyIcon className="h-3.5 w-3.5" />
-      </div>
-      <div className="flex-1 overflow-hidden">
-        <p className="truncate font-medium text-foreground">{app.name}</p>
-        <p className="truncate text-xs text-muted-foreground">{formatDate(app.createdAt)}</p>
-      </div>
-      {showDelete && (
-        <Button
-          variant="ghost"
-          size="sm"
-          className="h-6 w-6 p-0 text-muted-foreground hover:text-destructive"
-          onClick={(e) => {
-            e.stopPropagation();
-            onRemove();
-          }}
+    <>
+      <div
+        className="group flex items-center gap-2 rounded-lg px-2 py-2 text-sm transition-colors hover:bg-accent"
+        onMouseEnter={() => setShowDelete(true)}
+        onMouseLeave={() => setShowDelete(false)}
+      >
+        <div
+          className={cn(
+            "flex h-7 w-7 shrink-0 items-center justify-center rounded-md",
+            app.ownership === "transferred"
+              ? "bg-muted text-muted-foreground"
+              : "bg-primary/10 text-primary",
+          )}
         >
-          <Trash2Icon className="h-3.5 w-3.5" />
-        </Button>
-      )}
-    </div>
+          <StatusIcon className="h-3.5 w-3.5" />
+        </div>
+        <div className="flex-1 overflow-hidden">
+          <div className="flex items-center gap-1">
+            <p
+              className={cn(
+                "truncate font-medium",
+                app.ownership === "transferred" ? "text-muted-foreground" : "text-foreground",
+              )}
+            >
+              {app.name}
+            </p>
+            {hasPendingTransfer && (
+              <span className="shrink-0 rounded bg-yellow-500/10 px-1 py-0.5 text-[10px] font-medium text-yellow-600">
+                Pending
+              </span>
+            )}
+          </div>
+          <p className="truncate text-xs text-muted-foreground">{formatDate(app.createdAt)}</p>
+        </div>
+        {showDelete && (
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-6 w-6 p-0 text-muted-foreground hover:text-destructive"
+            onClick={handleDeleteClick}
+          >
+            <Trash2Icon className="h-3.5 w-3.5" />
+          </Button>
+        )}
+      </div>
+
+      <Dialog open={deleteDialogOpen} onOpenChange={handleDialogClose}>
+        <DialogContent showCloseButton={!isDeleting}>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <AlertTriangleIcon className="h-5 w-5 text-destructive" />
+              Delete Clerk App
+            </DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete{" "}
+              <span className="font-medium text-foreground">&ldquo;{app.name}&rdquo;</span>?
+            </DialogDescription>
+          </DialogHeader>
+          <div className="rounded-lg border border-destructive/20 bg-destructive/10 p-3">
+            <p className="text-sm text-destructive">
+              This action is permanent and cannot be reversed. The Clerk app and all associated data
+              will be permanently deleted.
+            </p>
+          </div>
+          {deleteError && (
+            <div className="rounded-lg border border-destructive/20 bg-destructive/5 p-3">
+              <p className="text-sm text-destructive">{deleteError}</p>
+            </div>
+          )}
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => handleDialogClose(false)}
+              disabled={isDeleting}
+            >
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={handleConfirmDelete} disabled={isDeleting}>
+              {isDeleting ? (
+                <>
+                  <LoaderIcon className="h-4 w-4 animate-spin" />
+                  Deleting...
+                </>
+              ) : (
+                "Delete App"
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
+}
+
+function getOwnershipIcon(ownership: ClerkAppOwnership) {
+  switch (ownership) {
+    case "transferred":
+      return { icon: CheckCircleIcon };
+    case "owned":
+    default:
+      return { icon: KeyIcon };
+  }
 }
 
 function formatDate(timestamp: number): string {

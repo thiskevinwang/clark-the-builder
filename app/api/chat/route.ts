@@ -1,10 +1,11 @@
 import { anthropic } from "@ai-sdk/anthropic";
 import {
+  ToolLoopAgent,
   convertToModelMessages,
   createUIMessageStream,
   createUIMessageStreamResponse,
   stepCountIs,
-  streamText,
+  type ModelMessage,
 } from "ai";
 import { checkBotId } from "botid/server";
 import { NextResponse } from "next/server";
@@ -18,6 +19,11 @@ import { type ChatUIMessage } from "@/components/chat/types";
 import { type MCPConnector } from "@/components/connectors/use-mcp-connectors";
 
 import prompt from "./prompt.md";
+
+const systemMessage: ModelMessage = {
+  role: "system",
+  content: prompt,
+};
 
 interface BodyData {
   messages: ChatUIMessage[];
@@ -46,9 +52,11 @@ export async function POST(req: Request) {
 
   // dynamic list of MCP clients
   const clients = await Promise.all(
-    connectors?.map(async (connector) => {
-      return await getMCPClient(connector.url);
-    }) || [],
+    connectors
+      ?.filter((connector) => connector.enabled)
+      .map(async (connector) => {
+        return await getMCPClient(connector.url);
+      }) || [],
   );
 
   const dynamicTools = clients.reduce((acc, client) => {
@@ -62,58 +70,52 @@ export async function POST(req: Request) {
     return Promise.all(clients?.map((client) => client.close()) || []);
   }
 
+  const modelOptions = getModelOptions(modelId, { reasoningEffort });
+
   return createUIMessageStreamResponse({
     stream: createUIMessageStream({
       originalMessages: messages,
-      execute: ({ writer }) => {
-        const result = streamText({
-          ...getModelOptions(modelId, { reasoningEffort }),
-          system: prompt,
+      execute: async ({ writer }) => {
+        const agent = new ToolLoopAgent({
+          model: modelOptions.model,
+          headers: modelOptions.headers,
+          providerOptions: modelOptions.providerOptions,
+          stopWhen: stepCountIs(20),
+          onFinish: async () => {
+            await closeMCPClients();
+          },
           tools: {
             code_execution: anthropic.tools.codeExecution_20250825(),
             ...tools({ modelId, writer }),
             ...dynamicTools,
           },
-          providerOptions: {
-            // anthropic: {} satisfies AnthropicProviderOptions,
-          },
-          messages: convertToModelMessages(
-            messages.map((message) => {
-              message.parts = message.parts.map((part) => {
-                if (part.type === "data-report-errors") {
-                  return {
-                    type: "text",
-                    text:
-                      `There are errors in the generated code. This is the summary of the errors we have:\n` +
-                      `\`\`\`${part.data.summary}\`\`\`\n` +
-                      (part.data.paths?.length
-                        ? `The following files may contain errors:\n` +
-                          `\`\`\`${part.data.paths?.join("\n")}\`\`\`\n`
-                        : "") +
-                      `Fix the errors reported.`,
-                  };
-                }
-                return part;
-              });
-              return message;
-            }),
-          ),
-          onStepFinish: (step) => {
-            // console.log(JSON.stringify(step, null, 2));
-          },
-          stopWhen: stepCountIs(20),
-
-          onError: async (error) => {
-            console.error("Error communicating with AI");
-            console.error(JSON.stringify(error, null, 2));
-            await closeMCPClients();
-          },
-          onFinish: async () => {
-            await closeMCPClients();
-          },
         });
 
-        result.consumeStream();
+        const result = await agent.stream({
+          messages: [systemMessage].concat(
+            await convertToModelMessages(
+              messages.map((message) => {
+                message.parts = message.parts.map((part) => {
+                  if (part.type === "data-report-errors") {
+                    return {
+                      type: "text",
+                      text:
+                        `There are errors in the generated code. This is the summary of the errors we have:\n` +
+                        `\`\`\`${part.data.summary}\`\`\`\n` +
+                        (part.data.paths?.length
+                          ? `The following files may contain errors:\n` +
+                            `\`\`\`${part.data.paths?.join("\n")}\`\`\`\n`
+                          : "") +
+                        `Fix the errors reported.`,
+                    };
+                  }
+                  return part;
+                });
+                return message;
+              }),
+            ),
+          ),
+        });
 
         writer.merge(
           result.toUIMessageStream({

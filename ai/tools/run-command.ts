@@ -1,8 +1,8 @@
-import { Command, Sandbox } from "@vercel/sandbox";
 import type { UIMessage, UIMessageStreamWriter } from "ai";
 import { tool } from "ai";
-import z from "zod/v3";
+import z from "zod";
 
+import { sandboxProvider, type SandboxCommand } from "../../lib/sandbox";
 import type { DataPart } from "../messages/data-parts";
 import { getRichError } from "./get-rich-error";
 import description from "./run-command.md";
@@ -41,10 +41,10 @@ export const runCommand = ({ writer }: Params) =>
         data: { sandboxId, command, args, status: "executing" },
       });
 
-      let sandbox: Sandbox | null = null;
+      let sandbox;
 
       try {
-        sandbox = await Sandbox.get({ sandboxId });
+        sandbox = await sandboxProvider.get({ sandboxId });
       } catch (error) {
         const richError = getRichError({
           action: "get sandbox by id",
@@ -67,7 +67,7 @@ export const runCommand = ({ writer }: Params) =>
         return richError.message;
       }
 
-      let cmd: Command | null = null;
+      let cmd: SandboxCommand | null = null;
 
       try {
         cmd = await sandbox.runCommand({

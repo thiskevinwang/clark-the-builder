@@ -85,7 +85,7 @@ export function Chat({ className }: Props) {
             placeholder="Ask a follow-up..."
             rows={2}
             value={input}
-            className="text-base"
+            className="text-base max-h-[200px] overflow-y-auto"
           />
           <InputGroupAddon align="block-end">
             <div className="flex items-center gap-1">

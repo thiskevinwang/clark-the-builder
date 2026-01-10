@@ -1,5 +1,5 @@
-import { streamObject, type ModelMessage } from "ai";
-import z from "zod/v3";
+import { Output, streamText, type ModelMessage } from "ai";
+import z from "zod";
 
 import { getModelOptions } from "@/ai/gateway";
 
@@ -35,7 +35,7 @@ interface FileContentChunk {
 export async function* getContents(params: Params): AsyncGenerator<FileContentChunk> {
   const generated: z.infer<typeof fileSchema>[] = [];
   const deferred = new Deferred<void>();
-  const result = streamObject({
+  const result = streamText({
     ...getModelOptions(params.modelId, { reasoningEffort: "minimal" }),
     maxOutputTokens: 64000,
     system:
@@ -49,7 +49,7 @@ export async function* getContents(params: Params): AsyncGenerator<FileContentCh
         )}`,
       },
     ],
-    schema: z.object({ files: z.array(fileSchema) }),
+    output: Output.object({ schema: z.object({ files: z.array(fileSchema) }) }),
     onError: (error) => {
       deferred.reject(error);
       console.error("Error communicating with AI");
@@ -57,7 +57,7 @@ export async function* getContents(params: Params): AsyncGenerator<FileContentCh
     },
   });
 
-  for await (const items of result.partialObjectStream) {
+  for await (const items of result.partialOutputStream) {
     if (!Array.isArray(items?.files)) {
       continue;
     }
