@@ -36,12 +36,15 @@ export function MainLayout({ horizontalSizes, verticalSizes }: Props) {
             <TabContent tabId="chat" className="flex-1">
               <Chat className="flex-1 overflow-hidden" />
             </TabContent>
+
             <TabContent tabId="preview" className="flex-1">
               <Preview className="flex-1 overflow-hidden" />
             </TabContent>
+
             <TabContent tabId="file-explorer" className="flex-1">
               <FileExplorer className="flex-1 overflow-hidden" />
             </TabContent>
+
             <TabContent tabId="logs" className="flex-1">
               <Logs className="flex-1 overflow-hidden" />
             </TabContent>

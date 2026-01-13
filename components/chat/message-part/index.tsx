@@ -47,6 +47,8 @@ export const ResponseMessagePart = memo(function MessagePart({ part, partIndex }
       return <TextPart part={part} />;
     case "dynamic-tool":
       return <ToolInvocation part={part} />;
+    // case "tool-createClerkApp":
+    //   return <ToolInvocation part={part} />;
     default:
       return null;
   }

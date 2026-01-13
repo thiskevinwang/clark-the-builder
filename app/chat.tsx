@@ -1,7 +1,7 @@
 "use client";
 
-import { useChat } from "@ai-sdk/react";
-import { ArrowUpIcon } from "lucide-react";
+import { useChat, type Chat as SharedChat } from "@ai-sdk/react";
+import { ArrowUpIcon, StopCircleIcon } from "lucide-react";
 import { useCallback, useEffect } from "react";
 
 import {
@@ -33,10 +33,24 @@ interface Props {
 }
 
 export function Chat({ className }: Props) {
-  const [input, setInput] = useLocalStorageValue("prompt-input");
   const { chat } = useSharedChatContext();
+
+  if (!chat) {
+    return (
+      <Panel className={className} variant="ghost">
+        <div className="p-4 text-sm text-muted-foreground">Loading chat…</div>
+      </Panel>
+    );
+  }
+
+  return <ChatWithChat className={className} chat={chat} />;
+}
+
+function ChatWithChat({ className, chat }: { className: string; chat: SharedChat<ChatUIMessage> }) {
+  const [input, setInput] = useLocalStorageValue("prompt-input");
   const { modelId, reasoningEffort } = useSettings();
-  const { messages, sendMessage, status } = useChat<ChatUIMessage>({ chat });
+  const { messages, sendMessage, status, stop } = useChat<ChatUIMessage>({ chat });
+
   const { setChatStatus } = useSandboxStore();
 
   const validateAndSubmitMessage = useCallback(
@@ -44,6 +58,21 @@ export function Chat({ className }: Props) {
       if (text.trim()) {
         sendMessage({ text }, { body: { modelId, reasoningEffort } });
         setInput("");
+        // Optimistically update the messages list
+        // https://swr.vercel.app/examples/optimistic-ui
+
+        // const optimistic = {
+        //   messages: [
+        //     ...(data?.messages ?? []),
+        //     { id: `temp-${Date.now()}`, role: "user", parts: [{ type: "text", text }] },
+        //   ],
+        // };
+
+        // mutate(optimistic, {
+        //   optimisticData: optimistic,
+        //   populateCache: true,
+        //   revalidate: false,
+        // });
       }
     },
     [sendMessage, modelId, setInput, reasoningEffort],
@@ -85,7 +114,7 @@ export function Chat({ className }: Props) {
             placeholder="Ask a follow-up..."
             rows={2}
             value={input}
-            className="text-base max-h-[200px] overflow-y-auto"
+            className="text-base max-h-50 overflow-y-auto"
           />
           <InputGroupAddon align="block-end">
             <div className="flex items-center gap-1">
@@ -97,16 +126,30 @@ export function Chat({ className }: Props) {
             <div className="ml-auto flex items-center gap-2">
               <ModelSelector />
 
-              <InputGroupButton
-                type="submit"
-                size="sm"
-                variant="ghost"
-                disabled={status !== "ready" || !input.trim()}
-                className="h-9 w-9 p-0 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground disabled:opacity-40 disabled:bg-muted disabled:text-muted-foreground transition-all"
-              >
-                <ArrowUpIcon className="w-4 h-4" />
-                <span className="sr-only">Send</span>
-              </InputGroupButton>
+              {status === "ready" && (
+                <InputGroupButton
+                  type="submit"
+                  size="sm"
+                  variant="ghost"
+                  disabled={!input.trim()}
+                  className="h-9 w-9 p-0 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground disabled:opacity-40 disabled:bg-muted disabled:text-muted-foreground transition-all"
+                >
+                  <ArrowUpIcon className="w-4 h-4" />
+                  <span className="sr-only">Send</span>
+                </InputGroupButton>
+              )}
+              {(status === "streaming" || status === "submitted") && (
+                <InputGroupButton
+                  type="button"
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => stop()}
+                  className="h-9 w-9 p-0 rounded-xl bg-destructive hover:bg-destructive/90 text-destructive-foreground transition-all"
+                >
+                  <StopCircleIcon className="w-4 h-4" />
+                  <span className="sr-only">Stop</span>
+                </InputGroupButton>
+              )}
             </div>
           </InputGroupAddon>
         </InputGroup>

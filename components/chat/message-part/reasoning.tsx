@@ -2,6 +2,8 @@ import type { ReasoningUIPart } from "ai";
 import { BrainIcon, ChevronDownIcon, ChevronRightIcon } from "lucide-react";
 import { Streamdown } from "streamdown";
 
+import { TextShimmer } from "@/components/ui/text-shimmer";
+
 import { useReasoningContext } from "../message";
 import { MessageSpinner } from "../message-spinner";
 
@@ -13,7 +15,7 @@ export function Reasoning({ part, partIndex }: { part: ReasoningUIPart; partInde
     return null;
   }
 
-  const text = part.text || "_Thinking_";
+  const text = part.text;
   const isStreaming = part.state === "streaming";
   const firstLine = text.split("\n")[0].replace(/\*\*/g, "");
   const hasMoreContent = text.includes("\n") || text.length > 80;
@@ -33,7 +35,11 @@ export function Reasoning({ part, partIndex }: { part: ReasoningUIPart; partInde
       {/* Reasoning header */}
       <div className="flex items-center gap-2 px-3 py-2 text-muted-foreground border-b border-border/50">
         <BrainIcon className="w-3.5 h-3.5 shrink-0" />
-        <span className="font-medium">{isStreaming ? "Reasoning..." : "Reasoned"}</span>
+
+        <TextShimmer className="text-sm" duration={1}>
+          Thinking hard...
+        </TextShimmer>
+
         {hasMoreContent && (
           <div className="ml-auto">
             {isExpanded ? (

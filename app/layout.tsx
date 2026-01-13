@@ -32,7 +32,7 @@ export const metadata: Metadata = {
   description,
 };
 
-export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
+export default async function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${sansfont.variable} ${monofont.variable} font-sans antialiased`}>

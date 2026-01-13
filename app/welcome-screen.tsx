@@ -1,6 +1,6 @@
 "use client";
 
-import { useChat } from "@ai-sdk/react";
+import { useChat, type Chat } from "@ai-sdk/react";
 import { ArrowUpIcon, PanelLeftIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
@@ -48,10 +48,26 @@ const PROMPTS = [
 ];
 
 export function WelcomeScreen() {
-  const [input, setInput] = useLocalStorageValue("prompt-input");
   const { chat } = useSharedChatContext();
+
+  if (!chat) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background px-4">
+        <div className="text-sm text-muted-foreground">Preparing chat…</div>
+      </div>
+    );
+  }
+
+  return <WelcomeScreenWithChat chat={chat} />;
+}
+
+function WelcomeScreenWithChat({ chat }: { chat: Chat<ChatUIMessage> }) {
+  const [input, setInput] = useLocalStorageValue("prompt-input");
   const { modelId, reasoningEffort } = useSettings();
-  const { sendMessage, status, id, messages } = useChat<ChatUIMessage>({ chat });
+
+  const { sendMessage, status, id, messages } = useChat<ChatUIMessage>({
+    chat,
+  });
   const { isOpen, toggle } = useSidebar();
   const router = useRouter();
 
@@ -63,13 +79,13 @@ export function WelcomeScreen() {
   };
 
   useEffect(() => {
-    if (messages.length > 0 && id) {
+    if (id && messages.length) {
       router.replace(`/chats/${id}`);
     }
-  }, [id, messages.length, router]);
+  }, [id, messages, router]);
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-background via-background to-accent/20 px-4">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-linear-to-b from-background via-background to-accent/20 px-4">
       {/* Sidebar */}
       <Sidebar />
 
@@ -119,9 +135,6 @@ export function WelcomeScreen() {
           >
             How can I help you today?
           </h1>
-          {/* <p className="text-muted-foreground text-lg">
-            Build Clerk-powered apps in seconds
-          </p> */}
         </div>
 
         {/* Chat input */}

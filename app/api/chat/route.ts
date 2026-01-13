@@ -2,6 +2,7 @@ import {
   convertToModelMessages,
   createUIMessageStream,
   createUIMessageStreamResponse,
+  safeValidateUIMessages,
   stepCountIs,
   streamText,
   type ModelMessage,
@@ -16,6 +17,9 @@ import { tools } from "@/ai/tools";
 
 import { type ChatUIMessage } from "@/components/chat/types";
 import { type MCPConnector } from "@/components/connectors/use-mcp-connectors";
+import { db } from "@/lib/database/db";
+import { genMessageId } from "@/lib/identifiers/generator";
+import { createMessageRepository } from "@/lib/repositories/message-repository-impl";
 
 import prompt from "./prompt.md";
 
@@ -25,10 +29,18 @@ const systemMessage: ModelMessage = {
 };
 
 interface BodyData {
+  chatId: string;
   messages: ChatUIMessage[];
   modelId?: ModelId;
   reasoningEffort?: "low" | "medium";
   connectors?: MCPConnector[];
+}
+
+function coerceMetadata(value: unknown): Record<string, unknown> | undefined {
+  if (!value) return undefined;
+  if (typeof value !== "object") return undefined;
+  if (Array.isArray(value)) return undefined;
+  return value as Record<string, unknown>;
 }
 
 export async function POST(req: Request) {
@@ -37,12 +49,40 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: `Bot detected` }, { status: 403 });
   }
 
-  const [models, reqBody] = await Promise.all([
-    getAvailableModels(),
-    req.json() as Promise<BodyData>,
-  ]);
+  const [models, { messages, chatId, modelId = DEFAULT_MODEL, reasoningEffort, connectors }] =
+    await Promise.all([getAvailableModels(), req.json() as Promise<BodyData>]);
 
-  const { messages, modelId = DEFAULT_MODEL, reasoningEffort, connectors } = reqBody;
+  const messageRepo = createMessageRepository(db);
+
+  // Load persisted UI messages from the messages table.
+  // const persistedRows = await messageRepo.listByConversationId(chatId);
+
+  const validationResult = await safeValidateUIMessages({
+    // messages: [...persistedRows, message],
+    messages,
+  });
+  if (!validationResult.success) {
+    console.error("Corrupted message history:", validationResult.error);
+    return NextResponse.json({ error: "Corrupted message history" }, { status: 500 });
+  }
+  const allMessages = validationResult.data;
+
+  // `result.toUIMessageStream({ onFinish })` returns the full message list.
+  // Persisting everything every turn is both wasteful and can create duplicates
+  // if upstream message IDs ever change. Keep a snapshot of what's already known
+  // at request start and only persist newly-created messages.
+  const originalMessageIds = new Set(allMessages.map((m) => m.id));
+
+  // immediately persist the incoming latest message
+  const latestMessage = allMessages[allMessages.length - 1];
+  await messageRepo.upsertByExternalId({
+    id: latestMessage.id,
+    conversationId: chatId,
+    role: latestMessage.role,
+    parts: latestMessage.parts,
+    metadata: coerceMetadata(latestMessage.metadata),
+    externalId: latestMessage.id,
+  });
 
   const model = models.find((model) => model.id === modelId);
   if (!model) {
@@ -69,64 +109,60 @@ export async function POST(req: Request) {
     return Promise.all(clients?.map((client) => client.close()) || []);
   }
 
-  const modelOptions = getModelOptions(modelId, { reasoningEffort });
-  // const { tools: bashTools } = await createBashTool();
+  const stream = createUIMessageStream({
+    generateId: genMessageId,
+    originalMessages: allMessages,
+    execute: async ({ writer }) => {
+      const result = streamText({
+        ...getModelOptions(modelId, { reasoningEffort }),
+        system: systemMessage.content as string,
+        messages: await convertToModelMessages(allMessages), // todo: handle errored data-parts
+        stopWhen: stepCountIs(20),
+        tools: {
+          ...tools({ messageRepository: messageRepo, modelId, writer, chatId }),
+          ...dynamicTools,
+        },
+        onError: async (error) => {
+          console.error("Error during agent execution:", error);
+          await closeMCPClients();
+        },
+      });
 
-  return createUIMessageStreamResponse({
-    stream: createUIMessageStream({
-      originalMessages: messages,
-      execute: async ({ writer }) => {
-        const result = streamText({
-          ...modelOptions,
-          system: systemMessage.content as string,
-          messages: await convertToModelMessages(
-            messages.map((message) => {
-              message.parts = message.parts.map((part) => {
-                if (part.type === "data-report-errors") {
-                  return {
-                    type: "text",
-                    text:
-                      `There are errors in the generated code. This is the summary of the errors we have:\n` +
-                      `\`\`\`${part.data.summary}\`\`\`\n` +
-                      (part.data.paths?.length
-                        ? `The following files may contain errors:\n` +
-                          `\`\`\`${part.data.paths?.join("\n")}\`\`\`\n`
-                        : "") +
-                      `Fix the errors reported.`,
-                  };
-                }
-                return part;
-              });
-              return message;
-            }),
-          ),
-          onStepFinish: async (step) => {},
-          stopWhen: stepCountIs(20),
-          tools: {
-            ...tools({ modelId, writer }),
-            ...dynamicTools,
-          },
-          onError: async (error) => {
-            console.error("Error during agent execution:", error);
-            await closeMCPClients();
-          },
-          onFinish: async () => {
-            await closeMCPClients();
-          },
-        });
+      result.consumeStream();
 
-        result.consumeStream();
-
-        writer.merge(
-          result.toUIMessageStream({
-            sendReasoning: true,
-            sendStart: false,
-            messageMetadata: () => ({
-              model: model.name,
-            }),
+      writer.merge(
+        result.toUIMessageStream({
+          originalMessages: allMessages,
+          sendReasoning: true,
+          generateMessageId: genMessageId,
+          sendStart: false,
+          messageMetadata: () => ({
+            model: model.name,
           }),
-        );
-      },
-    }),
+          onFinish: async ({ messages }) => {
+            // Persist the updated list of messages including tool calls and final response
+
+            for (const msg of messages) {
+              if (originalMessageIds.has(msg.id)) continue;
+
+              await messageRepo.upsertByExternalId({
+                id: msg.id,
+                conversationId: chatId,
+                role: msg.role,
+                parts: msg.parts,
+                metadata: coerceMetadata(msg.metadata),
+                externalId: msg.id,
+              });
+            }
+
+            await closeMCPClients();
+          },
+        }),
+      );
+    },
   });
+
+  // https://ai-sdk.dev/docs/ai-sdk-ui/streaming-data#streaming-custom-data
+  // createUIMessageStreamResponse: creates a response object that streams data
+  return createUIMessageStreamResponse({ stream });
 }

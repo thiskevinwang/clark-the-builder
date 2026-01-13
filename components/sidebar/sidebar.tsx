@@ -5,9 +5,12 @@ import {
   CheckCircleIcon,
   KeyIcon,
   LoaderIcon,
+  MessagesSquareIcon,
   Trash2Icon,
   XIcon,
 } from "lucide-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -33,6 +36,7 @@ interface SidebarProps {
 export function Sidebar({ className }: SidebarProps) {
   const { isOpen, close } = useSidebar();
   const { apps, isLoaded, isLoading, removeApp } = useClerkAppsStore();
+  const pathname = usePathname();
 
   // Initialize the store on mount
   useClerkAppsInit();
@@ -77,6 +81,30 @@ export function Sidebar({ className }: SidebarProps) {
         {/* Apps List */}
         <ScrollArea className="flex-1 min-h-0">
           <div className="p-2">
+            {/* Navigation */}
+            <div className="mb-4">
+              <div className="px-2 mb-1">
+                <p className="text-xs font-medium text-muted-foreground">Navigation</p>
+              </div>
+              <div className="space-y-1">
+                <Link
+                  href="/chats"
+                  onClick={close}
+                  className={cn(
+                    "flex items-center gap-2 rounded-lg px-2 py-2 text-sm transition-colors hover:bg-accent",
+                    pathname === "/chats" || pathname.startsWith("/chats/")
+                      ? "bg-accent text-foreground"
+                      : "text-muted-foreground hover:text-foreground",
+                  )}
+                >
+                  <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
+                    <MessagesSquareIcon className="h-3.5 w-3.5" />
+                  </div>
+                  <span className="font-medium">Chats</span>
+                </Link>
+              </div>
+            </div>
+
             {isLoading && !isLoaded ? (
               <div className="flex items-center justify-center gap-2 px-2 py-4 text-sm text-muted-foreground">
                 <LoaderIcon className="h-4 w-4 animate-spin" />

@@ -41,7 +41,7 @@ Generate the api client
 bunx @hey-api/openapi-ts \
   -i openapi.json \
   -o lib/api \
-  -c @hey-api/client-fetch
+  -c @tanstack/react-query
 ```
 
 Get vercel token for Sandbox access
