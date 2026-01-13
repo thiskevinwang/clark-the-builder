@@ -109,10 +109,6 @@ export function Sidebar({ className }: SidebarProps) {
         <ScrollArea className="flex-1 min-h-0">
           <div className={cn("p-2", isCollapsed && "md:px-1")}>
             <div className="mb-4">
-              <div className={cn("px-2 mb-1", isCollapsed && "md:hidden")}>
-                <p className="text-xs font-medium text-muted-foreground">Navigation</p>
-              </div>
-
               <div className="space-y-1">
                 {isCollapsed ? (
                   <>
