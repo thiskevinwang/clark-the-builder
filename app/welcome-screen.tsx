@@ -5,6 +5,7 @@ import { ArrowUpIcon, PanelLeftIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
+import { Loader } from "@/components/ai-elements/loader";
 import type { ChatUIMessage } from "@/components/chat/types";
 import { ClarkAvatar } from "@/components/clark-avatar";
 import { ConnectorsMenu } from "@/components/connectors/connectors-menu";
@@ -53,7 +54,9 @@ export function WelcomeScreen() {
   if (!chat) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background px-4">
-        <div className="text-sm text-muted-foreground">Preparing chat…</div>
+        <div className="text-sm text-muted-foreground">
+          <Loader />
+        </div>
       </div>
     );
   }
@@ -97,7 +100,7 @@ function WelcomeScreenWithChat({ chat }: { chat: Chat<ChatUIMessage> }) {
               variant="ghost"
               size="icon"
               onClick={toggle}
-              className="fixed top-4 left-4 z-30 h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-accent/80 backdrop-blur-sm"
+              className="fixed top-4 left-4 z-30 h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-accent/80 backdrop-blur-sm md:hidden"
             >
               <PanelLeftIcon className="h-4 w-4" />
             </Button>

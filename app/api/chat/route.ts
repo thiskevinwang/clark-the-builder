@@ -80,7 +80,6 @@ export async function POST(req: Request) {
     conversationId: chatId,
     role: latestMessage.role,
     parts: latestMessage.parts,
-    metadata: coerceMetadata(latestMessage.metadata),
     externalId: latestMessage.id,
   });
 
@@ -126,6 +125,12 @@ export async function POST(req: Request) {
           console.error("Error during agent execution:", error);
           await closeMCPClients();
         },
+        onFinish: async ({ usage, reasoningText, totalUsage }) => {
+          console.log("Generation finished");
+          console.log("Usage:", JSON.stringify(usage, null, 2));
+          console.log("Total Usage:", JSON.stringify(totalUsage, null, 2));
+          console.log("Reasoning Text:", reasoningText);
+        },
       });
 
       result.consumeStream();
@@ -134,6 +139,7 @@ export async function POST(req: Request) {
         result.toUIMessageStream({
           originalMessages: allMessages,
           sendReasoning: true,
+          sendSources: true,
           generateMessageId: genMessageId,
           sendStart: false,
           messageMetadata: () => ({

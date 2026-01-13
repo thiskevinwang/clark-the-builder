@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, IBM_Plex_Serif } from "next/font/google";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import type { ReactNode } from "react";
 import { Suspense } from "react";
@@ -24,6 +24,12 @@ const monofont = Geist_Mono({
   variable: "--font-mono",
 });
 
+const seriffont = IBM_Plex_Serif({
+  subsets: ["latin"],
+  weight: ["400", "700"],
+  variable: "--font-serif",
+});
+
 const title = "Clerk0";
 const description = `This is a demo for a generative AI builder app that provisions Clerk applications through the Clerk Platform API`;
 
@@ -35,7 +41,9 @@ export const metadata: Metadata = {
 export default async function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${sansfont.variable} ${monofont.variable} font-sans antialiased`}>
+      <body
+        className={`${sansfont.variable} ${monofont.variable} ${seriffont.variable} font-sans antialiased`}
+      >
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
