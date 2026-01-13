@@ -79,10 +79,10 @@ function WelcomeScreenWithChat({ chat }: { chat: Chat<ChatUIMessage> }) {
   };
 
   useEffect(() => {
-    if (id && messages.length) {
+    if (id && messages.length == 1) {
       router.replace(`/chats/${id}`);
     }
-  }, [id, messages, router]);
+  }, [id, messages.length, router]);
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-linear-to-b from-background via-background to-accent/20 px-4">
