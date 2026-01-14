@@ -1,9 +1,10 @@
 "use client";
 
-import { useChat } from "@ai-sdk/react";
+import { useChat, type Chat } from "@ai-sdk/react";
 import { createContext, useCallback, useContext, useEffect, useRef, useTransition } from "react";
 
 import { useCommandErrorsLogs } from "@/app/state";
+import type { ChatUIMessage } from "@/components/chat/types";
 import { useSettings } from "@/components/settings/use-settings";
 import { useSharedChatContext } from "@/lib/chat-context";
 
@@ -17,17 +18,39 @@ interface Props {
 }
 
 export function ErrorMonitor({ children, debounceTimeMs = 10000 }: Props) {
+  const { chat } = useSharedChatContext();
+
+  if (!chat) {
+    return <Context.Provider value={{ status: "disabled" }}>{children}</Context.Provider>;
+  }
+
+  return (
+    <ErrorMonitorWithChat chat={chat} debounceTimeMs={debounceTimeMs}>
+      {children}
+    </ErrorMonitorWithChat>
+  );
+}
+
+function ErrorMonitorWithChat({
+  chat,
+  children,
+  debounceTimeMs,
+}: {
+  chat: Chat<ChatUIMessage>;
+  children: React.ReactNode;
+  debounceTimeMs: number;
+}) {
   const [pending, startTransition] = useTransition();
   const { cursor, scheduled, setCursor, setScheduled } = useMonitorState();
   const { errors } = useCommandErrorsLogs();
   const { fixErrors } = useSettings();
-  const { chat } = useSharedChatContext();
   const { sendMessage, status: chatStatus, messages } = useChat({ chat });
   const submitTimeout = useRef<NodeJS.Timeout | null>(null);
   const inspectedErrors = useRef<number>(0);
   const lastReportedErrors = useRef<string[]>([]);
   const errorReportCount = useRef<Map<string, number>>(new Map());
   const lastErrorReportTime = useRef<number>(0);
+
   const clearSubmitTimeout = useCallback(() => {
     if (submitTimeout.current) {
       setScheduled(false);
@@ -96,14 +119,14 @@ export function ErrorMonitor({ children, debounceTimeMs = 10000 }: Props) {
   useEffect(() => {
     if (status === "ready" && inspectedErrors.current < errors.length) {
       const prev = errors.slice(0, cursor);
-      const pending = errors.slice(cursor);
+      const pendingErrors = errors.slice(cursor);
       inspectedErrors.current = errors.length;
       setScheduled(true);
       clearSubmitTimeout();
       submitTimeout.current = setTimeout(() => {
         setScheduled(false);
         setCursor(errors.length);
-        handleErrors(pending, prev);
+        handleErrors(pendingErrors, prev);
       }, debounceTimeMs);
     } else if (status === "disabled") {
       clearSubmitTimeout();

@@ -1,9 +1,7 @@
 "use client";
 
 import { PanelLeftIcon } from "lucide-react";
-import Link from "next/link";
 
-import { ClarkAvatar } from "@/components/clark-avatar";
 import { useSidebar } from "@/components/sidebar";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
@@ -27,7 +25,7 @@ export function Header({ className }: Props) {
                 variant="ghost"
                 size="icon"
                 onClick={toggle}
-                className="h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-accent"
+                className="h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-accent md:hidden"
               >
                 <PanelLeftIcon className="h-4 w-4" />
               </Button>
@@ -44,12 +42,12 @@ export function Header({ className }: Props) {
           </Tooltip>
         )}
 
-        <ClarkAvatar size={28} className="rounded-md" />
+        {/* <ClarkAvatar size={28} className="rounded-md" />
         <Link href="/" className="hover:underline">
           <span className="font-mono hidden md:inline text-sm font-semibold text-foreground tracking-tight">
             Clerk0
           </span>
-        </Link>
+        </Link> */}
       </div>
     </header>
   );
