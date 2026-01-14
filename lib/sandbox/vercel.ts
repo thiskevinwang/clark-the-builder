@@ -65,11 +65,19 @@ export const vercelSandboxProvider: SandboxProvider = {
       timeout: options.timeout,
       ports: options.ports,
       runtime: "node24",
+      projectId: process.env.VERCEL_PROJECT_ID,
+      teamId: process.env.VERCEL_TEAM_ID,
+      token: process.env.VERCEL_TOKEN,
     });
     return wrapSandbox(sandbox);
   },
   async get(options: { sandboxId: string }): Promise<Sandbox> {
-    const sandbox = await VercelSandbox.get(options);
+    const sandbox = await VercelSandbox.get({
+      sandboxId: options.sandboxId,
+      projectId: process.env.VERCEL_PROJECT_ID,
+      teamId: process.env.VERCEL_TEAM_ID,
+      token: process.env.VERCEL_TOKEN,
+    });
     return wrapSandbox(sandbox);
   },
 };

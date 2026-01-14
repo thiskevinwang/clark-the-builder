@@ -2,19 +2,10 @@
 
 import { Chat } from "@ai-sdk/react";
 import { DataUIPart, DefaultChatTransport } from "ai";
-import { useParams, usePathname } from "next/navigation";
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-  type ReactNode,
-} from "react";
+import { useParams } from "next/navigation";
+import { createContext, useContext, useMemo, useRef, type ReactNode } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
-import useSWRMutation from "swr/mutation";
 
 import { DataPart } from "@/ai/messages/data-parts";
 
@@ -30,40 +21,28 @@ interface ChatContextValue {
 
 const ChatContext = createContext<ChatContextValue | undefined>(undefined);
 
+export const PENDING_WELCOME_PROMPT_KEY = "pending-welcome-prompt";
+
+const EMPTY_MESSAGES: ChatUIMessage[] = [];
+
 /**
  * https://ai-sdk.dev/cookbook/next/use-shared-chat-context
  */
 export function ChatProvider({ children }: { children: ReactNode }) {
-  const params = useParams<{ chatId: string }>();
-  const [chatId, setChatId] = useState(() => params.chatId);
-  const pathname = usePathname();
-
-  const createChatMutation = useSWRMutation<
-    { chat: { id: string } },
-    unknown,
-    string,
-    { title?: string }
-  >("/api/chats", async (url, { arg }) => {
-    const res = await fetch(url, {
-      method: "POST",
-      body: JSON.stringify({ title: arg?.title ?? "New Chat" }),
-    });
-    return res.json();
-  });
-
-  useEffect(() => {
-    // Only auto-create a chat on the welcome screen.
-    // Visiting /chats (the list/search page) shouldn't create empty conversations.
-    if (!chatId && pathname === "/") {
-      createChatMutation.trigger({ title: "New Chat" }).then((data) => {
-        setChatId(data.chat.id);
-      });
-    }
-  }, [chatId, pathname, createChatMutation]);
+  const params = useParams<{ chatId?: string }>();
+  const chatId = params?.chatId ?? null;
 
   const listMessagesQuery = useSWR(
     chatId ? `/api/chats/${chatId}/messages` : null,
-    (key) => fetch(key).then((res) => res.json()),
+    async (key) => {
+      const res = await fetch(key);
+      if (!res.ok) {
+        const error = new Error(`Failed to load messages (${res.status})`);
+        (error as Error & { status?: number }).status = res.status;
+        throw error;
+      }
+      return res.json();
+    },
     {
       fallbackData: { messages: [] },
     },
@@ -95,11 +74,13 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     });
   }, [chatId]);
 
+  const messages = chatId ? (listMessagesQuery.data?.messages ?? EMPTY_MESSAGES) : EMPTY_MESSAGES;
+
   const chat = useMemo(() => {
     if (!chatId || !transport) return null;
 
     return new Chat<ChatUIMessage>({
-      messages: listMessagesQuery.data.messages,
+      messages,
       generateId: genMessageId,
       id: chatId,
       transport,
@@ -111,11 +92,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
         console.error("Error sending message:", error);
       },
     });
-  }, [
-    chatId,
-    transport,
-    listMessagesQuery.data.messages?.[listMessagesQuery.data.messages?.length - 1]?.id,
-  ]);
+  }, [chatId, transport, messages]);
 
   return (
     <ChatContext.Provider value={{ chat, chatId: chatId ?? null }}>{children}</ChatContext.Provider>

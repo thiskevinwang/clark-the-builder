@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import z from "zod";
 
 import { db } from "@/lib/database/db";
-import { Conversation } from "@/lib/models/conversation";
+import { Conversation, ConversationWithMessageCount } from "@/lib/models/conversation";
 import { createConversationRepository } from "@/lib/repositories/conversation-repository-impl";
 
 const ListChatsQuerySchema = z.object({
@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Invalid query parameters" }, { status: 400 });
   }
 
-  const conversations = await createConversationRepository(db).listRecent(
+  const conversations = await createConversationRepository(db).listRecentWithMessageCount(
     parsed.data.limit,
     parsed.data.offset,
     parsed.data.q,
@@ -51,7 +51,7 @@ export async function POST(req: Request) {
 }
 
 export interface GETResponse {
-  chats: Conversation[];
+  chats: ConversationWithMessageCount[];
 }
 
 export interface POSTResponse {

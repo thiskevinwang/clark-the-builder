@@ -2,7 +2,7 @@
 
 import { useChat, type Chat as SharedChat } from "@ai-sdk/react";
 import { ArrowUpIcon, StopCircleIcon } from "lucide-react";
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useRef } from "react";
 
 import {
   Conversation,
@@ -22,7 +22,7 @@ import {
   InputGroupButton,
   InputGroupTextarea,
 } from "@/components/ui/input-group";
-import { useSharedChatContext } from "@/lib/chat-context";
+import { PENDING_WELCOME_PROMPT_KEY, useSharedChatContext } from "@/lib/chat-context";
 import { useLocalStorageValue } from "@/lib/use-local-storage-value";
 
 import { useSandboxStore } from "./state";
@@ -50,6 +50,8 @@ function ChatWithChat({ className, chat }: { className: string; chat: SharedChat
   const [input, setInput] = useLocalStorageValue("prompt-input");
   const { modelId, reasoningEffort } = useSettings();
   const { messages, sendMessage, status, stop } = useChat<ChatUIMessage>({ chat });
+
+  const hasHandledPendingPromptRef = useRef(false);
 
   const { setChatStatus } = useSandboxStore();
 
@@ -81,6 +83,43 @@ function ChatWithChat({ className, chat }: { className: string; chat: SharedChat
   useEffect(() => {
     setChatStatus(status);
   }, [status, setChatStatus]);
+
+  useEffect(() => {
+    if (hasHandledPendingPromptRef.current) return;
+    if (status !== "ready") return;
+    if (messages.length > 0) {
+      // If the chat already has content, don't auto-send anything.
+      hasHandledPendingPromptRef.current = true;
+      try {
+        const raw = sessionStorage.getItem(PENDING_WELCOME_PROMPT_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw) as { chatId?: string; prompt?: string };
+          if (parsed?.chatId === (chat as unknown as { id?: string })?.id) {
+            sessionStorage.removeItem(PENDING_WELCOME_PROMPT_KEY);
+          }
+        }
+      } catch {
+        // ignore
+      }
+      return;
+    }
+
+    try {
+      const raw = sessionStorage.getItem(PENDING_WELCOME_PROMPT_KEY);
+      if (!raw) return;
+      const parsed = JSON.parse(raw) as { chatId?: string; prompt?: string };
+
+      const chatId = (chat as unknown as { id?: string })?.id;
+      if (!parsed?.prompt?.trim()) return;
+      if (!chatId || parsed.chatId !== chatId) return;
+
+      hasHandledPendingPromptRef.current = true;
+      sessionStorage.removeItem(PENDING_WELCOME_PROMPT_KEY);
+      sendMessage({ text: parsed.prompt }, { body: { modelId, reasoningEffort } });
+    } catch {
+      // ignore
+    }
+  }, [chat, messages.length, modelId, reasoningEffort, sendMessage, status]);
 
   return (
     <Panel className={className} variant="ghost">

@@ -5,6 +5,11 @@ export interface Conversation {
   updatedAt: Date;
 }
 
+export interface ConversationWithMessageCount extends Conversation {
+  /** Total persisted messages in this conversation. */
+  messageCount: number;
+}
+
 export interface CreateConversationInput {
   title?: string | null;
   /** Optional override (normally server-generated). */

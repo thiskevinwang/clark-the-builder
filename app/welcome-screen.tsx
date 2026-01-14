@@ -1,12 +1,10 @@
 "use client";
 
-import { useChat, type Chat } from "@ai-sdk/react";
 import { ArrowUpIcon, PanelLeftIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useState } from "react";
+import { toast } from "sonner";
 
-import { Loader } from "@/components/ai-elements/loader";
-import type { ChatUIMessage } from "@/components/chat/types";
 import { ClarkAvatar } from "@/components/clark-avatar";
 import { ConnectorsMenu } from "@/components/connectors/connectors-menu";
 import { ModelSelector } from "@/components/settings/model-selector";
@@ -21,7 +19,7 @@ import {
   InputGroupTextarea,
 } from "@/components/ui/input-group";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { useSharedChatContext } from "@/lib/chat-context";
+import { PENDING_WELCOME_PROMPT_KEY } from "@/lib/chat-context";
 import { useLocalStorageValue } from "@/lib/use-local-storage-value";
 
 const PROMPTS = [
@@ -49,43 +47,52 @@ const PROMPTS = [
 ];
 
 export function WelcomeScreen() {
-  const { chat } = useSharedChatContext();
-
-  if (!chat) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-background px-4">
-        <div className="text-sm text-muted-foreground">
-          <Loader />
-        </div>
-      </div>
-    );
-  }
-
-  return <WelcomeScreenWithChat chat={chat} />;
-}
-
-function WelcomeScreenWithChat({ chat }: { chat: Chat<ChatUIMessage> }) {
   const [input, setInput] = useLocalStorageValue("prompt-input");
-  const { modelId, reasoningEffort } = useSettings();
-
-  const { sendMessage, status, id, messages } = useChat<ChatUIMessage>({
-    chat,
-  });
+  useSettings();
   const { isOpen, toggle } = useSidebar();
   const router = useRouter();
 
-  const handleSubmit = () => {
-    if (input.trim()) {
-      sendMessage({ text: input }, { body: { modelId, reasoningEffort } });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async () => {
+    const prompt = input.trim();
+    if (!prompt || isSubmitting) return;
+
+    setIsSubmitting(true);
+    try {
+      const res = await fetch("/api/chats", {
+        method: "POST",
+        body: JSON.stringify({ title: "New Chat" }),
+      });
+      const data = (await res.json().catch(() => null)) as {
+        chat?: { id?: string } | null;
+        error?: string;
+      } | null;
+
+      if (!res.ok || !data?.chat?.id) {
+        throw new Error(data?.error ?? "Failed to create chat");
+      }
+
+      try {
+        sessionStorage.setItem(
+          PENDING_WELCOME_PROMPT_KEY,
+          JSON.stringify({ chatId: data.chat.id, prompt }),
+        );
+      } catch {
+        // If sessionStorage fails, we can still navigate; user can re-submit.
+      }
+
       setInput("");
+      // Move into the chat page; it will auto-send the pending prompt.
+      router.replace(`/chats/${data.chat.id}`);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Something went wrong";
+      toast.error(message);
+      console.error(err);
+    } finally {
+      setIsSubmitting(false);
     }
   };
-
-  useEffect(() => {
-    if (id && messages.length == 1) {
-      router.replace(`/chats/${id}`);
-    }
-  }, [id, messages.length, router]);
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-linear-to-b from-background via-background to-accent/20 px-4">
@@ -150,7 +157,7 @@ function WelcomeScreenWithChat({ chat }: { chat: Chat<ChatUIMessage> }) {
           >
             <InputGroup className="bg-card shadow-lg border-border/50 hover:border-border transition-colors">
               <InputGroupTextarea
-                disabled={status === "streaming" || status === "submitted"}
+                disabled={isSubmitting}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => {
                   if (e.key === "Enter" && !e.shiftKey) {
@@ -177,7 +184,7 @@ function WelcomeScreenWithChat({ chat }: { chat: Chat<ChatUIMessage> }) {
                     type="submit"
                     size="sm"
                     variant="default"
-                    disabled={status !== "ready" || !input.trim()}
+                    disabled={isSubmitting || !input.trim()}
                     className="h-9 w-9 p-0 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground disabled:opacity-40 disabled:bg-muted disabled:text-muted-foreground transition-all"
                   >
                     <ArrowUpIcon className="w-4 h-4" />
@@ -190,7 +197,7 @@ function WelcomeScreenWithChat({ chat }: { chat: Chat<ChatUIMessage> }) {
         </div>
 
         {/* Quick prompts */}
-        <div className="mt-8 w-full animate-in fade-in slide-in-from-bottom-8 duration-700 delay-300">
+        {/* <div className="mt-8 w-full animate-in fade-in slide-in-from-bottom-8 duration-700 delay-300">
           <p className="text-sm text-muted-foreground text-center mb-4">Try one of these</p>
           <div className="grid gap-3 md:grid-cols-2">
             {PROMPTS.map((prompt) => (
@@ -204,7 +211,7 @@ function WelcomeScreenWithChat({ chat }: { chat: Chat<ChatUIMessage> }) {
               />
             ))}
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   );

@@ -1,10 +1,11 @@
-import { desc, eq, ilike, or } from "drizzle-orm";
+import { desc, eq, ilike, or, sql } from "drizzle-orm";
 
 import type { DB } from "@/lib/database/db";
-import { ConversationRow, conversations } from "@/lib/database/schema";
+import { ConversationRow, conversations, messages } from "@/lib/database/schema";
 
 import type {
   Conversation,
+  ConversationWithMessageCount,
   CreateConversationInput,
   UpdateConversationInput,
 } from "../models/conversation";
@@ -15,6 +16,20 @@ const rowToModel = (row: ConversationRow): Conversation => ({
   title: row.title,
   createdAt: row.createdAt,
   updatedAt: row.updatedAt,
+});
+
+const rowToModelWithMessageCount = (row: {
+  id: string;
+  title: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+  messageCount: number;
+}): ConversationWithMessageCount => ({
+  id: row.id,
+  title: row.title,
+  createdAt: row.createdAt,
+  updatedAt: row.updatedAt,
+  messageCount: row.messageCount,
 });
 
 export const createConversationRepository = (db: DB): ConversationRepository => ({
@@ -36,6 +51,37 @@ export const createConversationRepository = (db: DB): ConversationRepository => 
       .limit(limit)
       .offset(offset);
     return rows.map(rowToModel);
+  },
+  async listRecentWithMessageCount(limit, offset = 0, query) {
+    const q = query?.trim();
+    const where = q
+      ? or(ilike(conversations.title, `%${q}%`), ilike(conversations.id, `%${q}%`))
+      : undefined;
+
+    const messageCount = sql<number>`count(${messages.id})`.mapWith(Number);
+
+    const rows = await db
+      .select({
+        id: conversations.id,
+        title: conversations.title,
+        createdAt: conversations.createdAt,
+        updatedAt: conversations.updatedAt,
+        messageCount,
+      })
+      .from(conversations)
+      .leftJoin(messages, eq(messages.conversationId, conversations.id))
+      .where(where)
+      .groupBy(conversations.id)
+      .orderBy(desc(conversations.updatedAt))
+      .limit(limit)
+      .offset(offset);
+
+    return rows.map((row) =>
+      rowToModelWithMessageCount({
+        ...row,
+        messageCount: row.messageCount ?? 0,
+      }),
+    );
   },
   async create(input: CreateConversationInput) {
     const rows = await db

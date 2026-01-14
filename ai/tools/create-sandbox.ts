@@ -53,7 +53,7 @@ export const createSandbox = ({ writer }: Params) =>
           // },
           // FUTURE(kevin): Can we require auth & fetch VERCEL_OIDC_TOKEN for the application visitor?
           // token: ...,
-          timeout: timeout ?? 1000 * 60 * 5, // 5 minutes
+          timeout: timeout ?? 1000 * 60 * 20, // 20 minutes
           ports,
         });
 
