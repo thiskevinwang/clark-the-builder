@@ -25,7 +25,7 @@ export const waitTool = ({ writer }: Params) => {
     }),
     execute: async ({ time_ms }, { toolCallId }) => {
       writer.write({
-        id: toolCallId + "__1",
+        id: toolCallId,
         type: "data-wait",
         data: { status: "waiting", time_ms },
       });
@@ -33,7 +33,7 @@ export const waitTool = ({ writer }: Params) => {
       await new Promise((resolve) => setTimeout(resolve, time_ms));
 
       writer.write({
-        id: toolCallId + "__2",
+        id: toolCallId,
         type: "data-wait",
         data: { status: "completed", time_ms },
       });

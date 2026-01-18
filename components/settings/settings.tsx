@@ -1,15 +1,37 @@
 import { SlidersVerticalIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuPortal,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
-import { AutoFixErrors } from "./auto-fix-errors";
-import { ReasoningEffort } from "./reasoning-effort";
+import { useFixErrors, useReasoningEffort } from "./use-settings";
+
+const OPTIONS = [
+  { value: "none", label: "None" },
+  { value: "low", label: "Low" },
+  { value: "medium", label: "Medium" },
+  { value: "high", label: "High" },
+  { value: "xhigh", label: "Extra high" },
+] as const;
 
 export function Settings() {
+  const [fixErrors, setFixErrors] = useFixErrors();
+  const [reasoningEffort, setReasoningEffort] = useReasoningEffort();
   return (
-    <Popover>
-      <PopoverTrigger asChild>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
         <Button
           variant="ghost"
           size="sm"
@@ -17,17 +39,38 @@ export function Settings() {
         >
           <SlidersVerticalIcon className="w-4 h-4" />
         </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-80 p-0" align="start">
-        <div className="p-4 border-b border-border">
-          <h4 className="text-sm font-medium text-foreground">Settings</h4>
-          <p className="text-xs text-muted-foreground mt-0.5">Configure your chat preferences</p>
-        </div>
-        <div className="p-4 space-y-5">
-          <AutoFixErrors />
-          <ReasoningEffort />
-        </div>
-      </PopoverContent>
-    </Popover>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="w-80 p-0" align="start">
+        <DropdownMenuLabel>Settings</DropdownMenuLabel>
+        <DropdownMenuSeparator />
+
+        <DropdownMenuCheckboxItem
+          checked={fixErrors}
+          onCheckedChange={(checked) => setFixErrors(checked === "indeterminate" ? false : checked)}
+        >
+          Auto-fix errors
+        </DropdownMenuCheckboxItem>
+        <DropdownMenuSeparator />
+
+        <DropdownMenuSub>
+          <DropdownMenuLabel>Reasoning Effort</DropdownMenuLabel>
+          <DropdownMenuSubTrigger>
+            {OPTIONS.find((option) => option.value === reasoningEffort)?.label ||
+              "Reasoning Effort"}
+          </DropdownMenuSubTrigger>
+          <DropdownMenuPortal>
+            <DropdownMenuSubContent>
+              <DropdownMenuRadioGroup value={reasoningEffort} onValueChange={setReasoningEffort}>
+                {OPTIONS.map((level) => (
+                  <DropdownMenuRadioItem key={level.value} value={level.value}>
+                    {level.label}
+                  </DropdownMenuRadioItem>
+                ))}
+              </DropdownMenuRadioGroup>
+            </DropdownMenuSubContent>
+          </DropdownMenuPortal>
+        </DropdownMenuSub>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }

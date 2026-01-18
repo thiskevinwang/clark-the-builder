@@ -32,7 +32,7 @@ interface BodyData {
   chatId: string;
   messages: ChatUIMessage[];
   modelId?: ModelId;
-  reasoningEffort?: "low" | "medium";
+  reasoningEffort?: "none" | "low" | "medium" | "high" | "xhigh";
   connectors?: MCPConnector[];
 }
 
@@ -108,10 +108,12 @@ export async function POST(req: Request) {
     return Promise.all(clients?.map((client) => client.close()) || []);
   }
 
+  // This is the main streaming response
   const stream = createUIMessageStream({
     generateId: genMessageId,
     originalMessages: allMessages,
     execute: async ({ writer }) => {
+      // This is the actual model request + response
       const result = streamText({
         ...getModelOptions(modelId, { reasoningEffort }),
         system: systemMessage.content as string,

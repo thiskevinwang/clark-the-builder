@@ -60,21 +60,6 @@ function ChatWithChat({ className, chat }: { className: string; chat: SharedChat
       if (text.trim()) {
         sendMessage({ text }, { body: { modelId, reasoningEffort } });
         setInput("");
-        // Optimistically update the messages list
-        // https://swr.vercel.app/examples/optimistic-ui
-
-        // const optimistic = {
-        //   messages: [
-        //     ...(data?.messages ?? []),
-        //     { id: `temp-${Date.now()}`, role: "user", parts: [{ type: "text", text }] },
-        //   ],
-        // };
-
-        // mutate(optimistic, {
-        //   optimisticData: optimistic,
-        //   populateCache: true,
-        //   revalidate: false,
-        // });
       }
     },
     [sendMessage, modelId, setInput, reasoningEffort],

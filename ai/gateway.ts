@@ -1,5 +1,5 @@
-import { anthropic } from "@ai-sdk/anthropic";
-import { openai } from "@ai-sdk/openai";
+import { anthropic, type AnthropicProviderOptions } from "@ai-sdk/anthropic";
+import { openai, type OpenAIResponsesProviderOptions } from "@ai-sdk/openai";
 import type { LanguageModelV3 } from "@ai-sdk/provider";
 import type { JSONValue } from "ai";
 
@@ -44,11 +44,18 @@ export function getModelOptions(
     headers: { "anthropic-beta": "fine-grained-tool-streaming-2025-05-14" },
     providerOptions: {
       anthropic: {
+        thinking: {
+          type: "enabled",
+        },
+        sendReasoning: true,
         cacheControl: { type: "ephemeral" },
-      },
+      } satisfies AnthropicProviderOptions /* https://ai-sdk.dev/providers/ai-sdk-providers/anthropic */,
       openai: {
+        reasoningSummary: "detailed",
+        forceReasoning: true,
+        textVerbosity: "high",
         ...options,
-      },
+      } satisfies OpenAIResponsesProviderOptions /* https://ai-sdk.dev/providers/ai-sdk-providers/openai */,
     },
   };
 }
