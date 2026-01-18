@@ -24,7 +24,7 @@ export function getModelOptions(
   modelId: ModelId,
   options?: {
     // gpt-5.2:  'none', 'low', 'medium', 'high', and 'xhigh'
-    reasoningEffort?: "minimal" | "low" | "medium";
+    reasoningEffort?: "none" | "low" | "medium" | "high" | "xhigh";
   },
 ): ModelOptions {
   let v3Model;

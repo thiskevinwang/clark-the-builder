@@ -9,6 +9,7 @@ import { createSandbox } from "./create-sandbox";
 import { generateFiles } from "./generate-files";
 import { getSandboxURL } from "./get-sandbox-url";
 import { runCommand } from "./run-command";
+import { waitTool } from "./wait";
 
 interface Params {
   messageRepository: MessageRepository;
@@ -24,6 +25,7 @@ export function tools({ messageRepository, chatId, modelId, writer }: Params) {
     generateFiles: generateFiles({ writer, modelId }),
     getSandboxURL: getSandboxURL({ writer }),
     runCommand: runCommand({ writer }),
+    waitTool: waitTool({ writer }),
   };
 }
 
