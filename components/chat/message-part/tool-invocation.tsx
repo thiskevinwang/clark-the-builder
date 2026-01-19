@@ -18,7 +18,7 @@ type Content = {
 };
 
 export function ToolInvocation({ part }: Props) {
-  const toolName = part.toolName;
+  const toolName = part.toolName || part.type.replace("tool-", "");
   const isLoading = part.state === "input-streaming" || part.state === "input-available";
   const isError = part.state === "output-error";
 
@@ -46,7 +46,7 @@ export function ToolInvocation({ part }: Props) {
           <CollapsibleTrigger asChild>
             <Button variant="ghost" size="icon" className="size-8 ml-auto">
               <ChevronsUpDown />
-              <span className="sr-only">Toggle</span>
+              {/* <span className="sr-only">Toggle</span> */}
             </Button>
           </CollapsibleTrigger>
         </div>

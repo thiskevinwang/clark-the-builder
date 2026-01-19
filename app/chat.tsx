@@ -1,7 +1,7 @@
 "use client";
 
 import { useChat } from "@ai-sdk/react";
-import { ArrowUpIcon } from "lucide-react";
+import { ArrowUpIcon, StopCircleIcon } from "lucide-react";
 import { useCallback, useEffect } from "react";
 
 import {
@@ -25,33 +25,48 @@ import {
 import { useSharedChatContext } from "@/lib/chat-context";
 import { useLocalStorageValue } from "@/lib/use-local-storage-value";
 
-import { useSandboxStore } from "./state";
+// Deduplication guard: prevent auto-sending the same prompt multiple times
+//
+// Notably applicable for React Strict Mode in development, which calls some functions twice
+// - https://react.dev/reference/react/StrictMode
+const autoSentKeys = new Set<string>();
 
-interface Props {
-  className: string;
-  modelId?: string;
-}
-
-export function Chat({ className }: Props) {
-  const [input, setInput] = useLocalStorageValue("prompt-input");
+export function Chat({ className }: { className: string }) {
   const { chat } = useSharedChatContext();
+  const [input, setInput] = useLocalStorageValue(`chat:${chat?.id}:prompt-input`);
+
   const { modelId, reasoningEffort } = useSettings();
-  const { messages, sendMessage, status } = useChat<ChatUIMessage>({ chat });
-  const { setChatStatus } = useSandboxStore();
+  const { messages, sendMessage, status, stop } = useChat<ChatUIMessage>({
+    chat: chat!,
+  });
 
   const validateAndSubmitMessage = useCallback(
     (text: string) => {
       if (text.trim()) {
-        sendMessage({ text }, { body: { modelId, reasoningEffort } });
         setInput("");
+        sendMessage({ text }, { body: { modelId, reasoningEffort } });
       }
     },
-    [sendMessage, modelId, setInput, reasoningEffort],
+    [modelId, reasoningEffort, sendMessage, setInput],
   );
 
   useEffect(() => {
-    setChatStatus(status);
-  }, [status, setChatStatus]);
+    const prompt = input.trim();
+    if (!chat?.id) return;
+    if (!prompt) return;
+    const key = `${chat.id}:${prompt}`;
+    if (autoSentKeys.has(key)) {
+      setInput("");
+      return;
+    }
+    if (messages.length > 0) return;
+    if (status !== "ready") return;
+
+    setInput("");
+    localStorage.removeItem(`chat:${chat.id}:prompt-input`);
+    autoSentKeys.add(key);
+    validateAndSubmitMessage(prompt);
+  }, [chat?.id, input, messages.length, setInput, status, validateAndSubmitMessage]);
 
   return (
     <Panel className={className} variant="ghost">
@@ -85,7 +100,7 @@ export function Chat({ className }: Props) {
             placeholder="Ask a follow-up..."
             rows={2}
             value={input}
-            className="text-base max-h-[200px] overflow-y-auto"
+            className="text-base max-h-50 overflow-y-auto"
           />
           <InputGroupAddon align="block-end">
             <div className="flex items-center gap-1">
@@ -97,16 +112,30 @@ export function Chat({ className }: Props) {
             <div className="ml-auto flex items-center gap-2">
               <ModelSelector />
 
-              <InputGroupButton
-                type="submit"
-                size="sm"
-                variant="ghost"
-                disabled={status !== "ready" || !input.trim()}
-                className="h-9 w-9 p-0 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground disabled:opacity-40 disabled:bg-muted disabled:text-muted-foreground transition-all"
-              >
-                <ArrowUpIcon className="w-4 h-4" />
-                <span className="sr-only">Send</span>
-              </InputGroupButton>
+              {status === "ready" && (
+                <InputGroupButton
+                  type="submit"
+                  size="sm"
+                  variant="ghost"
+                  disabled={!input.trim()}
+                  className="h-9 w-9 p-0 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground disabled:opacity-40 disabled:bg-muted disabled:text-muted-foreground transition-all"
+                >
+                  <ArrowUpIcon className="w-4 h-4" />
+                  <span className="sr-only">Send</span>
+                </InputGroupButton>
+              )}
+              {(status === "streaming" || status === "submitted") && (
+                <InputGroupButton
+                  type="button"
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => stop()}
+                  className="h-9 w-9 p-0 rounded-xl bg-destructive hover:bg-destructive/90 text-destructive-foreground transition-all"
+                >
+                  <StopCircleIcon className="w-4 h-4" />
+                  <span className="sr-only">Stop</span>
+                </InputGroupButton>
+              )}
             </div>
           </InputGroupAddon>
         </InputGroup>

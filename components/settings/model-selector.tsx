@@ -30,7 +30,7 @@ export function ModelSelector({ className }: { className?: string }) {
       value={modelId}
       onValueChange={(value) => {
         // `useQueryState` setters are async; the Select API expects void.
-        void setModelId(value as any);
+        void setModelId(value as typeof modelId);
       }}
       disabled={isLoading || !!error || !models?.length}
     >

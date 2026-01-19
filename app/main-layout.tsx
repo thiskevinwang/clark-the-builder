@@ -1,5 +1,5 @@
 import { Horizontal, Vertical } from "@/components/layout/panels";
-import { Sidebar, SidebarProvider } from "@/components/sidebar";
+import { Sidebar, SidebarInset, SidebarProvider } from "@/components/sidebar";
 import { TabContent, TabItem } from "@/components/tabs";
 
 import { Chat } from "./chat";
@@ -22,7 +22,7 @@ export function MainLayout({ horizontalSizes, verticalSizes }: Props) {
         <Sidebar />
 
         {/* Main Content */}
-        <div className="flex flex-1 flex-col overflow-hidden p-3">
+        <SidebarInset className="flex flex-1 flex-col overflow-hidden p-3">
           <Header className="flex items-center w-full px-1" />
           <ul className="flex gap-1 text-sm px-1 py-2 md:hidden">
             <TabItem tabId="chat">Chat</TabItem>
@@ -36,12 +36,15 @@ export function MainLayout({ horizontalSizes, verticalSizes }: Props) {
             <TabContent tabId="chat" className="flex-1">
               <Chat className="flex-1 overflow-hidden" />
             </TabContent>
+
             <TabContent tabId="preview" className="flex-1">
               <Preview className="flex-1 overflow-hidden" />
             </TabContent>
+
             <TabContent tabId="file-explorer" className="flex-1">
               <FileExplorer className="flex-1 overflow-hidden" />
             </TabContent>
+
             <TabContent tabId="logs" className="flex-1">
               <Logs className="flex-1 overflow-hidden" />
             </TabContent>
@@ -61,7 +64,7 @@ export function MainLayout({ horizontalSizes, verticalSizes }: Props) {
               }
             />
           </div>
-        </div>
+        </SidebarInset>
       </div>
     </SidebarProvider>
   );

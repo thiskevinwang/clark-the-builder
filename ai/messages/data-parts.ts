@@ -4,6 +4,7 @@ export const errorSchema = z.object({
   message: z.string(),
 });
 
+// Update this schema when adding a new DataPart.
 export const dataPartSchema = z.object({
   "create-sandbox": z.object({
     sandboxId: z.string().optional(),
@@ -39,6 +40,10 @@ export const dataPartSchema = z.object({
   "report-errors": z.object({
     summary: z.string(),
     paths: z.array(z.string()).optional(),
+  }),
+  wait: z.object({
+    status: z.enum(["waiting", "completed"]),
+    time_ms: z.number().optional(),
   }),
 });
 

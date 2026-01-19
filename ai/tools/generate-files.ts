@@ -2,6 +2,8 @@ import type { UIMessage, UIMessageStreamWriter } from "ai";
 import { tool } from "ai";
 import z from "zod";
 
+import type { ModelId } from "@/ai/constants";
+
 import { sandboxProvider, type Sandbox } from "../../lib/sandbox";
 import type { DataPart } from "../messages/data-parts";
 import description from "./generate-files.prompt.md";
@@ -15,7 +17,7 @@ const fileSchema = z.object({
 });
 
 interface Params {
-  modelId: string;
+  modelId: ModelId;
   writer: UIMessageStreamWriter<UIMessage<never, DataPart>>;
 }
 

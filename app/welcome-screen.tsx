@@ -1,16 +1,13 @@
 "use client";
 
-import { useChat } from "@ai-sdk/react";
 import { ArrowUpIcon, PanelLeftIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { toast } from "sonner";
 
-import type { ChatUIMessage } from "@/components/chat/types";
 import { ClarkAvatar } from "@/components/clark-avatar";
 import { ConnectorsMenu } from "@/components/connectors/connectors-menu";
 import { ModelSelector } from "@/components/settings/model-selector";
 import { Settings } from "@/components/settings/settings";
-import { useSettings } from "@/components/settings/use-settings";
 import { Sidebar, useSidebar } from "@/components/sidebar";
 import { Button } from "@/components/ui/button";
 import {
@@ -20,8 +17,9 @@ import {
   InputGroupTextarea,
 } from "@/components/ui/input-group";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { useSharedChatContext } from "@/lib/chat-context";
 import { useLocalStorageValue } from "@/lib/use-local-storage-value";
+
+import { useCreateChatMutation } from "./api/hooks";
 
 const PROMPTS = [
   {
@@ -48,28 +46,32 @@ const PROMPTS = [
 ];
 
 export function WelcomeScreen() {
-  const [input, setInput] = useLocalStorageValue("prompt-input");
-  const { chat } = useSharedChatContext();
-  const { modelId, reasoningEffort } = useSettings();
-  const { sendMessage, status, id, messages } = useChat<ChatUIMessage>({ chat });
+  const [input, setInput] = useLocalStorageValue("chat:new:prompt-input");
   const { isOpen, toggle } = useSidebar();
   const router = useRouter();
 
-  const handleSubmit = () => {
-    if (input.trim()) {
-      sendMessage({ text: input }, { body: { modelId, reasoningEffort } });
+  const createChatMutation = useCreateChatMutation({
+    onSuccess: (data) => {
+      const newChatId = data.chat.id;
+      localStorage.setItem(`chat:${newChatId}:prompt-input`, input);
       setInput("");
-    }
+      router.replace(`/chats/${data.chat.id}`);
+    },
+    onError: (error) => {
+      const message = error?.message ?? "An unknown error occurred";
+      toast.error(message);
+    },
+  });
+  const isSubmitting = createChatMutation.isMutating;
+
+  const handleSubmit = async () => {
+    const prompt = input.trim();
+    if (!prompt || isSubmitting) return;
+    await createChatMutation.trigger({ title: "New Chat" });
   };
 
-  useEffect(() => {
-    if (messages.length > 0 && id) {
-      router.replace(`/chats/${id}`);
-    }
-  }, [id, messages.length, router]);
-
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-background via-background to-accent/20 px-4">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-linear-to-b from-background via-background to-accent/20 px-4">
       {/* Sidebar */}
       <Sidebar />
 
@@ -81,7 +83,7 @@ export function WelcomeScreen() {
               variant="ghost"
               size="icon"
               onClick={toggle}
-              className="fixed top-4 left-4 z-30 h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-accent/80 backdrop-blur-sm"
+              className="fixed top-4 left-4 z-30 h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-accent/80 backdrop-blur-sm md:hidden"
             >
               <PanelLeftIcon className="h-4 w-4" />
             </Button>
@@ -119,9 +121,6 @@ export function WelcomeScreen() {
           >
             How can I help you today?
           </h1>
-          {/* <p className="text-muted-foreground text-lg">
-            Build Clerk-powered apps in seconds
-          </p> */}
         </div>
 
         {/* Chat input */}
@@ -134,7 +133,7 @@ export function WelcomeScreen() {
           >
             <InputGroup className="bg-card shadow-lg border-border/50 hover:border-border transition-colors">
               <InputGroupTextarea
-                disabled={status === "streaming" || status === "submitted"}
+                disabled={isSubmitting}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => {
                   if (e.key === "Enter" && !e.shiftKey) {
@@ -161,7 +160,7 @@ export function WelcomeScreen() {
                     type="submit"
                     size="sm"
                     variant="default"
-                    disabled={status !== "ready" || !input.trim()}
+                    disabled={isSubmitting || !input.trim()}
                     className="h-9 w-9 p-0 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground disabled:opacity-40 disabled:bg-muted disabled:text-muted-foreground transition-all"
                   >
                     <ArrowUpIcon className="w-4 h-4" />
@@ -174,7 +173,7 @@ export function WelcomeScreen() {
         </div>
 
         {/* Quick prompts */}
-        <div className="mt-8 w-full animate-in fade-in slide-in-from-bottom-8 duration-700 delay-300">
+        {/* <div className="mt-8 w-full animate-in fade-in slide-in-from-bottom-8 duration-700 delay-300">
           <p className="text-sm text-muted-foreground text-center mb-4">Try one of these</p>
           <div className="grid gap-3 md:grid-cols-2">
             {PROMPTS.map((prompt) => (
@@ -188,7 +187,7 @@ export function WelcomeScreen() {
               />
             ))}
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   );

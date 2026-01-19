@@ -1,29 +1,20 @@
 "use client";
 
 import {
-  AlertTriangleIcon,
-  CheckCircleIcon,
-  KeyIcon,
-  LoaderIcon,
-  Trash2Icon,
-  XIcon,
+  ArchiveIcon,
+  MessagesSquareIcon,
+  PanelLeftCloseIcon,
+  PanelLeftOpenIcon,
 } from "lucide-react";
-import { useState } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useClerkAppsInit, useClerkAppsStore } from "@/lib/storage/clerk-apps-store";
-import type { ClerkAppData, ClerkAppOwnership } from "@/lib/storage/types";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 
+import { ClarkAvatar } from "../clark-avatar";
 import { useSidebar } from "./sidebar-state";
 
 interface SidebarProps {
@@ -31,17 +22,12 @@ interface SidebarProps {
 }
 
 export function Sidebar({ className }: SidebarProps) {
-  const { isOpen, close } = useSidebar();
-  const { apps, isLoaded, isLoading, removeApp } = useClerkAppsStore();
+  const { isOpen, close, open } = useSidebar();
+  const pathname = usePathname();
+  const isCollapsed = !isOpen;
 
-  // Initialize the store on mount
-  useClerkAppsInit();
-
-  // Separate apps by ownership
-  const ownedApps = apps.filter((app) => app.ownership === "owned");
-  const transferredApps = apps.filter((app) => app.ownership === "transferred");
-
-  const hasAnyApps = apps.length > 0;
+  const isChatsActive = pathname === "/chats" || pathname.startsWith("/chats/");
+  const isArtifactsActive = pathname === "/artifacts" || pathname.startsWith("/artifacts/");
 
   return (
     <>
@@ -56,57 +42,164 @@ export function Sidebar({ className }: SidebarProps) {
       {/* Sidebar panel */}
       <div
         className={cn(
-          "fixed left-0 top-0 z-50 flex h-full w-72 flex-col border-r border-border bg-card transition-transform duration-300 ease-out",
-          isOpen ? "translate-x-0" : "-translate-x-full pointer-events-none",
+          "fixed left-0 top-0 z-50 flex h-full flex-col border-r border-border bg-card transition-all duration-300 ease-out",
+          // On small screens, slide fully off-canvas when closed (current behavior)
+          isOpen
+            ? "translate-x-0"
+            : "-translate-x-full pointer-events-none md:translate-x-0 md:pointer-events-auto",
+          // On md+ keep the sidebar visible as an icon-only rail when closed
+          isOpen ? "w-72" : "w-72 md:w-16",
           className,
         )}
       >
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-border p-3">
-          <h2 className="text-sm font-semibold text-foreground">Apps</h2>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-7 w-7 p-0 text-muted-foreground hover:text-foreground"
-            onClick={close}
-          >
-            <XIcon className="h-4 w-4" />
-          </Button>
+        <div
+          className={cn(
+            "flex items-center justify-between p-3",
+            isCollapsed && "md:justify-center md:px-2",
+          )}
+        >
+          <div className={cn("flex flex-row items-center gap-2", isCollapsed && "md:hidden")}>
+            <ClarkAvatar size={28} className="rounded-md" />
+            <Link href="/" className="hover:underline">
+              <span>
+                <div className="dark:block hidden">
+                  <span className="hidden md:inline text-lg tracking-tight font-semibold text-foreground font-serif!">
+                    Karl
+                  </span>
+                </div>
+                <div className="dark:hidden block">
+                  <span className="hidden md:inline text-lg tracking-tight font-semibold text-foreground font-serif!">
+                    Clark
+                  </span>
+                </div>
+              </span>
+            </Link>
+          </div>
+
+          {isCollapsed ? (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="hidden md:inline-flex h-8 w-8 p-0 text-muted-foreground hover:text-foreground"
+                  onClick={open}
+                  aria-label="Expand sidebar"
+                >
+                  <PanelLeftOpenIcon className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="right">Expand sidebar</TooltipContent>
+            </Tooltip>
+          ) : (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-7 w-7 p-0 text-muted-foreground hover:text-foreground"
+              onClick={close}
+              aria-label="Collapse sidebar"
+            >
+              <PanelLeftCloseIcon className="h-4 w-4" />
+            </Button>
+          )}
         </div>
 
-        {/* Apps List */}
+        {/* Navigation */}
         <ScrollArea className="flex-1 min-h-0">
-          <div className="p-2">
-            {isLoading && !isLoaded ? (
-              <div className="flex items-center justify-center gap-2 px-2 py-4 text-sm text-muted-foreground">
-                <LoaderIcon className="h-4 w-4 animate-spin" />
-                Loading...
-              </div>
-            ) : !hasAnyApps ? (
-              <div className="px-2 py-4 text-center text-sm text-muted-foreground">No apps yet</div>
-            ) : (
-              <div className="space-y-4">
-                {/* Owned apps */}
-                {ownedApps.length > 0 && (
-                  <AppSection title="Your Apps" apps={ownedApps} onRemove={removeApp} />
-                )}
+          <div className={cn("p-2", isCollapsed && "md:px-1")}>
+            <div className="mb-4">
+              <div className="space-y-1">
+                {isCollapsed ? (
+                  <>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Link
+                          href="/chats"
+                          onClick={close}
+                          aria-label="Chats"
+                          className={cn(
+                            "flex items-center gap-2 rounded-lg px-2 py-2 text-sm transition-colors hover:bg-accent",
+                            "md:justify-center md:gap-0",
+                            isChatsActive
+                              ? "bg-accent text-foreground"
+                              : "text-muted-foreground hover:text-foreground",
+                          )}
+                        >
+                          <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
+                            <MessagesSquareIcon className="h-3.5 w-3.5" />
+                          </div>
+                          <span className="md:hidden">Chats</span>
+                        </Link>
+                      </TooltipTrigger>
+                      <TooltipContent side="right">Chats</TooltipContent>
+                    </Tooltip>
 
-                {/* Transferred apps */}
-                {transferredApps.length > 0 && (
-                  <AppSection
-                    title="Transferred"
-                    description="Claimed by another account"
-                    apps={transferredApps}
-                    onRemove={removeApp}
-                  />
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Link
+                          href="/artifacts"
+                          onClick={close}
+                          aria-label="Artifacts"
+                          className={cn(
+                            "flex items-center gap-2 rounded-lg px-2 py-2 text-sm transition-colors hover:bg-accent",
+                            "md:justify-center md:gap-0",
+                            isArtifactsActive
+                              ? "bg-accent text-foreground"
+                              : "text-muted-foreground hover:text-foreground",
+                          )}
+                        >
+                          <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
+                            <ArchiveIcon className="h-3.5 w-3.5" />
+                          </div>
+                          <span className="md:hidden">Artifacts</span>
+                        </Link>
+                      </TooltipTrigger>
+                      <TooltipContent side="right">Artifacts</TooltipContent>
+                    </Tooltip>
+                  </>
+                ) : (
+                  <>
+                    <Link
+                      href="/chats"
+                      onClick={close}
+                      className={cn(
+                        "flex items-center gap-2 rounded-lg px-2 py-2 text-sm transition-colors hover:bg-accent",
+                        isChatsActive
+                          ? "bg-accent text-foreground"
+                          : "text-muted-foreground hover:text-foreground",
+                      )}
+                    >
+                      <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
+                        <MessagesSquareIcon className="h-3.5 w-3.5" />
+                      </div>
+                      <span className="font-medium">Chats</span>
+                    </Link>
+
+                    <Link
+                      href="/artifacts"
+                      onClick={close}
+                      className={cn(
+                        "flex items-center gap-2 rounded-lg px-2 py-2 text-sm transition-colors hover:bg-accent",
+                        isArtifactsActive
+                          ? "bg-accent text-foreground"
+                          : "text-muted-foreground hover:text-foreground",
+                      )}
+                    >
+                      <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
+                        <ArchiveIcon className="h-3.5 w-3.5" />
+                      </div>
+                      <span className="font-medium">Artifacts</span>
+                    </Link>
+                  </>
                 )}
               </div>
-            )}
+            </div>
           </div>
         </ScrollArea>
 
         {/* Footer - New App hint */}
-        <div className="shrink-0 border-t border-border p-3">
+        <div className={cn("shrink-0 border-t border-border p-3", isCollapsed && "md:hidden")}>
           <p className="text-xs text-muted-foreground">
             Ask the assistant to create a new Clerk app
           </p>
@@ -114,194 +207,4 @@ export function Sidebar({ className }: SidebarProps) {
       </div>
     </>
   );
-}
-
-interface AppSectionProps {
-  title: string;
-  description?: string;
-  apps: ClerkAppData[];
-  onRemove: (applicationId: string) => Promise<void>;
-}
-
-function AppSection({ title, description, apps, onRemove }: AppSectionProps) {
-  return (
-    <div>
-      <div className="px-2 mb-1">
-        <p className="text-xs font-medium text-muted-foreground">{title}</p>
-        {description && <p className="text-xs text-muted-foreground/70">{description}</p>}
-      </div>
-      <div className="space-y-1">
-        {apps.map((app) => (
-          <AppItem key={app.applicationId} app={app} onRemove={() => onRemove(app.applicationId)} />
-        ))}
-      </div>
-    </div>
-  );
-}
-
-interface AppItemProps {
-  app: ClerkAppData;
-  onRemove: () => Promise<void>;
-}
-
-function AppItem({ app, onRemove }: AppItemProps) {
-  const [showDelete, setShowDelete] = useState(false);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [deleteError, setDeleteError] = useState<string | null>(null);
-
-  const { icon: StatusIcon } = getOwnershipIcon(app.ownership);
-  const hasPendingTransfer = app.transfer?.status === "pending";
-
-  const handleDeleteClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setDeleteError(null);
-    setDeleteDialogOpen(true);
-  };
-
-  const handleConfirmDelete = async () => {
-    setIsDeleting(true);
-    setDeleteError(null);
-
-    try {
-      await onRemove();
-      setDeleteDialogOpen(false);
-    } catch (error) {
-      setDeleteError(error instanceof Error ? error.message : "Failed to delete app");
-    } finally {
-      setIsDeleting(false);
-    }
-  };
-
-  const handleDialogClose = (open: boolean) => {
-    if (!isDeleting) {
-      setDeleteDialogOpen(open);
-      if (!open) {
-        setDeleteError(null);
-      }
-    }
-  };
-
-  return (
-    <>
-      <div
-        className="group flex items-center gap-2 rounded-lg px-2 py-2 text-sm transition-colors hover:bg-accent"
-        onMouseEnter={() => setShowDelete(true)}
-        onMouseLeave={() => setShowDelete(false)}
-      >
-        <div
-          className={cn(
-            "flex h-7 w-7 shrink-0 items-center justify-center rounded-md",
-            app.ownership === "transferred"
-              ? "bg-muted text-muted-foreground"
-              : "bg-primary/10 text-primary",
-          )}
-        >
-          <StatusIcon className="h-3.5 w-3.5" />
-        </div>
-        <div className="flex-1 overflow-hidden">
-          <div className="flex items-center gap-1">
-            <p
-              className={cn(
-                "truncate font-medium",
-                app.ownership === "transferred" ? "text-muted-foreground" : "text-foreground",
-              )}
-            >
-              {app.name}
-            </p>
-            {hasPendingTransfer && (
-              <span className="shrink-0 rounded bg-yellow-500/10 px-1 py-0.5 text-[10px] font-medium text-yellow-600">
-                Pending
-              </span>
-            )}
-          </div>
-          <p className="truncate text-xs text-muted-foreground">{formatDate(app.createdAt)}</p>
-        </div>
-        {showDelete && (
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-6 w-6 p-0 text-muted-foreground hover:text-destructive"
-            onClick={handleDeleteClick}
-          >
-            <Trash2Icon className="h-3.5 w-3.5" />
-          </Button>
-        )}
-      </div>
-
-      <Dialog open={deleteDialogOpen} onOpenChange={handleDialogClose}>
-        <DialogContent showCloseButton={!isDeleting}>
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <AlertTriangleIcon className="h-5 w-5 text-destructive" />
-              Delete Clerk App
-            </DialogTitle>
-            <DialogDescription>
-              Are you sure you want to delete{" "}
-              <span className="font-medium text-foreground">&ldquo;{app.name}&rdquo;</span>?
-            </DialogDescription>
-          </DialogHeader>
-          <div className="rounded-lg border border-destructive/20 bg-destructive/10 p-3">
-            <p className="text-sm text-destructive">
-              This action is permanent and cannot be reversed. The Clerk app and all associated data
-              will be permanently deleted.
-            </p>
-          </div>
-          {deleteError && (
-            <div className="rounded-lg border border-destructive/20 bg-destructive/5 p-3">
-              <p className="text-sm text-destructive">{deleteError}</p>
-            </div>
-          )}
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => handleDialogClose(false)}
-              disabled={isDeleting}
-            >
-              Cancel
-            </Button>
-            <Button variant="destructive" onClick={handleConfirmDelete} disabled={isDeleting}>
-              {isDeleting ? (
-                <>
-                  <LoaderIcon className="h-4 w-4 animate-spin" />
-                  Deleting...
-                </>
-              ) : (
-                "Delete App"
-              )}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </>
-  );
-}
-
-function getOwnershipIcon(ownership: ClerkAppOwnership) {
-  switch (ownership) {
-    case "transferred":
-      return { icon: CheckCircleIcon };
-    case "owned":
-    default:
-      return { icon: KeyIcon };
-  }
-}
-
-function formatDate(timestamp: number): string {
-  const date = new Date(timestamp);
-  const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
-  const diffMins = Math.floor(diffMs / 60000);
-  const diffHours = Math.floor(diffMs / 3600000);
-  const diffDays = Math.floor(diffMs / 86400000);
-
-  if (diffMins < 1) return "Just now";
-  if (diffMins < 60) return `${diffMins}m ago`;
-  if (diffHours < 24) return `${diffHours}h ago`;
-  if (diffDays < 7) return `${diffDays}d ago`;
-
-  return date.toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-  });
 }

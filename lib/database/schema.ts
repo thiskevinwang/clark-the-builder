@@ -1,0 +1,60 @@
+import { UIMessagePart } from "ai";
+import { sql } from "drizzle-orm";
+import { check, index, jsonb, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+
+import type { DataPart } from "@/ai/messages/data-parts";
+import type { ToolSet } from "@/ai/tools";
+
+import { genConversationId, genMessageId } from "@/lib/identifiers/generator";
+
+export const conversations = pgTable(
+  "conversations",
+  {
+    id: text("id").primaryKey().$defaultFn(genConversationId),
+    title: text("title"),
+    metadata: jsonb("metadata").$type<Record<string, unknown>>().notNull().default({}),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (t) => [index("idx_conversations_updated_at").on(t.updatedAt)],
+);
+
+export type ConversationRow = typeof conversations.$inferSelect;
+export type NewConversationRow = typeof conversations.$inferInsert;
+
+export const messages = pgTable(
+  "messages",
+  {
+    id: text("id").primaryKey().$defaultFn(genMessageId),
+    conversationId: text("conversation_id")
+      .notNull()
+      .references(() => conversations.id, { onDelete: "cascade" }),
+    role: text("role").$type<"system" | "user" | "assistant" | "developer" | "tool">(),
+    metadata: jsonb("metadata").$type<Record<string, unknown>>().notNull().default({}),
+    parts: jsonb("parts").$type<Array<UIMessagePart<DataPart, ToolSet>>>().notNull().default([]),
+    parentId: text("parent_id"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+    // An optional unique external ID:
+    // nulls are NOT considered equal, so multiple nulls are allowed.
+    externalId: text("external_id").unique("uniq_messages_external_id", {
+      nulls: "distinct",
+    }),
+  },
+  (t) => [
+    index("idx_messages_conversation_id_created_at").on(t.conversationId, t.createdAt),
+    check(
+      "chk_messages_role",
+      sql`${t.role} IS NULL OR ${t.role} IN ('system', 'user', 'assistant', 'developer', 'tool')`,
+    ),
+  ],
+);
+
+export type MessageRow = typeof messages.$inferSelect;
+export type NewMessageRow = typeof messages.$inferInsert;
