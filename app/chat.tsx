@@ -1,8 +1,8 @@
 "use client";
 
-import { useChat, type Chat as SharedChat } from "@ai-sdk/react";
+import { useChat } from "@ai-sdk/react";
 import { ArrowUpIcon, StopCircleIcon } from "lucide-react";
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect } from "react";
 
 import {
   Conversation,
@@ -22,89 +22,51 @@ import {
   InputGroupButton,
   InputGroupTextarea,
 } from "@/components/ui/input-group";
-import { PENDING_WELCOME_PROMPT_KEY, useSharedChatContext } from "@/lib/chat-context";
+import { useSharedChatContext } from "@/lib/chat-context";
 import { useLocalStorageValue } from "@/lib/use-local-storage-value";
 
-import { useSandboxStore } from "./state";
+// Deduplication guard: prevent auto-sending the same prompt multiple times
+//
+// Notably applicable for React Strict Mode in development, which calls some functions twice
+// - https://react.dev/reference/react/StrictMode
+const autoSentKeys = new Set<string>();
 
-interface Props {
-  className: string;
-  modelId?: string;
-}
-
-export function Chat({ className }: Props) {
+export function Chat({ className }: { className: string }) {
   const { chat } = useSharedChatContext();
+  const [input, setInput] = useLocalStorageValue(`chat:${chat?.id}:prompt-input`);
 
-  if (!chat) {
-    return (
-      <Panel className={className} variant="ghost">
-        <div className="p-4 text-sm text-muted-foreground">Loading chat…</div>
-      </Panel>
-    );
-  }
-
-  return <ChatWithChat className={className} chat={chat} />;
-}
-
-function ChatWithChat({ className, chat }: { className: string; chat: SharedChat<ChatUIMessage> }) {
-  const [input, setInput] = useLocalStorageValue("prompt-input");
   const { modelId, reasoningEffort } = useSettings();
-  const { messages, sendMessage, status, stop } = useChat<ChatUIMessage>({ chat });
-
-  const hasHandledPendingPromptRef = useRef(false);
-
-  const { setChatStatus } = useSandboxStore();
+  const { messages, sendMessage, status, stop } = useChat<ChatUIMessage>({
+    chat: chat!,
+  });
 
   const validateAndSubmitMessage = useCallback(
     (text: string) => {
       if (text.trim()) {
-        sendMessage({ text }, { body: { modelId, reasoningEffort } });
         setInput("");
+        sendMessage({ text }, { body: { modelId, reasoningEffort } });
       }
     },
-    [sendMessage, modelId, setInput, reasoningEffort],
+    [modelId, reasoningEffort, sendMessage, setInput],
   );
 
   useEffect(() => {
-    setChatStatus(status);
-  }, [status, setChatStatus]);
-
-  useEffect(() => {
-    if (hasHandledPendingPromptRef.current) return;
-    if (status !== "ready") return;
-    if (messages.length > 0) {
-      // If the chat already has content, don't auto-send anything.
-      hasHandledPendingPromptRef.current = true;
-      try {
-        const raw = sessionStorage.getItem(PENDING_WELCOME_PROMPT_KEY);
-        if (raw) {
-          const parsed = JSON.parse(raw) as { chatId?: string; prompt?: string };
-          if (parsed?.chatId === (chat as unknown as { id?: string })?.id) {
-            sessionStorage.removeItem(PENDING_WELCOME_PROMPT_KEY);
-          }
-        }
-      } catch {
-        // ignore
-      }
+    const prompt = input.trim();
+    if (!chat?.id) return;
+    if (!prompt) return;
+    const key = `${chat.id}:${prompt}`;
+    if (autoSentKeys.has(key)) {
+      setInput("");
       return;
     }
+    if (messages.length > 0) return;
+    if (status !== "ready") return;
 
-    try {
-      const raw = sessionStorage.getItem(PENDING_WELCOME_PROMPT_KEY);
-      if (!raw) return;
-      const parsed = JSON.parse(raw) as { chatId?: string; prompt?: string };
-
-      const chatId = (chat as unknown as { id?: string })?.id;
-      if (!parsed?.prompt?.trim()) return;
-      if (!chatId || parsed.chatId !== chatId) return;
-
-      hasHandledPendingPromptRef.current = true;
-      sessionStorage.removeItem(PENDING_WELCOME_PROMPT_KEY);
-      sendMessage({ text: parsed.prompt }, { body: { modelId, reasoningEffort } });
-    } catch {
-      // ignore
-    }
-  }, [chat, messages.length, modelId, reasoningEffort, sendMessage, status]);
+    setInput("");
+    localStorage.removeItem(`chat:${chat.id}:prompt-input`);
+    autoSentKeys.add(key);
+    validateAndSubmitMessage(prompt);
+  }, [chat?.id, input, messages.length, setInput, status, validateAndSubmitMessage]);
 
   return (
     <Panel className={className} variant="ghost">

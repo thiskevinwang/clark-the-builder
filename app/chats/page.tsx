@@ -10,9 +10,12 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
-import useSWR from "swr";
-import useSWRMutation from "swr/mutation";
 
+import {
+  useBatchDeleteChatsMutation,
+  useCreateChatMutation,
+  useListChatsQuery,
+} from "@/app/api/hooks";
 import { Sidebar, SidebarInset, SidebarProvider } from "@/components/sidebar";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -31,23 +34,8 @@ import { cn } from "@/lib/utils";
 
 import { Header } from "../header";
 
-type ConversationJson = {
-  id: string;
-  title: string | null;
-  createdAt: string;
-  updatedAt: string;
-  messageCount: number;
-};
-
-type ListChatsResponse = {
-  chats: ConversationJson[];
-};
-
-type CreateChatResponse = {
-  chat: ConversationJson;
-};
-
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
+type NonUndefined<T> = T extends undefined ? never : T;
+type ConversationJson = NonUndefined<ReturnType<typeof useCreateChatMutation>["data"]>["chat"];
 
 export default function ChatsPage() {
   const router = useRouter();
@@ -63,31 +51,10 @@ export default function ChatsPage() {
   const [isRenaming, setIsRenaming] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  const listUrl = useMemo(() => {
-    const params = new URLSearchParams();
-    params.set("limit", "50");
-    params.set("offset", "0");
-    if (query.trim()) params.set("q", query.trim());
-    return `/api/chats?${params.toString()}`;
-  }, [query]);
-
-  const list = useSWR<ListChatsResponse>(listUrl, fetcher, {
-    keepPreviousData: true,
-    fallbackData: { chats: [] },
-  });
-
-  const createChat = useSWRMutation<CreateChatResponse, unknown, string, { title?: string }>(
-    "/api/chats",
-    async (url, { arg }) => {
-      const res = await fetch(url, {
-        method: "POST",
-        body: JSON.stringify({ title: arg?.title ?? "New Chat" }),
-      });
-      return res.json();
-    },
-  );
-
+  const list = useListChatsQuery({ query });
   const chats = list.data?.chats ?? [];
+
+  const createChat = useCreateChatMutation();
 
   const visibleChatIds = useMemo(() => new Set(chats.map((c) => c.id)), [chats]);
   const selectedVisibleCount = useMemo(() => {
@@ -134,6 +101,7 @@ export default function ChatsPage() {
   };
 
   const openRename = (chat: ConversationJson) => {
+    if (!chat) return;
     setActiveChat(chat);
     setRenameTitle(chat.title?.trim() ? chat.title : "");
     setRenameDialogOpen(true);
@@ -144,19 +112,7 @@ export default function ChatsPage() {
     setDeleteDialogOpen(true);
   };
 
-  const deleteMany = useSWRMutation<
-    { deletedIds: string[]; deletedCount: number },
-    unknown,
-    string,
-    { chatIds: string[] }
-  >("/api/chats/batch-delete", async (url, { arg }) => {
-    const res = await fetch(url, {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ chatIds: arg.chatIds }),
-    });
-    return res.json();
-  });
+  const deleteMany = useBatchDeleteChatsMutation();
 
   return (
     <SidebarProvider>
@@ -296,7 +252,7 @@ export default function ChatsPage() {
                               </div>
 
                               <div className="shrink-0 text-right text-xs text-muted-foreground">
-                                <div>{formatRelative(chat.updatedAt)}</div>
+                                <div>{formatRelative(new Date(chat.updatedAt).toISOString())}</div>
                                 <div className="mt-1">
                                   {chat.messageCount} message{chat.messageCount === 1 ? "" : "s"}
                                 </div>
@@ -330,7 +286,7 @@ export default function ChatsPage() {
 
                             <div className="flex shrink-0 items-start gap-3">
                               <div className="text-right text-xs text-muted-foreground">
-                                <div>{formatRelative(chat.updatedAt)}</div>
+                                <div>{formatRelative(new Date(chat.updatedAt).toISOString())}</div>
                                 <div className="mt-1">
                                   {chat.messageCount} message{chat.messageCount === 1 ? "" : "s"}
                                 </div>

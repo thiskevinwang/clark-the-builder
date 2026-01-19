@@ -32,9 +32,10 @@ export const messages = pgTable(
     conversationId: text("conversation_id")
       .notNull()
       .references(() => conversations.id, { onDelete: "cascade" }),
-    role: text("role").notNull().$type<"system" | "user" | "assistant">(),
+    role: text("role").$type<"system" | "user" | "assistant" | "developer" | "tool">(),
     metadata: jsonb("metadata").$type<Record<string, unknown>>().notNull().default({}),
     parts: jsonb("parts").$type<Array<UIMessagePart<DataPart, ToolSet>>>().notNull().default([]),
+    parentId: text("parent_id"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at")
       .defaultNow()
@@ -48,7 +49,10 @@ export const messages = pgTable(
   },
   (t) => [
     index("idx_messages_conversation_id_created_at").on(t.conversationId, t.createdAt),
-    check("chk_messages_role", sql`${t.role} IN ('system', 'user', 'assistant')`),
+    check(
+      "chk_messages_role",
+      sql`${t.role} IS NULL OR ${t.role} IN ('system', 'user', 'assistant', 'developer', 'tool')`,
+    ),
   ],
 );
 

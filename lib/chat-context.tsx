@@ -5,10 +5,10 @@ import { DataUIPart, DefaultChatTransport } from "ai";
 import { useParams } from "next/navigation";
 import { createContext, useContext, useMemo, useRef, type ReactNode } from "react";
 import { toast } from "sonner";
-import useSWR from "swr";
 
 import { DataPart } from "@/ai/messages/data-parts";
 
+import { useListMessagesQuery } from "@/app/api/hooks";
 import { useDataStateMapper } from "@/app/state";
 import { type ChatUIMessage } from "@/components/chat/types";
 
@@ -21,10 +21,6 @@ interface ChatContextValue {
 
 const ChatContext = createContext<ChatContextValue | undefined>(undefined);
 
-export const PENDING_WELCOME_PROMPT_KEY = "pending-welcome-prompt";
-
-const EMPTY_MESSAGES: ChatUIMessage[] = [];
-
 /**
  * https://ai-sdk.dev/cookbook/next/use-shared-chat-context
  */
@@ -32,21 +28,12 @@ export function ChatProvider({ children }: { children: ReactNode }) {
   const params = useParams<{ chatId?: string }>();
   const chatId = params?.chatId ?? null;
 
-  const listMessagesQuery = useSWR(
-    chatId ? `/api/chats/${chatId}/messages` : null,
-    async (key) => {
-      const res = await fetch(key);
-      if (!res.ok) {
-        const error = new Error(`Failed to load messages (${res.status})`);
-        (error as Error & { status?: number }).status = res.status;
-        throw error;
-      }
-      return res.json();
-    },
-    {
-      fallbackData: { messages: [] },
-    },
-  );
+  const listMessagesQuery = useListMessagesQuery(chatId, {
+    // Despite the SSR error, "Fallback data is required when using Suspense in SSR."
+    // We're omitting fallbackData as we don't know what it might be,
+    // and we also want queried data to be defined by the time ChatContext is used.
+    suspense: true,
+  });
 
   const mapDataToState = useDataStateMapper();
   const mapDataToStateRef = useRef(mapDataToState);
@@ -61,8 +48,6 @@ export function ChatProvider({ children }: { children: ReactNode }) {
         chatId,
       },
       prepareSendMessagesRequest: async ({ id: conversationId, messages, body }) => {
-        // Persist the user message immediately
-        //        await createMessageMutation.trigger({ message: messages[messages.length - 1] });
         return {
           body: {
             ...(body ?? {}),
@@ -74,13 +59,31 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     });
   }, [chatId]);
 
-  const messages = chatId ? (listMessagesQuery.data?.messages ?? EMPTY_MESSAGES) : EMPTY_MESSAGES;
+  const messageIds = useMemo(() => {
+    return (
+      listMessagesQuery.data?.messages
+        ?.map((m: ChatUIMessage) => m.id)
+        .sort((a: string, b: string) => a.localeCompare(b)) ?? null
+    );
+  }, [
+    listMessagesQuery.data?.messages
+      ?.map((m: ChatUIMessage) => m.id)
+      .sort((a: string, b: string) => a.localeCompare(b))
+      .join("|") ?? null,
+  ]);
 
+  // Be careful of how we memoize the chat instance to avoid losing state and/or
+  // recreating it too often.
+  //
+  // AFAICT: Chat accepts an existing list of messages but also maintains its own internal state,
+  // and reconciles incoming server response messages + data too.
+  //
+  // It looks like ID's are the key to all of this working smoothly so that's all we'll use to determine memoization.
   const chat = useMemo(() => {
     if (!chatId || !transport) return null;
 
     return new Chat<ChatUIMessage>({
-      messages,
+      messages: listMessagesQuery.data?.messages ?? undefined,
       generateId: genMessageId,
       id: chatId,
       transport,
@@ -92,10 +95,17 @@ export function ChatProvider({ children }: { children: ReactNode }) {
         console.error("Error sending message:", error);
       },
     });
-  }, [chatId, transport, messages]);
+  }, [chatId, transport, JSON.stringify(messageIds)]);
 
   return (
-    <ChatContext.Provider value={{ chat, chatId: chatId ?? null }}>{children}</ChatContext.Provider>
+    <ChatContext.Provider
+      value={{
+        chat,
+        chatId: chatId ?? null,
+      }}
+    >
+      {children}
+    </ChatContext.Provider>
   );
 }
 

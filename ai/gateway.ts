@@ -51,9 +51,6 @@ export function getModelOptions(
         cacheControl: { type: "ephemeral" },
       } satisfies AnthropicProviderOptions /* https://ai-sdk.dev/providers/ai-sdk-providers/anthropic */,
       openai: {
-        reasoningSummary: "detailed",
-        forceReasoning: true,
-        textVerbosity: "high",
         ...options,
       } satisfies OpenAIResponsesProviderOptions /* https://ai-sdk.dev/providers/ai-sdk-providers/openai */,
     },

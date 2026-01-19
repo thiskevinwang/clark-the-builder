@@ -2,14 +2,12 @@
 
 import { ArrowUpIcon, PanelLeftIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
 import { toast } from "sonner";
 
 import { ClarkAvatar } from "@/components/clark-avatar";
 import { ConnectorsMenu } from "@/components/connectors/connectors-menu";
 import { ModelSelector } from "@/components/settings/model-selector";
 import { Settings } from "@/components/settings/settings";
-import { useSettings } from "@/components/settings/use-settings";
 import { Sidebar, useSidebar } from "@/components/sidebar";
 import { Button } from "@/components/ui/button";
 import {
@@ -19,8 +17,9 @@ import {
   InputGroupTextarea,
 } from "@/components/ui/input-group";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { PENDING_WELCOME_PROMPT_KEY } from "@/lib/chat-context";
 import { useLocalStorageValue } from "@/lib/use-local-storage-value";
+
+import { useCreateChatMutation } from "./api/hooks";
 
 const PROMPTS = [
   {
@@ -47,51 +46,28 @@ const PROMPTS = [
 ];
 
 export function WelcomeScreen() {
-  const [input, setInput] = useLocalStorageValue("prompt-input");
-  useSettings();
+  const [input, setInput] = useLocalStorageValue("chat:new:prompt-input");
   const { isOpen, toggle } = useSidebar();
   const router = useRouter();
 
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const createChatMutation = useCreateChatMutation({
+    onSuccess: (data) => {
+      const newChatId = data.chat.id;
+      localStorage.setItem(`chat:${newChatId}:prompt-input`, input);
+      setInput("");
+      router.replace(`/chats/${data.chat.id}`);
+    },
+    onError: (error) => {
+      const message = error?.message ?? "An unknown error occurred";
+      toast.error(message);
+    },
+  });
+  const isSubmitting = createChatMutation.isMutating;
 
   const handleSubmit = async () => {
     const prompt = input.trim();
     if (!prompt || isSubmitting) return;
-
-    setIsSubmitting(true);
-    try {
-      const res = await fetch("/api/chats", {
-        method: "POST",
-        body: JSON.stringify({ title: "New Chat" }),
-      });
-      const data = (await res.json().catch(() => null)) as {
-        chat?: { id?: string } | null;
-        error?: string;
-      } | null;
-
-      if (!res.ok || !data?.chat?.id) {
-        throw new Error(data?.error ?? "Failed to create chat");
-      }
-
-      try {
-        sessionStorage.setItem(
-          PENDING_WELCOME_PROMPT_KEY,
-          JSON.stringify({ chatId: data.chat.id, prompt }),
-        );
-      } catch {
-        // If sessionStorage fails, we can still navigate; user can re-submit.
-      }
-
-      setInput("");
-      // Move into the chat page; it will auto-send the pending prompt.
-      router.replace(`/chats/${data.chat.id}`);
-    } catch (err) {
-      const message = err instanceof Error ? err.message : "Something went wrong";
-      toast.error(message);
-      console.error(err);
-    } finally {
-      setIsSubmitting(false);
-    }
+    await createChatMutation.trigger({ title: "New Chat" });
   };
 
   return (

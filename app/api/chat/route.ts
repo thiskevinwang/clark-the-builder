@@ -43,7 +43,7 @@ function coerceMetadata(value: unknown): Record<string, unknown> | undefined {
   return value as Record<string, unknown>;
 }
 
-export async function POST(req: Request) {
+export async function POST(req: Request, res, ctx) {
   const checkResult = await checkBotId();
   if (checkResult.isBot) {
     return NextResponse.json({ error: `Bot detected` }, { status: 403 });
@@ -66,22 +66,6 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Corrupted message history" }, { status: 500 });
   }
   const allMessages = validationResult.data;
-
-  // `result.toUIMessageStream({ onFinish })` returns the full message list.
-  // Persisting everything every turn is both wasteful and can create duplicates
-  // if upstream message IDs ever change. Keep a snapshot of what's already known
-  // at request start and only persist newly-created messages.
-  const originalMessageIds = new Set(allMessages.map((m) => m.id));
-
-  // immediately persist the incoming latest message
-  const latestMessage = allMessages[allMessages.length - 1];
-  await messageRepo.upsertByExternalId({
-    id: latestMessage.id,
-    conversationId: chatId,
-    role: latestMessage.role,
-    parts: latestMessage.parts,
-    externalId: latestMessage.id,
-  });
 
   const model = models.find((model) => model.id === modelId);
   if (!model) {
@@ -143,7 +127,7 @@ export async function POST(req: Request) {
           sendReasoning: true,
           sendSources: true,
           generateMessageId: genMessageId,
-          sendStart: false,
+          sendStart: true,
           messageMetadata: () => ({
             model: model.name,
           }),
@@ -151,8 +135,6 @@ export async function POST(req: Request) {
             // Persist the updated list of messages including tool calls and final response
 
             for (const msg of messages) {
-              if (originalMessageIds.has(msg.id)) continue;
-
               await messageRepo.upsertByExternalId({
                 id: msg.id,
                 conversationId: chatId,

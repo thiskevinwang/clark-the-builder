@@ -39,6 +39,19 @@ export const Message = memo(function Message({ message }: Props) {
   }, [reasoningParts]);
 
   const [debug, setDebug] = useState(false);
+  const [debugMode, setDebugMode] = useState(false);
+  // ctrl+D to toggle debug mode
+  useEffect(() => {
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.ctrlKey && event.key === "d") {
+        setDebugMode((prev) => !prev);
+      }
+    }
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
 
   return (
     <ReasoningContext.Provider value={{ expandedReasoningIndex, setExpandedReasoningIndex }}>
@@ -55,7 +68,11 @@ export const Message = memo(function Message({ message }: Props) {
           ))}
         </div>
 
-        <Collapsible open={debug} onOpenChange={setDebug} className="mt-1">
+        <Collapsible
+          open={debug}
+          onOpenChange={setDebug}
+          className={cn("mt-1", { hidden: debugMode })}
+        >
           <div className="flex justify-end items-center space-x-1 mb-2">
             <code className="text-xs text-muted-foreground">Raw</code>
             <CollapsibleTrigger asChild>

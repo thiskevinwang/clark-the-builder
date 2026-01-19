@@ -1,14 +1,17 @@
 import { UIMessage } from "ai";
 
-/** A persisted UI message belonging to a conversation. */
+export type MessageRole = "system" | "user" | "assistant" | "developer" | "tool";
+
+/** A persisted conversation entry (UI message or session event). */
 export interface Message {
   id: UIMessage["id"];
   conversationId: string;
-  role: UIMessage["role"];
+  role?: MessageRole | null;
   createdAt: Date;
   updatedAt: Date;
   parts: UIMessage["parts"];
   metadata: Record<string, unknown>;
+  parentId?: string | null;
   // An optional external ID:
   // eg. OpenAI tool call id: `call_1234`
   // eg. Anthropic tool call id: `toolu_1234`
@@ -18,14 +21,17 @@ export interface Message {
 export interface CreateMessageInput {
   id?: UIMessage["id"];
   conversationId: string;
-  role: UIMessage["role"];
-  parts: UIMessage["parts"];
+  role?: MessageRole | null;
+  parts?: UIMessage["parts"];
   metadata?: Record<string, unknown>;
+  parentId?: string | null;
   externalId?: string;
 }
 
 export interface UpdateMessageInput {
+  role?: MessageRole | null;
   parts?: UIMessage["parts"];
   metadata?: Record<string, unknown>;
+  parentId?: string | null;
   externalId?: string;
 }
