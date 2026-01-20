@@ -6,5 +6,5 @@ export interface MessageRepository {
   create(input: CreateMessageInput): Promise<Message>;
   update(id: string, input: UpdateMessageInput): Promise<Message | null>;
   delete(id: string): Promise<boolean>;
-  upsertByExternalId(input: CreateMessageInput): Promise<Message>;
+  upsert(input: CreateMessageInput): Promise<Message>;
 }

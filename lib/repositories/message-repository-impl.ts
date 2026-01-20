@@ -92,20 +92,20 @@ export const createMessageRepository = (db: DB): MessageRepository => ({
     return true;
   },
 
-  async upsertByExternalId(input: CreateMessageInput) {
-    if (!input.externalId) {
-      throw new Error("externalId is required for upsertByExternalId");
+  async upsert(input: CreateMessageInput) {
+    if (!input.id) {
+      throw new Error("id is required for upsert");
     }
 
-    const insertValues = buildInsertValues({ ...input, externalId: input.externalId });
-    const updateValues = buildUpdateValues(input);
+    const insertValues = buildInsertValues(input);
+    const { id: _id, ...upsertValues } = insertValues;
 
     const row = await db
       .insert(messages)
       .values(insertValues as typeof messages.$inferInsert)
       .onConflictDoUpdate({
-        target: messages.externalId,
-        set: Object.keys(updateValues).length > 0 ? updateValues : { externalId: input.externalId },
+        target: messages.id,
+        set: upsertValues,
       })
       .returning()
       .then((rows) => rows[0]);

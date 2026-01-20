@@ -102,7 +102,22 @@ export async function POST(req: Request) {
       const result = streamText({
         ...getModelOptions(modelId, { reasoningEffort }),
         system: systemMessage.content as string,
-        messages: await convertToModelMessages(allMessages), // todo: handle errored data-parts
+        messages: await convertToModelMessages(allMessages, {
+          // // By default, data parts in user messages are filtered out during conversion.
+          // // To include them, provide a convertDataPart callback that transforms data parts
+          // // into text or file parts that the model can understand:
+          // // - https://ai-sdk.dev/docs/reference/ai-sdk-ui/convert-to-model-messages#converttomodelmessages
+          // convertDataPart: (part) => {
+          //   if (part.type.startsWith("data-")) {
+          //     // TEST...
+          //     return {
+          //       type: "text",
+          //       text: "This is a data part: " + part.type,
+          //     };
+          //   }
+          //   // Other data parts are ignored
+          // },
+        }), // todo: handle errored data-parts
         stopWhen: stepCountIs(20),
         tools: {
           ...tools({ modelId, writer, chatId }),
@@ -129,20 +144,30 @@ export async function POST(req: Request) {
           sendSources: true,
           generateMessageId: genMessageId,
           sendStart: true,
-          messageMetadata: () => ({
-            model: model.name,
-          }),
+          sendFinish: true,
+          messageMetadata: ({ part }) => {
+            if (part.type === "finish") {
+              return {
+                model: model.name,
+                totalTokens: part.totalUsage.totalTokens,
+                createdAt: Date.now(),
+              };
+            }
+
+            return {
+              model: model.name,
+            };
+          },
           onFinish: async ({ messages }) => {
             // Persist the updated list of messages including tool calls and final response
 
             for (const msg of messages) {
-              await messageRepo.upsertByExternalId({
+              await messageRepo.upsert({
                 id: msg.id,
                 conversationId: chatId,
                 role: msg.role,
                 parts: msg.parts,
                 metadata: coerceMetadata(msg.metadata),
-                externalId: msg.id,
               });
             }
 

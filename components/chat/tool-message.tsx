@@ -7,10 +7,15 @@ export function ToolMessage(props: { className?: string; children: ReactNode }) 
     <div
       data-component={"ToolMessage"}
       className={cn(
-        "text-sm px-3.5 py-3 border border-border bg-card",
+        "text-sm px-3.5 py-3 border border-border bg-background",
+        "transition-colors hover:bg-accent/30",
         // CSS rules:
-        // - first of kind in a list gets top-rounded
-        "first-of-type:rounded-t-md",
+        // - adjacent tool parts merge into one rounded group
+        "rounded-md",
+        "[&+&]:border-t-0",
+        "[&+&]:rounded-t-none",
+        "[&:has(+&)]:border-b-0",
+        "[&:has(+&)]:rounded-b-none",
         props.className,
       )}
     >
