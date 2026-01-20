@@ -1,11 +1,11 @@
 import { UIMessagePart } from "ai";
 import { sql } from "drizzle-orm";
-import { check, index, jsonb, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import { boolean, check, index, jsonb, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 
 import type { DataPart } from "@/ai/messages/data-parts";
 import type { ToolSet } from "@/ai/tools";
 
-import { genConversationId, genMessageId } from "@/lib/identifiers/generator";
+import { genConversationId, genMcpConnectionId, genMessageId } from "@/lib/identifiers/generator";
 
 export const conversations = pgTable(
   "conversations",
@@ -58,3 +58,23 @@ export const messages = pgTable(
 
 export type MessageRow = typeof messages.$inferSelect;
 export type NewMessageRow = typeof messages.$inferInsert;
+
+export const mcpConnections = pgTable(
+  "mcp_connections",
+  {
+    id: text("id").primaryKey().$defaultFn(genMcpConnectionId),
+    name: text("name").notNull().unique("uniq_mcp_connections_name"),
+    url: text("url").notNull(),
+    auth: jsonb("auth").$type<Record<string, unknown> | null>().default(null),
+    enabled: boolean("enabled").notNull().default(true),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (t) => [index("idx_mcp_connections_updated_at").on(t.updatedAt)],
+);
+
+export type MCPConnectionRow = typeof mcpConnections.$inferSelect;
+export type NewMCPConnectionRow = typeof mcpConnections.$inferInsert;

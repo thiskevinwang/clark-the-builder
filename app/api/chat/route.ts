@@ -16,9 +16,9 @@ import { getMCPClient } from "@/ai/mcp-client";
 import { tools } from "@/ai/tools";
 
 import { type ChatUIMessage } from "@/components/chat/types";
-import { type MCPConnector } from "@/components/connectors/use-mcp-connectors";
 import { db } from "@/lib/database/db";
 import { genMessageId } from "@/lib/identifiers/generator";
+import { createMCPConnectionRepository } from "@/lib/repositories/mcp-connection-repository-impl";
 import { createMessageRepository } from "@/lib/repositories/message-repository-impl";
 
 import prompt from "./prompt.md";
@@ -28,12 +28,11 @@ const systemMessage: ModelMessage = {
   content: prompt,
 };
 
-interface BodyData {
+export interface ChatRequestBody {
   chatId: string;
   messages: ChatUIMessage[];
   modelId?: ModelId;
   reasoningEffort?: "none" | "low" | "medium" | "high" | "xhigh";
-  connectors?: MCPConnector[];
 }
 
 function coerceMetadata(value: unknown): Record<string, unknown> | undefined {
@@ -43,16 +42,18 @@ function coerceMetadata(value: unknown): Record<string, unknown> | undefined {
   return value as Record<string, unknown>;
 }
 
-export async function POST(req: Request, res, ctx) {
+export async function POST(req: Request) {
   const checkResult = await checkBotId();
   if (checkResult.isBot) {
     return NextResponse.json({ error: `Bot detected` }, { status: 403 });
   }
 
-  const [models, { messages, chatId, modelId = DEFAULT_MODEL, reasoningEffort, connectors }] =
-    await Promise.all([getAvailableModels(), req.json() as Promise<BodyData>]);
+  const [models, { messages, chatId, modelId = DEFAULT_MODEL, reasoningEffort }] =
+    await Promise.all([getAvailableModels(), req.json() as Promise<ChatRequestBody>]);
 
   const messageRepo = createMessageRepository(db);
+  const mcpConnectionRepo = createMCPConnectionRepository(db);
+  const connectors = await mcpConnectionRepo.listRecent(10, 0, undefined);
 
   // Load persisted UI messages from the messages table.
   // const persistedRows = await messageRepo.listByConversationId(chatId);
@@ -104,7 +105,7 @@ export async function POST(req: Request, res, ctx) {
         messages: await convertToModelMessages(allMessages), // todo: handle errored data-parts
         stopWhen: stepCountIs(20),
         tools: {
-          ...tools({ messageRepository: messageRepo, modelId, writer, chatId }),
+          ...tools({ modelId, writer, chatId }),
           ...dynamicTools,
         },
         onError: async (error) => {

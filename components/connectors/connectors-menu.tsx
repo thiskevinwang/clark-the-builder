@@ -41,12 +41,12 @@ export function ConnectorsMenu() {
             <div className="space-y-1 mb-2">
               {connectors.map((connector) => (
                 <div
-                  key={connector.name}
+                  key={connector.id}
                   className="flex items-center justify-between gap-2 px-2 py-1.5 rounded-md hover:bg-muted/50 group"
                 >
                   <Switch
                     checked={connector.enabled !== false}
-                    onCheckedChange={(checked) => toggleConnector(connector.name, checked)}
+                    onCheckedChange={(checked) => toggleConnector(connector.id, checked)}
                   />
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-foreground truncate">{connector.name}</p>
@@ -56,7 +56,7 @@ export function ConnectorsMenu() {
                     variant="ghost"
                     size="sm"
                     className="h-7 w-7 p-0 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive"
-                    onClick={() => removeConnector(connector.name)}
+                    onClick={() => removeConnector(connector.id)}
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                   </Button>

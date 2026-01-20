@@ -1,106 +1,118 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
-const STORAGE_KEY = "clark:mcp-connectors";
+import type { MCPConnectionAuth } from "@/lib/models/mcp-connection";
 
 export type AuthType = "none" | "bearer" | "headers" | "oauth";
 
-export interface MCPServerAuth {
-  type: AuthType;
-  bearer?: string;
-  headers?: Record<string, string>;
-  oauth?: {
-    clientId: string;
-    clientSecret: string;
-    tokenUrl: string;
-  };
-}
+export type MCPServerAuth = MCPConnectionAuth;
+
 export interface MCPServer {
   url: string;
-  auth?: MCPServerAuth;
+  auth?: MCPServerAuth | null;
   enabled?: boolean;
 }
 
 export interface MCPConnector extends MCPServer {
+  id: string;
   name: string;
 }
 
-export interface MCPConnectorsConfig {
-  mcpServers: Record<string, MCPServer>;
+export interface CreateConnectorInput {
+  name: string;
+  url: string;
+  auth?: MCPServerAuth | null;
+  enabled?: boolean;
+}
+
+interface MCPConnectionRecord {
+  id: string;
+  name: string;
+  url: string;
+  auth: MCPServerAuth | null;
+  enabled: boolean;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export function useMCPConnectors() {
-  const [config, setConfig] = useState<MCPConnectorsConfig>({ mcpServers: {} });
+  const [connections, setConnections] = useState<MCPConnectionRecord[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
 
+  const fetchConnections = useCallback(async () => {
+    try {
+      const res = await fetch("/api/mcp-connections", { cache: "no-store" });
+      if (!res.ok) throw new Error("Failed to load MCP connections");
+      const data = (await res.json()) as { connections: MCPConnectionRecord[] };
+      setConnections(data.connections);
+    } finally {
+      setIsLoaded(true);
+    }
+  }, []);
+
   useEffect(() => {
-    if (typeof window === "undefined") return;
+    void fetchConnections();
+  }, [fetchConnections]);
 
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) {
-      try {
-        setConfig(JSON.parse(stored));
-      } catch {
-        setConfig({ mcpServers: {} });
-      }
+  const addConnector = useCallback(async (input: CreateConnectorInput) => {
+    const res = await fetch("/api/mcp-connections", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: input.name,
+        url: input.url,
+        ...(Object.prototype.hasOwnProperty.call(input, "auth")
+          ? { auth: input.auth ?? null }
+          : {}),
+        ...(input.enabled !== undefined ? { enabled: input.enabled } : {}),
+      }),
+    });
+
+    if (!res.ok) {
+      throw new Error("Failed to create MCP connection");
     }
-    setIsLoaded(true);
+
+    const data = (await res.json()) as { connection: MCPConnectionRecord };
+    setConnections((prev) => [data.connection, ...prev]);
   }, []);
 
-  const saveConfig = useCallback((newConfig: MCPConnectorsConfig) => {
-    setConfig(newConfig);
-    if (typeof window !== "undefined") {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(newConfig));
+  const removeConnector = useCallback(async (id: string) => {
+    const res = await fetch(`/api/mcp-connections/${id}`, { method: "DELETE" });
+    if (!res.ok) {
+      throw new Error("Failed to delete MCP connection");
     }
+    setConnections((prev) => prev.filter((connection) => connection.id !== id));
   }, []);
 
-  const addConnector = useCallback(
-    (name: string, server: MCPServer) => {
-      const newConfig = {
-        ...config,
-        mcpServers: {
-          ...config.mcpServers,
-          [name]: server,
-        },
-      };
-      saveConfig(newConfig);
-    },
-    [config, saveConfig],
+  const toggleConnector = useCallback(async (id: string, enabled: boolean) => {
+    const res = await fetch(`/api/mcp-connections/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ enabled }),
+    });
+    if (!res.ok) {
+      throw new Error("Failed to update MCP connection");
+    }
+    const data = (await res.json()) as { connection: MCPConnectionRecord };
+    setConnections((prev) =>
+      prev.map((connection) => (connection.id === id ? data.connection : connection)),
+    );
+  }, []);
+
+  const connectors = useMemo(
+    () =>
+      connections.map((connection) => ({
+        id: connection.id,
+        name: connection.name,
+        url: connection.url,
+        auth: connection.auth ?? undefined,
+        enabled: connection.enabled,
+      })) satisfies MCPConnector[],
+    [connections],
   );
-
-  const removeConnector = useCallback(
-    (name: string) => {
-      const { [name]: _, ...rest } = config.mcpServers;
-      saveConfig({ mcpServers: rest });
-    },
-    [config, saveConfig],
-  );
-
-  const toggleConnector = useCallback(
-    (name: string, enabled: boolean) => {
-      const server = config.mcpServers[name];
-      if (!server) return;
-
-      const newConfig = {
-        ...config,
-        mcpServers: {
-          ...config.mcpServers,
-          [name]: { ...server, enabled },
-        },
-      };
-      saveConfig(newConfig);
-    },
-    [config, saveConfig],
-  );
-
-  const connectors = Object.entries(config.mcpServers).map(([name, server]) => ({
-    name,
-    ...server,
-  })) satisfies MCPConnector[];
 
   return {
-    config,
     connectors,
     isLoaded,
     addConnector,

@@ -16,7 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 
-import type { AuthType, MCPServer, MCPServerAuth } from "./use-mcp-connectors";
+import type { AuthType, CreateConnectorInput, MCPServerAuth } from "./use-mcp-connectors";
 
 const AUTH_OPTIONS: { value: AuthType; label: string }[] = [
   { value: "none", label: "None" },
@@ -26,7 +26,7 @@ const AUTH_OPTIONS: { value: AuthType; label: string }[] = [
 ];
 
 interface AddConnectorDialogProps {
-  onAdd: (name: string, server: MCPServer) => void;
+  onAdd: (input: CreateConnectorInput) => Promise<void> | void;
 }
 
 export function AddConnectorDialog({ onAdd }: AddConnectorDialogProps) {
@@ -53,24 +53,19 @@ export function AddConnectorDialog({ onAdd }: AddConnectorDialogProps) {
     setOauthTokenUrl("");
   };
 
-  const handleSubmit = () => {
-    if (!name.trim() || !url.trim()) return;
+  const handleSubmit = async () => {
+    if (!isValid) return;
 
-    let auth: MCPServerAuth | undefined;
+    let auth: MCPServerAuth | null | undefined = null;
 
-    if (authType === "bearer" && bearerToken.trim()) {
+    if (authType === "bearer") {
       auth = { type: "bearer", bearer: bearerToken.trim() };
-    } else if (authType === "headers" && headerKey.trim() && headerValue.trim()) {
+    } else if (authType === "headers") {
       auth = {
         type: "headers",
         headers: { [headerKey.trim()]: headerValue.trim() },
       };
-    } else if (
-      authType === "oauth" &&
-      oauthClientId.trim() &&
-      oauthClientSecret.trim() &&
-      oauthTokenUrl.trim()
-    ) {
+    } else if (authType === "oauth") {
       auth = {
         type: "oauth",
         oauth: {
@@ -79,21 +74,27 @@ export function AddConnectorDialog({ onAdd }: AddConnectorDialogProps) {
           tokenUrl: oauthTokenUrl.trim(),
         },
       };
-    } else if (authType !== "none") {
-      auth = { type: authType };
+    } else if (authType === "none") {
+      auth = null;
     }
 
-    const server: MCPServer = { url: url.trim() };
-    if (auth) {
-      server.auth = auth;
-    }
+    await onAdd({
+      name: name.trim(),
+      url: url.trim(),
+      ...(auth !== undefined ? { auth } : {}),
+    });
 
-    onAdd(name.trim(), server);
     resetForm();
     setOpen(false);
   };
 
-  const isValid = name.trim() && url.trim();
+  const isValid =
+    Boolean(name.trim() && url.trim()) &&
+    (authType === "none" ||
+      (authType === "bearer" && Boolean(bearerToken.trim())) ||
+      (authType === "headers" && Boolean(headerKey.trim() && headerValue.trim())) ||
+      (authType === "oauth" &&
+        Boolean(oauthClientId.trim() && oauthClientSecret.trim() && oauthTokenUrl.trim())));
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -154,7 +155,7 @@ export function AddConnectorDialog({ onAdd }: AddConnectorDialogProps) {
             </div>
           </div>
 
-          <div className="min-h-[120px] rounded-lg border border-border bg-muted/30 p-4">
+          <div className="min-h-30 rounded-lg border border-border bg-muted/30 p-4">
             {authType === "none" && (
               <p className="text-sm text-muted-foreground text-center py-8">
                 No authentication method selected.

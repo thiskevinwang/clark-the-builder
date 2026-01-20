@@ -169,6 +169,12 @@ export function WelcomeScreen() {
                 </div>
               </InputGroupAddon>
             </InputGroup>
+
+            <p className="text-center text-muted-foreground text-xs mt-2">
+              <span className="inline-block dark:hidden">Clark</span>
+              <span className="hidden dark:inline-block">Karl</span>&nbsp;is AI and can make
+              mistakes. Please double-check responses.
+            </p>
           </form>
         </div>
 

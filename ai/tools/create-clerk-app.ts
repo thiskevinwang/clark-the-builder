@@ -4,19 +4,16 @@ import z from "zod";
 
 import { platformCreateApplication } from "@/lib/api";
 import { createClient, createConfig } from "@/lib/api/client";
-import { MessageRepository } from "@/lib/repositories/message-repository";
 
 import type { DataPart } from "../messages/data-parts";
 import description from "./create-clerk-app.prompt.md";
 import { getRichError } from "./get-rich-error";
 
 interface Params {
-  messageRepository: MessageRepository;
-  chatId: string;
   writer: UIMessageStreamWriter<UIMessage<never, DataPart>>;
 }
 
-export const createClerkApp = ({ messageRepository, chatId, writer }: Params) =>
+export const createClerkApp = ({ writer }: Params) =>
   tool({
     description,
     inputSchema: z.object({
@@ -43,18 +40,6 @@ export const createClerkApp = ({ messageRepository, chatId, writer }: Params) =>
         id: toolCallId,
         type: "data-create-clerk-app",
         data: { status: "loading", name },
-      });
-
-      await messageRepository.upsertByExternalId({
-        externalId: toolCallId,
-        conversationId: chatId,
-        role: "assistant",
-        parts: [
-          {
-            type: "data-create-clerk-app",
-            data: { status: "loading", name },
-          },
-        ],
       });
 
       const clerkPlatformToken = process.env.CLERK_PLATFORM_ACCESS_TOKEN;
@@ -134,23 +119,6 @@ export const createClerkApp = ({ messageRepository, chatId, writer }: Params) =>
             publishableKey: devInstance.publishable_key,
             secretKey: devInstance.secret_key,
           },
-        });
-        await messageRepository.upsertByExternalId({
-          externalId: toolCallId,
-          conversationId: chatId,
-          role: "assistant",
-          parts: [
-            {
-              type: "data-create-clerk-app",
-              data: {
-                status: "done",
-                name,
-                applicationId: application.application_id,
-                publishableKey: devInstance.publishable_key,
-                secretKey: devInstance.secret_key,
-              },
-            },
-          ],
         });
 
         return (

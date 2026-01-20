@@ -8,6 +8,7 @@ import { toast } from "sonner";
 
 import { DataPart } from "@/ai/messages/data-parts";
 
+import { type ChatRequestBody } from "@/app/api/chat/route";
 import { useListMessagesQuery } from "@/app/api/hooks";
 import { useDataStateMapper } from "@/app/state";
 import { type ChatUIMessage } from "@/components/chat/types";
@@ -53,7 +54,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
             ...(body ?? {}),
             chatId: conversationId,
             messages,
-          },
+          } satisfies ChatRequestBody,
         };
       },
     });

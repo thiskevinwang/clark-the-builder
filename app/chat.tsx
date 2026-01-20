@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/input-group";
 import { useSharedChatContext } from "@/lib/chat-context";
 import { useLocalStorageValue } from "@/lib/use-local-storage-value";
+import { cn } from "@/lib/utils";
 
 // Deduplication guard: prevent auto-sending the same prompt multiple times
 //
@@ -69,7 +70,7 @@ export function Chat({ className }: { className: string }) {
   }, [chat?.id, input, messages.length, setInput, status, validateAndSubmitMessage]);
 
   return (
-    <Panel className={className} variant="ghost">
+    <Panel className={cn("max-w-3xl mx-auto", className)} variant="ghost">
       {/* Messages Area */}
       <Conversation className="relative w-full">
         <ConversationContent className="space-y-4">
@@ -139,6 +140,11 @@ export function Chat({ className }: { className: string }) {
             </div>
           </InputGroupAddon>
         </InputGroup>
+        <p className="text-center text-muted-foreground text-xs mt-2">
+          <span className="inline-block dark:hidden">Clark</span>
+          <span className="hidden dark:inline-block">Karl</span>&nbsp;is AI and can make mistakes.
+          Please double-check responses.
+        </p>
       </form>
     </Panel>
   );

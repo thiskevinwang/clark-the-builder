@@ -1,7 +1,5 @@
 import type { InferUITools, UIMessage, UIMessageStreamWriter } from "ai";
 
-import { MessageRepository } from "@/lib/repositories/message-repository";
-
 import type { ModelId } from "../constants";
 import type { DataPart } from "../messages/data-parts";
 import { createClerkApp } from "./create-clerk-app";
@@ -12,15 +10,15 @@ import { runCommand } from "./run-command";
 import { waitTool } from "./wait";
 
 interface Params {
-  messageRepository: MessageRepository;
   chatId: string;
   modelId: ModelId;
   writer: UIMessageStreamWriter<UIMessage<never, DataPart>>;
 }
 
-export function tools({ messageRepository, chatId, modelId, writer }: Params) {
+export function tools({ chatId, modelId, writer }: Params) {
+  console.log("Creating tools for chatId:", chatId);
   return {
-    createClerkApp: createClerkApp({ messageRepository, chatId, writer }),
+    createClerkApp: createClerkApp({ writer }),
     createSandbox: createSandbox({ writer }),
     generateFiles: generateFiles({ writer, modelId }),
     getSandboxURL: getSandboxURL({ writer }),

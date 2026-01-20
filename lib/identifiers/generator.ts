@@ -11,3 +11,9 @@ export const genConversationId = createIdGenerator({
   separator: "_",
   size: 24,
 });
+
+export const genMcpConnectionId = createIdGenerator({
+  prefix: "mcp",
+  separator: "_",
+  size: 24,
+});
