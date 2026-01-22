@@ -19,6 +19,13 @@ export const dataPartSchema = z.object({
     status: z.enum(["loading", "done", "error"]),
     error: errorSchema.optional(),
   }),
+  "create-pscale-db": z.object({
+    name: z.string(),
+    databaseId: z.string().optional(),
+    url: z.string().optional(),
+    status: z.enum(["loading", "done", "error"]),
+    error: errorSchema.optional(),
+  }),
   "generating-files": z.object({
     paths: z.array(z.string()),
     status: z.enum(["generating", "uploading", "uploaded", "done", "error"]),

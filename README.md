@@ -25,8 +25,19 @@ Populate environment variables
 #.env
 OPEAI_API_KEY=
 ANTHROPIC_API_KEY=
+
+# For auth artifacts
 CLERK_PLATFORM_API_BASE_URL=
 CLERK_PLATFORM_ACCESS_TOKEN=
+
+# For sandbox artifacts
+VERCEL_TOKEN=
+VERCEL_TEAM_ID=
+VERCEL_PROJECT_ID=
+
+# For database artifacts
+PLANETSCALE_SERVICE_TOKEN_ID=
+PLANETSCALE_SERVICE_TOKEN=
 ```
 
 Install deps
@@ -35,12 +46,21 @@ Install deps
 bun i
 ```
 
-Generate the api client
+Generate the clerk api client
 
 ```bash
 bunx @hey-api/openapi-ts \
   -i openapi.json \
   -o lib/api \
+  -c @tanstack/react-query
+```
+
+Generate the pscale api client
+
+```bash
+bunx @hey-api/openapi-ts \
+  -i planetscale.yaml \
+  -o lib/pscale \
   -c @tanstack/react-query
 ```
 
