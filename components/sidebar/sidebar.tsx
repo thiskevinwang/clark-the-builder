@@ -197,13 +197,6 @@ export function Sidebar({ className }: SidebarProps) {
             </div>
           </div>
         </ScrollArea>
-
-        {/* Footer - New App hint */}
-        <div className={cn("shrink-0 border-t border-border p-3", isCollapsed && "md:hidden")}>
-          <p className="text-xs text-muted-foreground">
-            Ask the assistant to create a new Clerk app
-          </p>
-        </div>
       </div>
     </>
   );
