@@ -10,9 +10,9 @@ export function TextPart({ className, part }: { className?: string; part: TextUI
   return (
     <div
       data-component={"Text"}
-      className={cn("text-sm px-3.5 py-3 rounded-md overflow-x-auto", className)}
+      className={cn("px-3.5 py-3 rounded-md overflow-x-auto", className)}
     >
-      <Streamdown>{part.text}</Streamdown>
+      <Streamdown className="**:text-sm">{part.text}</Streamdown>
     </div>
   );
 }
