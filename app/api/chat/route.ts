@@ -4,7 +4,7 @@ import {
   createUIMessageStreamResponse,
   safeValidateUIMessages,
   stepCountIs,
-  streamText,
+  ToolLoopAgent,
   type ModelMessage,
 } from "ai";
 import { checkBotId } from "botid/server";
@@ -114,29 +114,23 @@ export async function POST(req: Request) {
       await closeMCPClients();
     },
     execute: async ({ writer }) => {
-      // This is the actual model request + response
-      const result = streamText({
+      const agent = new ToolLoopAgent({
         ...getModelOptions(modelId, { reasoningEffort }),
-        system: systemMessage.content as string,
-        messages: await convertToModelMessages(allMessages), // todo: handle errored data-parts
         stopWhen: stepCountIs(20),
         tools: {
           ...tools({ modelId, writer, chatId }),
           ...dynamicTools,
         },
-        onError: async (error) => {
-          console.error("Error during agent execution:", error);
-          await closeMCPClients();
-        },
         onFinish: async ({ usage, reasoningText, totalUsage }) => {
-          console.log("Generation finished");
+          console.log("Agent execution finished");
           console.log("Usage:", JSON.stringify(usage, null, 2));
           console.log("Total Usage:", JSON.stringify(totalUsage, null, 2));
           console.log("Reasoning Text:", reasoningText);
         },
       });
-
-      result.consumeStream();
+      const result = await agent.stream({
+        messages: await convertToModelMessages(allMessages), // todo: handle errored data-parts
+      });
 
       writer.merge(
         result.toUIMessageStream({
@@ -146,6 +140,9 @@ export async function POST(req: Request) {
           generateMessageId: genMessageId,
           sendStart: true,
           sendFinish: true,
+          onFinish: () => {
+            closeMCPClients();
+          },
           messageMetadata: ({ part }) => {
             if (part.type === "finish") {
               return {

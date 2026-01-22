@@ -1,10 +1,6 @@
-import { CheckIcon, XIcon } from "lucide-react";
-
 import type { DataPart } from "@/ai/messages/data-parts";
 
-import { ToolHeader } from "../tool-header";
-import { ToolMessage } from "../tool-message";
-import { Spinner } from "./spinner";
+import { DataPartMessage } from "../data-part-message";
 
 interface Props {
   message: DataPart["create-sandbox"];
@@ -12,17 +8,12 @@ interface Props {
 
 export function CreateSandbox({ message }: Props) {
   return (
-    <ToolMessage>
-      <ToolHeader>Create Sandbox</ToolHeader>
-
-      <div className="relative pl-6 min-h-5">
-        <Spinner className="absolute left-0 top-0" loading={message.status === "loading"}>
-          {message.status === "error" ? (
-            <XIcon className="w-4 h-4 text-red-700" />
-          ) : (
-            <CheckIcon className="w-4 h-4" />
-          )}
-        </Spinner>
+    <DataPartMessage
+      title="Create Sandbox"
+      loading={message.status == "loading"}
+      error={message.error?.message || message.status == "error"}
+    >
+      <div className="relative">
         <span>
           {message.status === "done" && "Sandbox created successfully"}
           {message.status === "loading" && "Creating Sandbox"}
@@ -31,6 +22,6 @@ export function CreateSandbox({ message }: Props) {
       </div>
 
       <small className="text-muted-foreground">{message.sandboxId}</small>
-    </ToolMessage>
+    </DataPartMessage>
   );
 }

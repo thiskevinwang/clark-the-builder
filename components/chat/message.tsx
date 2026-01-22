@@ -1,5 +1,6 @@
 import { ChevronsUpDown } from "lucide-react";
 import { createContext, memo, useContext, useEffect, useState } from "react";
+import { Streamdown } from "streamdown";
 
 import { cn } from "@/lib/utils";
 
@@ -71,7 +72,7 @@ export const Message = memo(function Message({ message }: Props) {
         <Collapsible
           open={debug}
           onOpenChange={setDebug}
-          className={cn("mt-1", { hidden: debugMode })}
+          className={cn("mt-1 max-w-full", { hidden: debugMode })}
         >
           <div className="flex justify-end items-center space-x-1 mb-2">
             <code className="text-xs text-muted-foreground">Raw</code>
@@ -83,10 +84,10 @@ export const Message = memo(function Message({ message }: Props) {
               </Button>
             </CollapsibleTrigger>
           </div>
-          <CollapsibleContent className="overflow-hidden [&[data-state=open]]:animate-collapsible-down [&[data-state=closed]]:animate-collapsible-up">
-            <pre className="text-xs overflow-x-auto bg-muted p-2">
-              {JSON.stringify(message, null, 2)}
-            </pre>
+          <CollapsibleContent className="[&[data-state=open]]:animate-collapsible-down [&[data-state=closed]]:animate-collapsible-up">
+            <Streamdown className="**:text-xs! text-muted-foreground max-w-full">
+              {"\`\`\`json\n" + JSON.stringify(message, null, 2) + "\n\`\`\`"}
+            </Streamdown>
           </CollapsibleContent>
         </Collapsible>
       </div>

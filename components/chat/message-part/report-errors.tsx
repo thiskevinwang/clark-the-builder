@@ -1,20 +1,18 @@
-import { BugIcon } from "lucide-react";
 import { Streamdown } from "streamdown";
 
 import type { DataPart } from "@/ai/messages/data-parts";
 
-import { ToolHeader } from "../tool-header";
-import { ToolMessage } from "../tool-message";
+import { DataPartMessage } from "../data-part-message";
 
-export function ReportErrors({ message }: { message: DataPart["report-errors"] }) {
+interface Props {
+  message: DataPart["report-errors"];
+}
+export function ReportErrors({ message }: Props) {
   return (
-    <ToolMessage>
-      <ToolHeader icon={<BugIcon className="w-3.5 h-3.5" />}>
-        <span>Auto-detected errors</span>
-      </ToolHeader>
+    <DataPartMessage title="Errors">
       <div className="relative min-h-5">
-        <Streamdown>{message.summary}</Streamdown>
+        <Streamdown className="**:text-xs">{message.summary}</Streamdown>
       </div>
-    </ToolMessage>
+    </DataPartMessage>
   );
 }

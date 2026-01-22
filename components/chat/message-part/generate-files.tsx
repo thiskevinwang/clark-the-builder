@@ -2,30 +2,29 @@ import { CheckIcon, XIcon } from "lucide-react";
 
 import type { DataPart } from "@/ai/messages/data-parts";
 
-import { ToolHeader } from "../tool-header";
-import { ToolMessage } from "../tool-message";
+import { DataPartMessage } from "../data-part-message";
 import { Spinner } from "./spinner";
 
-export function GenerateFiles(props: {
-  className?: string;
+interface Props {
   message: DataPart["generating-files"];
-}) {
-  const lastInProgress = ["error", "uploading", "generating"].includes(props.message.status);
+}
+
+export function GenerateFiles({ message }: Props) {
+  const lastInProgress = ["error", "uploading", "generating"].includes(message.status);
 
   const generated = lastInProgress
-    ? props.message.paths.slice(0, props.message.paths.length - 1)
-    : props.message.paths;
+    ? message.paths.slice(0, message.paths.length - 1)
+    : message.paths;
 
-  const generating = lastInProgress
-    ? (props.message.paths[props.message.paths.length - 1] ?? "")
-    : null;
+  const generating = lastInProgress ? (message.paths[message.paths.length - 1] ?? "") : null;
 
   return (
-    <ToolMessage className={props.className}>
-      <ToolHeader>
-        <span>Generate files</span>
-      </ToolHeader>
-      <div className="text-sm relative min-h-5">
+    <DataPartMessage
+      title="Generate Files"
+      loading={message.status == "generating" || message.status == "uploading"}
+      error={message.error?.message || message.status == "error"}
+    >
+      <div className="relative">
         {generated.map((path) => (
           <div className="flex items-center" key={"gen" + path}>
             <CheckIcon className="w-4 h-4 mx-1" />
@@ -34,8 +33,8 @@ export function GenerateFiles(props: {
         ))}
         {typeof generating === "string" && (
           <div className="flex">
-            <Spinner className="mr-1" loading={props.message.status !== "error"}>
-              {props.message.status === "error" ? (
+            <Spinner className="mr-1" loading={message.status !== "error"}>
+              {message.status === "error" ? (
                 <XIcon className="w-4 h-4 text-red-700" />
               ) : (
                 <CheckIcon className="w-4 h-4" />
@@ -45,6 +44,6 @@ export function GenerateFiles(props: {
           </div>
         )}
       </div>
-    </ToolMessage>
+    </DataPartMessage>
   );
 }
