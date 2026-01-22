@@ -22,6 +22,7 @@ import {
   InputGroupButton,
   InputGroupTextarea,
 } from "@/components/ui/input-group";
+import { useAuth } from "@/lib/auth";
 import { useSharedChatContext } from "@/lib/chat-context";
 import { useLocalStorageValue } from "@/lib/use-local-storage-value";
 import { cn } from "@/lib/utils";
@@ -35,6 +36,7 @@ const autoSentKeys = new Set<string>();
 export function Chat({ className }: { className: string }) {
   const { chat } = useSharedChatContext();
   const [input, setInput] = useLocalStorageValue(`chat:${chat?.id}:prompt-input`);
+  const { isLoaded, isSignedIn } = useAuth();
 
   const { modelId, reasoningEffort } = useSettings();
   const { messages, sendMessage, status, stop } = useChat<ChatUIMessage>({
@@ -43,12 +45,13 @@ export function Chat({ className }: { className: string }) {
 
   const validateAndSubmitMessage = useCallback(
     (text: string) => {
+      if (!isLoaded || !isSignedIn) return;
       if (text.trim()) {
         setInput("");
         sendMessage({ text }, { body: { modelId, reasoningEffort } });
       }
     },
-    [modelId, reasoningEffort, sendMessage, setInput],
+    [isLoaded, isSignedIn, modelId, reasoningEffort, sendMessage, setInput],
   );
 
   useEffect(() => {
@@ -62,12 +65,22 @@ export function Chat({ className }: { className: string }) {
     }
     if (messages.length > 0) return;
     if (status !== "ready") return;
+    if (!isLoaded || !isSignedIn) return;
 
     setInput("");
     localStorage.removeItem(`chat:${chat.id}:prompt-input`);
     autoSentKeys.add(key);
     validateAndSubmitMessage(prompt);
-  }, [chat?.id, input, messages.length, setInput, status, validateAndSubmitMessage]);
+  }, [
+    chat?.id,
+    input,
+    isLoaded,
+    isSignedIn,
+    messages.length,
+    setInput,
+    status,
+    validateAndSubmitMessage,
+  ]);
 
   return (
     <Panel className={cn("max-w-3xl mx-auto", className)} variant="ghost">
@@ -90,7 +103,7 @@ export function Chat({ className }: { className: string }) {
       >
         <InputGroup className="bg-card">
           <InputGroupTextarea
-            disabled={status === "streaming" || status === "submitted"}
+            disabled={!isLoaded || !isSignedIn || status === "streaming" || status === "submitted"}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === "Enter" && !e.shiftKey) {
@@ -98,7 +111,7 @@ export function Chat({ className }: { className: string }) {
                 validateAndSubmitMessage(input);
               }
             }}
-            placeholder="Ask a follow-up..."
+            placeholder={!isLoaded || !isSignedIn ? "Sign in to chat..." : "Ask a follow-up..."}
             rows={2}
             value={input}
             className="text-base max-h-50 overflow-y-auto"
@@ -118,7 +131,7 @@ export function Chat({ className }: { className: string }) {
                   type="submit"
                   size="sm"
                   variant="ghost"
-                  disabled={!input.trim()}
+                  disabled={!isLoaded || !isSignedIn || !input.trim()}
                   className="h-9 w-9 p-0 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground disabled:opacity-40 disabled:bg-muted disabled:text-muted-foreground transition-all"
                 >
                   <ArrowUpIcon className="w-4 h-4" />

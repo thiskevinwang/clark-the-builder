@@ -17,6 +17,7 @@ import {
   InputGroupTextarea,
 } from "@/components/ui/input-group";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { useAuth } from "@/lib/auth";
 import { useLocalStorageValue } from "@/lib/use-local-storage-value";
 
 import { useCreateChatMutation } from "./api/hooks";
@@ -49,6 +50,7 @@ export function WelcomeScreen() {
   const [input, setInput] = useLocalStorageValue("chat:new:prompt-input");
   const { isOpen, toggle } = useSidebar();
   const router = useRouter();
+  const { isLoaded, isSignedIn } = useAuth();
 
   const createChatMutation = useCreateChatMutation({
     onSuccess: (data) => {
@@ -67,6 +69,10 @@ export function WelcomeScreen() {
   const handleSubmit = async () => {
     const prompt = input.trim();
     if (!prompt || isSubmitting) return;
+    if (!isLoaded || !isSignedIn) {
+      toast.error("Sign in to start a chat.");
+      return;
+    }
     await createChatMutation.trigger({ title: "New Chat" });
   };
 
@@ -133,7 +139,7 @@ export function WelcomeScreen() {
           >
             <InputGroup className="bg-card shadow-lg border-border/50 hover:border-border transition-colors">
               <InputGroupTextarea
-                disabled={isSubmitting}
+                disabled={isSubmitting || !isLoaded || !isSignedIn}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => {
                   if (e.key === "Enter" && !e.shiftKey) {
@@ -141,7 +147,11 @@ export function WelcomeScreen() {
                     handleSubmit();
                   }
                 }}
-                placeholder="Describe the app you want to build..."
+                placeholder={
+                  !isLoaded || !isSignedIn
+                    ? "Sign in to start building..."
+                    : "Describe the app you want to build..."
+                }
                 rows={3}
                 value={input}
                 className="text-base"
@@ -160,7 +170,7 @@ export function WelcomeScreen() {
                     type="submit"
                     size="sm"
                     variant="default"
-                    disabled={isSubmitting || !input.trim()}
+                    disabled={isSubmitting || !isLoaded || !isSignedIn || !input.trim()}
                     className="h-9 w-9 p-0 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground disabled:opacity-40 disabled:bg-muted disabled:text-muted-foreground transition-all"
                   >
                     <ArrowUpIcon className="w-4 h-4" />

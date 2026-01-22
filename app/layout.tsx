@@ -9,6 +9,7 @@ import { ErrorMonitor } from "@/components/error-monitor/error-monitor";
 import { SandboxState } from "@/components/modals/sandbox-state";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
+import { AuthProvider } from "@/lib/auth";
 import { ChatProvider } from "@/lib/chat-context";
 
 import "./globals.css";
@@ -44,23 +45,25 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
       <body
         className={`${sansfont.variable} ${monofont.variable} ${seriffont.variable} font-sans antialiased`}
       >
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <Suspense fallback={null}>
-            <NuqsAdapter>
-              <ChatProvider>
-                <ErrorMonitor>{children}</ErrorMonitor>
-              </ChatProvider>
-            </NuqsAdapter>
-          </Suspense>
-          <Toaster />
-          <CommandLogsStream />
-          <SandboxState />
-        </ThemeProvider>
+        <AuthProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <Suspense fallback={null}>
+              <NuqsAdapter>
+                <ChatProvider>
+                  <ErrorMonitor>{children}</ErrorMonitor>
+                </ChatProvider>
+              </NuqsAdapter>
+            </Suspense>
+            <Toaster />
+            <CommandLogsStream />
+            <SandboxState />
+          </ThemeProvider>
+        </AuthProvider>
       </body>
     </html>
   );

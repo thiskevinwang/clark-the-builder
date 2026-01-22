@@ -13,6 +13,7 @@ export interface MCPConnectionAuth {
 
 export interface MCPConnection {
   id: string;
+  userId: string | null;
   name: string;
   url: string;
   auth: MCPConnectionAuth | null;
@@ -23,6 +24,7 @@ export interface MCPConnection {
 
 export interface CreateMCPConnectionInput {
   id?: string;
+  userId?: string | null;
   name: string;
   url: string;
   auth?: MCPConnectionAuth | null;

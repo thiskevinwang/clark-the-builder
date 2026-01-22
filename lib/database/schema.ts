@@ -5,12 +5,38 @@ import { boolean, check, index, jsonb, pgTable, text, timestamp } from "drizzle-
 import type { DataPart } from "@/ai/messages/data-parts";
 import type { ToolSet } from "@/ai/tools";
 
-import { genConversationId, genMcpConnectionId, genMessageId } from "@/lib/identifiers/generator";
+import {
+  genConversationId,
+  genMcpConnectionId,
+  genMessageId,
+  genUserId,
+} from "@/lib/identifiers/generator";
+
+export const users = pgTable(
+  "users",
+  {
+    id: text("id").primaryKey().$defaultFn(genUserId),
+    externalId: text("external_id").notNull().unique("uniq_users_external_id"),
+    email: text("email"),
+    name: text("name"),
+    imageUrl: text("image_url"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (t) => [index("idx_users_external_id").on(t.externalId)],
+);
+
+export type UserRow = typeof users.$inferSelect;
+export type NewUserRow = typeof users.$inferInsert;
 
 export const conversations = pgTable(
   "conversations",
   {
     id: text("id").primaryKey().$defaultFn(genConversationId),
+    userId: text("user_id").references(() => users.id, { onDelete: "cascade" }),
     title: text("title"),
     metadata: jsonb("metadata").$type<Record<string, unknown>>().notNull().default({}),
     createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -63,6 +89,7 @@ export const mcpConnections = pgTable(
   "mcp_connections",
   {
     id: text("id").primaryKey().$defaultFn(genMcpConnectionId),
+    userId: text("user_id").references(() => users.id, { onDelete: "cascade" }),
     name: text("name").notNull().unique("uniq_mcp_connections_name"),
     url: text("url").notNull(),
     auth: jsonb("auth").$type<Record<string, unknown> | null>().default(null),

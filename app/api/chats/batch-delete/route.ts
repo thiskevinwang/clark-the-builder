@@ -1,9 +1,11 @@
-import { inArray } from "drizzle-orm";
+import { and, inArray } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import z from "zod";
 
+import { getServerAuth } from "@/lib/auth";
 import { db } from "@/lib/database/db";
 import { conversations } from "@/lib/database/schema";
+import { createUserRepository } from "@/lib/repositories/user-repository-impl";
 
 const BatchDeleteChatsBodySchema = z
   .object({
@@ -12,6 +14,12 @@ const BatchDeleteChatsBodySchema = z
   .strict();
 
 export async function POST(req: Request) {
+  const auth = await getServerAuth();
+  if (!auth.userId) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+  const user = await createUserRepository(db).ensureByExternalId(auth.userId);
+
   const body = await req.json().catch(() => null);
   const parsed = BatchDeleteChatsBodySchema.safeParse(body);
 
@@ -24,7 +32,7 @@ export async function POST(req: Request) {
 
   const deleted = await db
     .delete(conversations)
-    .where(inArray(conversations.id, chatIds))
+    .where(and(eq(conversations.userId, user.id), inArray(conversations.id, chatIds)))
     .returning({ id: conversations.id });
 
   return NextResponse.json<POSTResponse>(

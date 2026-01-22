@@ -1,9 +1,11 @@
 import { NextResponse, type NextRequest } from "next/server";
 import z from "zod";
 
+import { getServerAuth } from "@/lib/auth";
 import { db } from "@/lib/database/db";
 import { Conversation, ConversationWithMessageCount } from "@/lib/models/conversation";
 import { createConversationRepository } from "@/lib/repositories/conversation-repository-impl";
+import { createUserRepository } from "@/lib/repositories/user-repository-impl";
 
 const ListChatsQuerySchema = z.object({
   limit: z.coerce.number().int().min(1).max(200).default(50),
@@ -16,6 +18,12 @@ const CreateChatBodySchema = z.object({
 });
 
 export async function GET(request: NextRequest) {
+  const auth = await getServerAuth();
+  if (!auth.userId) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+  const user = await createUserRepository(db).ensureByExternalId(auth.userId);
+
   const parsed = ListChatsQuerySchema.safeParse({
     limit: request.nextUrl.searchParams.get("limit") ?? undefined,
     offset: request.nextUrl.searchParams.get("offset") ?? undefined,
@@ -30,12 +38,19 @@ export async function GET(request: NextRequest) {
     parsed.data.limit,
     parsed.data.offset,
     parsed.data.q,
+    user.id,
   );
 
   return NextResponse.json<GETResponse>({ chats: conversations }, { status: 200 });
 }
 
 export async function POST(req: Request) {
+  const auth = await getServerAuth();
+  if (!auth.userId) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+  const user = await createUserRepository(db).ensureByExternalId(auth.userId);
+
   const body = await req.json().catch(() => null);
   const parsed = CreateChatBodySchema.safeParse(body);
 
@@ -44,6 +59,7 @@ export async function POST(req: Request) {
   }
 
   const chat = await createConversationRepository(db).create({
+    userId: user.id,
     title: parsed.data.title ?? null,
   });
 
