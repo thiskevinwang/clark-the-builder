@@ -2,7 +2,7 @@ import { CheckIcon, XIcon } from "lucide-react";
 
 import type { DataPart } from "@/ai/messages/data-parts";
 
-import { DataPartMessage } from "../data-part-message";
+import { DataPartComponent } from "../data-part";
 import { Spinner } from "./spinner";
 
 interface Props {
@@ -19,7 +19,7 @@ export function GenerateFiles({ message }: Props) {
   const generating = lastInProgress ? (message.paths[message.paths.length - 1] ?? "") : null;
 
   return (
-    <DataPartMessage
+    <DataPartComponent
       title="Generate Files"
       loading={message.status == "generating" || message.status == "uploading"}
       error={message.error?.message || message.status == "error"}
@@ -44,6 +44,6 @@ export function GenerateFiles({ message }: Props) {
           </div>
         )}
       </div>
-    </DataPartMessage>
+    </DataPartComponent>
   );
 }

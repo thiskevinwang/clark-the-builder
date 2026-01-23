@@ -17,3 +17,9 @@ export const genMcpConnectionId = createIdGenerator({
   separator: "_",
   size: 24,
 });
+
+export const genResourceId = createIdGenerator({
+  prefix: "res",
+  separator: "_",
+  size: 24,
+});

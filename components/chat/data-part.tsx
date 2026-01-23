@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "../ui/collapsible";
 import { Spinner } from "./message-part/spinner";
 
-export function DataPartMessage(props: {
+export function DataPartComponent(props: {
   defaultOpen?: boolean;
   loading?: boolean;
   error?: boolean;
@@ -16,7 +16,7 @@ export function DataPartMessage(props: {
 }) {
   return (
     <div
-      data-component={"DataPartMessage"}
+      data-component={"DataPart"}
       className={cn(
         "text-sm bg-background cursor-pointer hover:bg-accent/30 transition-colors",
         // CSS rules:
@@ -32,13 +32,13 @@ export function DataPartMessage(props: {
       <Collapsible defaultOpen={props.defaultOpen}>
         <CollapsibleTrigger asChild>
           <div className="flex items-center gap-2 px-3 py-2 text-muted-foreground relative">
-            <div className="pl-5">{"Data Part: " + props.title}</div>
-            <span className="absolute">
-              <Spinner className="w-3.5 h-3.5 shrink-0" loading={props.loading}>
+            <div className="pl-5">{props.title}</div>
+            <span className="absolute flex items-center justify-center">
+              <Spinner className="w-3.5 h-3.5" loading={props.loading}>
                 {props.error ? (
-                  <XIcon className="w-3.5 h-3.5 shrink-0" />
+                  <XIcon className="w-3.5 h-3.5" />
                 ) : (
-                  <CheckIcon className="w-3.5 h-3.5 shrink-0" />
+                  <CheckIcon className="w-3.5 h-3.5" />
                 )}
               </Spinner>
             </span>

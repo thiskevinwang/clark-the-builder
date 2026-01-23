@@ -2,6 +2,9 @@ import type { UIMessage, UIMessageStreamWriter } from "ai";
 import { tool } from "ai";
 import z from "zod";
 
+import { db } from "@/lib/database/db";
+import { createResourceRepository } from "@/lib/repositories/resource-repository-impl";
+
 import { sandboxProvider } from "../../lib/sandbox";
 import type { DataPart } from "../messages/data-parts";
 import description from "./create-sandbox.prompt.md";
@@ -9,9 +12,10 @@ import { getRichError } from "./get-rich-error";
 
 interface Params {
   writer: UIMessageStreamWriter<UIMessage<never, DataPart>>;
+  conversationId: string;
 }
 
-export const createSandbox = ({ writer }: Params) =>
+export const createSandbox = ({ writer, conversationId }: Params) =>
   tool({
     description,
     inputSchema: z.object({
@@ -61,6 +65,18 @@ export const createSandbox = ({ writer }: Params) =>
           id: toolCallId,
           type: "data-create-sandbox",
           data: { sandboxId: sandbox.sandboxId, status: "done" },
+        });
+
+        // Save the Vercel sandbox as a resource
+        const resourceRepository = createResourceRepository(db);
+        await resourceRepository.create({
+          type: "vercel_sandbox",
+          externalId: sandbox.sandboxId,
+          conversationId,
+          metadata: {
+            timeout: timeout ?? 1000 * 60 * 20,
+            ports,
+          },
         });
 
         return (

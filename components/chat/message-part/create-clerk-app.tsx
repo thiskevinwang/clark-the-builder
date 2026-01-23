@@ -9,7 +9,7 @@ import { ClaimAppModal } from "@/components/modals/claim-app-modal";
 import { Button } from "@/components/ui/button";
 import { useClerkAppsStore } from "@/lib/storage/clerk-apps-store";
 
-import { DataPartMessage } from "../data-part-message";
+import { DataPartComponent } from "../data-part";
 
 interface Props {
   message: DataPart["create-clerk-app"];
@@ -26,7 +26,7 @@ export function CreateClerkApp({ message }: Props) {
   const isTransferred = app?.ownership === "transferred";
 
   return (
-    <DataPartMessage
+    <DataPartComponent
       title={"Create Clerk App"}
       defaultOpen
       loading={message.status == "loading"}
@@ -66,6 +66,6 @@ export function CreateClerkApp({ message }: Props) {
           appName={message.name}
         />
       )}
-    </DataPartMessage>
+    </DataPartComponent>
   );
 }

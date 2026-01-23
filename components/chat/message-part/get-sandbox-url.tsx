@@ -1,10 +1,10 @@
 import type { DataPart } from "@/ai/messages/data-parts";
 
-import { DataPartMessage } from "../data-part-message";
+import { DataPartComponent } from "../data-part";
 
 export function GetSandboxURL({ message }: { message: DataPart["get-sandbox-url"] }) {
   return (
-    <DataPartMessage title="Get Sandbox URL" loading={message.status == "loading"}>
+    <DataPartComponent title="Get Sandbox URL" loading={message.status == "loading"}>
       <div className="relative">
         <a
           href={message.url}
@@ -15,6 +15,6 @@ export function GetSandboxURL({ message }: { message: DataPart["get-sandbox-url"
           {message.url}
         </a>
       </div>
-    </DataPartMessage>
+    </DataPartComponent>
   );
 }

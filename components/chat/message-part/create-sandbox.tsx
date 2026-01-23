@@ -1,6 +1,6 @@
 import type { DataPart } from "@/ai/messages/data-parts";
 
-import { DataPartMessage } from "../data-part-message";
+import { DataPartComponent } from "../data-part";
 
 interface Props {
   message: DataPart["create-sandbox"];
@@ -8,7 +8,7 @@ interface Props {
 
 export function CreateSandbox({ message }: Props) {
   return (
-    <DataPartMessage
+    <DataPartComponent
       title="Create Sandbox"
       loading={message.status == "loading"}
       error={message.error?.message || message.status == "error"}
@@ -22,6 +22,6 @@ export function CreateSandbox({ message }: Props) {
       </div>
 
       <small className="text-muted-foreground">{message.sandboxId}</small>
-    </DataPartMessage>
+    </DataPartComponent>
   );
 }

@@ -38,50 +38,14 @@ function tryMapToolToName(partType: string): string | null {
 export const MessagePart = memo(function _MessagePart({ part, partIndex }: Props) {
   if (part.type === "reasoning") {
     // Cursed classnames
+    if (!part.text) return null;
     return (
       <details
         data-part="reasoning"
-        onMouseUp={(e) => {
-          // disable if there are preceeding adjacent details
-          const previousDetails = [];
-          let prev = e.currentTarget.previousElementSibling;
-          while (
-            prev &&
-            prev.tagName === "DETAILS" &&
-            prev.getAttribute("data-part") === "reasoning"
-          ) {
-            previousDetails.push(prev);
-            prev = prev.previousElementSibling;
-          }
-          if (previousDetails.length > 0) {
-            return;
-          }
-
-          // open/close all following details
-          console.log(e.currentTarget.open); // open state at the time of clicking, not the next state
-          const detailsElements: HTMLDetailsElement[] = [];
-
-          let next = e.currentTarget.nextElementSibling;
-          while (
-            next &&
-            next.tagName === "DETAILS" &&
-            next.getAttribute("data-part") === "reasoning"
-          ) {
-            detailsElements.push(next as HTMLDetailsElement);
-            next = next.nextElementSibling;
-          }
-          detailsElements.forEach((el) => {
-            (el as HTMLDetailsElement).open = !e.currentTarget.open;
-          });
-        }}
         className={cn(
-          "text-sm bg-background transition-colors",
+          "my-2 text-sm bg-background transition-colors",
           // if open, rotate data-chevron
           "[&[open]_[data-chevron]]:rotate-180",
-          // Subsequent reasoning: force content visible (override native details hiding)
-          "[[data-part=reasoning]+&_[data-content]]:!block",
-          // Subsequent reasoning: hide content when first in series is closed
-          "[[data-part=reasoning]:not([open])~&_[data-content]]:!hidden",
         )}
       >
         {/* Hide summary on subsequent adjacent reasoning parts */}
@@ -164,6 +128,7 @@ export const MessagePart = memo(function _MessagePart({ part, partIndex }: Props
 
   // tool- parts
   if (part.type.startsWith("tool-")) {
+    return null;
     return (
       <div
         className={cn(

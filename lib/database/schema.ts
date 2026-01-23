@@ -6,6 +6,7 @@ import type { DataPart } from "@/ai/messages/data-parts";
 import type { ToolSet } from "@/ai/tools";
 
 import { genConversationId, genMcpConnectionId, genMessageId } from "@/lib/identifiers/generator";
+import { genResourceId } from "@/lib/identifiers/generator";
 
 export const conversations = pgTable(
   "conversations",
@@ -78,3 +79,29 @@ export const mcpConnections = pgTable(
 
 export type MCPConnectionRow = typeof mcpConnections.$inferSelect;
 export type NewMCPConnectionRow = typeof mcpConnections.$inferInsert;
+
+export const resources = pgTable(
+  "resources",
+  {
+    id: text("id").primaryKey().$defaultFn(genResourceId),
+    type: text("type").notNull(),
+    externalId: text("external_id").notNull(),
+    conversationId: text("conversation_id").references(() => conversations.id, {
+      onDelete: "set null",
+    }),
+    metadata: jsonb("metadata").$type<Record<string, unknown>>().notNull().default({}),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (t) => [
+    index("idx_resources_type").on(t.type),
+    index("idx_resources_conversation_id").on(t.conversationId),
+    index("idx_resources_external_id").on(t.externalId),
+  ],
+);
+
+export type ResourceRow = typeof resources.$inferSelect;
+export type NewResourceRow = typeof resources.$inferInsert;

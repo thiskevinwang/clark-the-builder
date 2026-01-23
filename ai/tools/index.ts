@@ -18,8 +18,8 @@ interface Params {
 export function tools({ chatId, modelId, writer }: Params) {
   console.log("Creating tools for chatId:", chatId);
   return {
-    createClerkApp: createClerkApp({ writer }),
-    createSandbox: createSandbox({ writer }),
+    createClerkApp: createClerkApp({ writer, conversationId: chatId }),
+    createSandbox: createSandbox({ writer, conversationId: chatId }),
     generateFiles: generateFiles({ writer, modelId }),
     getSandboxURL: getSandboxURL({ writer }),
     runCommand: runCommand({ writer }),

@@ -1,6 +1,7 @@
 "use client";
 
 import { PreviewPanel as PreviewPanelComponent } from "@/components/preview/preview-panel";
+import { useSharedChatContext } from "@/lib/chat-context";
 
 import { useSandboxStore } from "./state";
 
@@ -9,6 +10,7 @@ interface Props {
 }
 
 export function PreviewPanel({ className }: Props) {
+  const { chat } = useSharedChatContext();
   const { sandboxId, status, url, urlUUID, paths } = useSandboxStore();
   return (
     <PreviewPanelComponent
@@ -18,6 +20,7 @@ export function PreviewPanel({ className }: Props) {
       url={url}
       paths={paths}
       sandboxId={sandboxId}
+      chatId={chat?.id}
     />
   );
 }

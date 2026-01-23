@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  BoxIcon,
   ChevronDownIcon,
   ChevronRightIcon,
   Code2Icon,
@@ -19,11 +20,12 @@ import { buildFileTree, type FileNode } from "@/components/file-explorer/build-f
 import { FileContent } from "@/components/file-explorer/file-content";
 import { useChatPanel } from "@/components/layout/panels";
 import { Panel } from "@/components/panels/panels";
+import { ResourcesList } from "@/components/preview/resources-list";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 
-type ViewMode = "preview" | "files";
+type ViewMode = "preview" | "files" | "resources";
 
 interface Props {
   className?: string;
@@ -31,9 +33,10 @@ interface Props {
   url?: string;
   paths: string[];
   sandboxId?: string;
+  chatId?: string;
 }
 
-export function PreviewPanel({ className, disabled, url, paths, sandboxId }: Props) {
+export function PreviewPanel({ className, disabled, url, paths, sandboxId, chatId }: Props) {
   const [viewMode, setViewMode] = useState<ViewMode>("preview");
   const [currentUrl, setCurrentUrl] = useState(url);
   const [error, setError] = useState<string | null>(null);
@@ -164,7 +167,7 @@ export function PreviewPanel({ className, disabled, url, paths, sandboxId }: Pro
                   type="button"
                   onClick={() => setViewMode("files")}
                   className={cn(
-                    "p-1.5 transition-colors",
+                    "p-1.5 transition-colors border-r border-border",
                     viewMode === "files"
                       ? "text-primary bg-primary/10"
                       : "text-muted-foreground hover:text-foreground",
@@ -174,6 +177,23 @@ export function PreviewPanel({ className, disabled, url, paths, sandboxId }: Pro
                 </button>
               </TooltipTrigger>
               <TooltipContent>Files</TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  type="button"
+                  onClick={() => setViewMode("resources")}
+                  className={cn(
+                    "p-1.5 transition-colors",
+                    viewMode === "resources"
+                      ? "text-primary bg-primary/10"
+                      : "text-muted-foreground hover:text-foreground",
+                  )}
+                >
+                  <BoxIcon className="w-3.5 h-3.5" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent>Resources</TooltipContent>
             </Tooltip>
           </div>
         </div>
@@ -275,7 +295,7 @@ export function PreviewPanel({ className, disabled, url, paths, sandboxId }: Pro
               </>
             )}
           </>
-        ) : (
+        ) : viewMode === "files" ? (
           <div className="absolute inset-0 flex text-sm">
             <ScrollArea className="w-1/4 border-r border-border shrink-0 bg-secondary/30">
               <div className="py-1">{renderFileTree(fs)}</div>
@@ -287,7 +307,17 @@ export function PreviewPanel({ className, disabled, url, paths, sandboxId }: Pro
               </ScrollArea>
             )}
           </div>
-        )}
+        ) : viewMode === "resources" ? (
+          <div className="absolute inset-0">
+            {chatId ? (
+              <ResourcesList chatId={chatId} />
+            ) : (
+              <div className="flex items-center justify-center h-full text-muted-foreground text-sm">
+                No conversation selected
+              </div>
+            )}
+          </div>
+        ) : null}
       </div>
     </Panel>
   );

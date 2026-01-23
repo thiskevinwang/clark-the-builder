@@ -4,8 +4,8 @@ import {
   createUIMessageStreamResponse,
   safeValidateUIMessages,
   stepCountIs,
+  SystemModelMessage,
   ToolLoopAgent,
-  type ModelMessage,
 } from "ai";
 import { checkBotId } from "botid/server";
 import { NextResponse } from "next/server";
@@ -23,10 +23,10 @@ import { createMessageRepository } from "@/lib/repositories/message-repository-i
 
 import prompt from "./prompt.md";
 
-const systemMessage: ModelMessage = {
+const systemMessage = {
   role: "system",
   content: prompt,
-};
+} satisfies SystemModelMessage;
 
 export interface ChatRequestBody {
   chatId: string;
@@ -116,6 +116,7 @@ export async function POST(req: Request) {
     execute: async ({ writer }) => {
       const agent = new ToolLoopAgent({
         ...getModelOptions(modelId, { reasoningEffort }),
+        instructions: systemMessage,
         stopWhen: stepCountIs(20),
         tools: {
           ...tools({ modelId, writer, chatId }),

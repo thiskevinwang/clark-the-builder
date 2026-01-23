@@ -4,6 +4,8 @@ import z from "zod";
 
 import { platformCreateApplication } from "@/lib/api";
 import { createClient, createConfig } from "@/lib/api/client";
+import { db } from "@/lib/database/db";
+import { createResourceRepository } from "@/lib/repositories/resource-repository-impl";
 
 import type { DataPart } from "../messages/data-parts";
 import description from "./create-clerk-app.prompt.md";
@@ -11,9 +13,10 @@ import { getRichError } from "./get-rich-error";
 
 interface Params {
   writer: UIMessageStreamWriter<UIMessage<never, DataPart>>;
+  conversationId: string;
 }
 
-export const createClerkApp = ({ writer }: Params) =>
+export const createClerkApp = ({ writer, conversationId }: Params) =>
   tool({
     description,
     inputSchema: z.object({
@@ -118,6 +121,19 @@ export const createClerkApp = ({ writer }: Params) =>
             applicationId: application.application_id,
             publishableKey: devInstance.publishable_key,
             secretKey: devInstance.secret_key,
+          },
+        });
+
+        // Save the Clerk application as a resource
+        const resourceRepository = createResourceRepository(db);
+        await resourceRepository.create({
+          type: "clerk_application",
+          externalId: application.application_id,
+          conversationId,
+          metadata: {
+            name,
+            template,
+            publishableKey: devInstance.publishable_key,
           },
         });
 
