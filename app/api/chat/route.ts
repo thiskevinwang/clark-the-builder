@@ -121,11 +121,11 @@ export async function POST(req: Request) {
           ...tools({ modelId, writer, chatId }),
           ...dynamicTools,
         },
-        onFinish: async ({ usage, reasoningText, totalUsage }) => {
+        onFinish: async ({ usage, reasoningText, totalUsage, reasoning }) => {
           console.log("Agent execution finished");
           console.log("Usage:", JSON.stringify(usage, null, 2));
           console.log("Total Usage:", JSON.stringify(totalUsage, null, 2));
-          console.log("Reasoning Text:", reasoningText);
+          console.log("Reasoning:", reasoningText, reasoning);
         },
       });
       const result = await agent.stream({
@@ -158,6 +158,10 @@ export async function POST(req: Request) {
           },
         }),
       );
+
+      console.log("Streaming complete");
+      // log reasoning
+      console.log(result.reasoningText, result.reasoning);
     },
   });
 

@@ -57,22 +57,30 @@ export const Message = memo(function Message({ message }: Props) {
   return (
     <ReasoningContext.Provider value={{ expandedReasoningIndex, setExpandedReasoningIndex }}>
       <div
-        className={cn("flex flex-col", {
+        className={cn("group flex flex-col", {
           "ml-20 items-end": message.role === "user",
           '[&_[data-component="Text"]]:bg-accent!': message.role === "user",
         })}
       >
         {/* Message Content */}
-        <div data-component="MessageContent" className="max-w-full">
+        <div data-component="MessageContent" className="max-w-full group">
           {message.parts.map((part, index) => (
             <MessagePart key={index} part={part} partIndex={index} />
           ))}
         </div>
 
+        {/* Model + token count */}
+        {message.role !== "user" && (
+          <div className="opacity-0 group-hover:opacity-100! transition-opacity flex justify-end text-xs text-muted-foreground">
+            {message.metadata?.model} · {message.metadata.totalTokens} tokens
+          </div>
+        )}
+
+        {/* Message JSON Debugger */}
         <Collapsible
           open={debug}
           onOpenChange={setDebug}
-          className={cn("mt-1 max-w-full", { hidden: debugMode })}
+          className={cn("mt-1 max-w-full", { hidden: !debugMode })}
         >
           <div className="flex justify-end items-center space-x-1 mb-2">
             <code className="text-xs text-muted-foreground">Raw</code>

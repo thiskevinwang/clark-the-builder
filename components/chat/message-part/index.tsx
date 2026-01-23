@@ -1,5 +1,5 @@
 import type { UIMessage } from "ai";
-import { BrainIcon, WrenchIcon, ZapIcon } from "lucide-react";
+import { ChevronDown, WrenchIcon, ZapIcon } from "lucide-react";
 import { memo } from "react";
 import { Streamdown } from "streamdown";
 
@@ -36,6 +36,96 @@ function tryMapToolToName(partType: string): string | null {
 }
 
 export const MessagePart = memo(function _MessagePart({ part, partIndex }: Props) {
+  if (part.type === "reasoning") {
+    // Cursed classnames
+    return (
+      <details
+        data-part="reasoning"
+        onMouseUp={(e) => {
+          // disable if there are preceeding adjacent details
+          const previousDetails = [];
+          let prev = e.currentTarget.previousElementSibling;
+          while (
+            prev &&
+            prev.tagName === "DETAILS" &&
+            prev.getAttribute("data-part") === "reasoning"
+          ) {
+            previousDetails.push(prev);
+            prev = prev.previousElementSibling;
+          }
+          if (previousDetails.length > 0) {
+            return;
+          }
+
+          // open/close all following details
+          console.log(e.currentTarget.open); // open state at the time of clicking, not the next state
+          const detailsElements: HTMLDetailsElement[] = [];
+
+          let next = e.currentTarget.nextElementSibling;
+          while (
+            next &&
+            next.tagName === "DETAILS" &&
+            next.getAttribute("data-part") === "reasoning"
+          ) {
+            detailsElements.push(next as HTMLDetailsElement);
+            next = next.nextElementSibling;
+          }
+          detailsElements.forEach((el) => {
+            (el as HTMLDetailsElement).open = !e.currentTarget.open;
+          });
+        }}
+        className={cn(
+          "text-sm bg-background transition-colors",
+          // if open, rotate data-chevron
+          "[&[open]_[data-chevron]]:rotate-180",
+          // Subsequent reasoning: force content visible (override native details hiding)
+          "[[data-part=reasoning]+&_[data-content]]:!block",
+          // Subsequent reasoning: hide content when first in series is closed
+          "[[data-part=reasoning]:not([open])~&_[data-content]]:!hidden",
+        )}
+      >
+        {/* Hide summary on subsequent adjacent reasoning parts */}
+        <summary
+          className={cn(
+            "hover:bg-accent/30 rounded-lg cursor-pointer transition-colors",
+            "flex items-center gap-2 px-3 py-2 text-muted-foreground relative list-none [&::-webkit-details-marker]:hidden",
+            "[[data-part=reasoning]+[data-part=reasoning]_&]:hidden",
+          )}
+        >
+          <div className="pl-5">Reasoning</div>
+          <span className="absolute l-0">
+            <ChevronDown className="w-3.5 h-3.5 shrink-0" data-chevron />
+          </span>
+        </summary>
+        {part.text && (
+          <div
+            data-content
+            className={cn(
+              "px-3",
+              // Continuous padding: no pb on non-last, no pt on non-first
+              "[details[data-part=reasoning]:has(+[data-part=reasoning])>&]:pb-0",
+              "[[data-part=reasoning]+[data-part=reasoning]>&]:pt-0",
+              // Last in series gets bottom padding
+              "[details[data-part=reasoning]:not(:has(+[data-part=reasoning]))>&]:pb-2",
+            )}
+          >
+            <div className="relative">
+              <Streamdown
+                className={cn(
+                  "pl-5 whitespace-pre-wrap wrap-anywhere text-xs **:text-xs! text-muted-foreground",
+                  "**:data-[streamdown='code-block-header']:p-1 **:data-[streamdown='code-block-body']:p-1",
+                )}
+              >
+                {part.text}
+              </Streamdown>
+              <div className="absolute ml-1 left-0 h-full w-px bg-muted top-0" />
+            </div>
+          </div>
+        )}
+      </details>
+    );
+  }
+
   if (part.type === "dynamic-tool") {
     const text = part.output?.content?.[0].text;
     return (
@@ -105,41 +195,6 @@ export const MessagePart = memo(function _MessagePart({ part, partIndex }: Props
                     : JSON.stringify(part.output)
                   : null}
               </Streamdown>
-              <div className="absolute ml-1 left-0 h-full w-px bg-muted top-0" />
-            </div>
-          </CollapsibleContent>
-        </Collapsible>
-      </div>
-    );
-  }
-  if (part.type === "reasoning") {
-    return (
-      <div
-        className={cn(
-          "text-sm bg-background cursor-pointer hover:bg-accent/30 transition-colors",
-          // CSS rules:
-          // - adjacent tool parts merge into one rounded group
-          "border border-border rounded-md",
-          "[&+&]:border-t-0",
-          "[&+&]:rounded-t-none",
-          "[&:has(+&)]:border-b-0",
-          "[&:has(+&)]:rounded-b-none",
-        )}
-      >
-        <Collapsible>
-          <CollapsibleTrigger asChild>
-            <div className="flex items-center gap-2 px-3 py-2 text-muted-foreground relative">
-              <div className="pl-5">Reasoning</div>
-              <span className="absolute l-0">
-                <BrainIcon className="w-3.5 h-3.5 shrink-0" />
-              </span>
-            </div>
-          </CollapsibleTrigger>
-          <CollapsibleContent className="max-h-50 px-3 pb-2 overflow-y-scroll [&[data-state=open]]:animate-collapsible-down [&[data-state=closed]]:animate-collapsible-up">
-            <div className="relative">
-              <p className="pl-5 whitespace-pre-wrap wrap-anywhere text-xs text-muted-foreground">
-                {part.text}
-              </p>
               <div className="absolute ml-1 left-0 h-full w-px bg-muted top-0" />
             </div>
           </CollapsibleContent>
