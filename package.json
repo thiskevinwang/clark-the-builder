@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "type-check": "tsc --noEmit"
+    "format": "prettier --write .",
+    "type-check": "tsc --noEmit",
+    "api:generate": "bunx @hey-api/openapi-ts -i openapi.json -o lib/api -c @tanstack/react-query"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "3.0.15",

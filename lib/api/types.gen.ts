@@ -25,7 +25,7 @@ export type PlatformApplicationInstance = {
   /**
    * The publishable key for this instance. Safe to include in client-side code and used to initialize Clerk SDKs in the browser.
    */
-  publishable_key: string;
+  publishable_key?: string;
 };
 
 export type PlatformApplicationResponse = {
@@ -33,6 +33,10 @@ export type PlatformApplicationResponse = {
    * The ID of the application.
    */
   application_id: string;
+  /**
+   * The name of the application.
+   */
+  name: string;
   /**
    * List of instances associated with this application.
    */
@@ -68,9 +72,13 @@ export type PlatformCreateApplicationRequest = {
    */
   domain?: string;
   /**
-   * List of environment types to create instances for.
+   * Custom proxy path for provider domains (e.g., "/__clerk"). Must start with a leading slash and be a single path segment. Defaults to "/__clerk" if not provided.
    */
-  environment_types?: Array<"development" | "production">;
+  proxy_path?: string;
+  /**
+   * List of environment types to create instances for. Accepted values are "development" and "production". Defaults to "development" if not provided.
+   */
+  environment_types?: Array<string>;
   /**
    * Application template to use for configuring the application (e.g., "b2b-saas", "b2c-saas", "waitlist").
    */
@@ -101,6 +109,10 @@ export type PlatformUpdateApplicationDomainRequest = {
    * The domain name.
    */
   name: string;
+  /**
+   * Optional proxy path for provider domains.
+   */
+  proxy_path?: string;
 };
 
 export type PlatformDomainResponse = {
@@ -118,6 +130,10 @@ export type PlatformDomainResponse = {
    */
   is_satellite?: boolean;
   /**
+   * Whether this is a provider domain.
+   */
+  is_provider_domain?: boolean;
+  /**
    * The frontend API URL.
    */
   frontend_api_url: string;
@@ -128,15 +144,46 @@ export type PlatformDomainResponse = {
   /**
    * The accounts portal URL.
    */
-  accounts_portal_url: string;
+  accounts_portal_url?: string;
+  /**
+   * The proxy URL.
+   */
+  proxy_url?: string;
   /**
    * CNAME targets for the domain.
    */
   cname_targets: Array<{
-    name?: string;
+    host?: string;
     value?: string;
     required?: boolean;
   }>;
+};
+
+/**
+ * List Application Domains Response
+ *
+ * A paginated list of application domains.
+ */
+export type PlatformListApplicationDomainsResponse = {
+  /**
+   * The list of application domains.
+   */
+  data: Array<PlatformDomainResponse>;
+  /**
+   * The total number of application domains for the application.
+   */
+  total_count: number;
+};
+
+export type PlatformCreateApplicationDomainRequest = {
+  /**
+   * The provider domain name.
+   */
+  name: string;
+  /**
+   * Optional proxy path for provider domains.
+   */
+  proxy_path?: string;
 };
 
 export type FailureHint = {
@@ -150,7 +197,7 @@ export type CnameStatus = {
   to: string;
   verified: boolean;
   required: boolean;
-  failure_hints: Array<FailureHint>;
+  failure_hints: Array<FailureHint> | null;
 };
 
 export type DnsStatus = {
@@ -224,7 +271,7 @@ export type PlatformApplicationTransferResponse = {
    */
   id: string;
   /**
-   * A unique code for the transfer that can be shared with the recipient to claim the application.
+   * A unique code for the transfer that can be shared with the recipient to claim the application through the clerk dashboard: https://dashboard.clerk.com/apps/transfer?code=<CODE>
    */
   code: string;
   /**
@@ -267,6 +314,876 @@ export type PlatformListApplicationTransfersResponse = {
    * The total number of application transfers matching the query.
    */
   total_count: number;
+};
+
+/**
+ * Instance Usage Meter With Billable
+ *
+ * Usage totals for a meter that includes both total and billable quantities.
+ */
+export type InstanceUsageMeterWithBillable = {
+  /**
+   * Total quantity for this meter in the selected period.
+   */
+  total_usage: number;
+  /**
+   * Billable subset of total usage for this meter in the selected period.
+   */
+  total_billable_usage: number;
+};
+
+/**
+ * Instance Usage Meter
+ *
+ * Usage totals for a single meter.
+ */
+export type InstanceUsageMeter = {
+  /**
+   * Total quantity for this meter in the selected period.
+   */
+  total_usage: number;
+};
+
+/**
+ * Instance SMS Usage
+ *
+ * Total SMS usage with per-geographic-tier breakdowns.
+ */
+export type InstanceSmsUsage = {
+  /**
+   * Total SMS messages across all tiers.
+   */
+  total_usage: number;
+  tier_a: InstanceUsageMeter;
+  tier_b: InstanceUsageMeter;
+  tier_c: InstanceUsageMeter;
+  tier_d: InstanceUsageMeter;
+  tier_e: InstanceUsageMeter;
+  tier_f: InstanceUsageMeter;
+};
+
+/**
+ * Instance Usage Report
+ *
+ * Usage report for an application instance containing per-meter totals.
+ */
+export type PlatformInstanceUsageResponse = {
+  /**
+   * The ID of the application.
+   */
+  application_id: string;
+  /**
+   * The ID of the instance.
+   */
+  instance_id: string;
+  /**
+   * Inclusive start of the usage period boundary (RFC3339). When an
+   * explicit date range is provided, this is midnight UTC on the start
+   * date. When no date range is provided, this is the start of the
+   * current billing cycle.
+   *
+   */
+  period_start: string;
+  /**
+   * Exclusive end of the usage period boundary (RFC3339). When an
+   * explicit date range is provided, this is midnight UTC immediately
+   * after the requested end date. When no date range is provided, this
+   * is the end of the current billing cycle.
+   *
+   */
+  period_end: string;
+  mau: InstanceUsageMeterWithBillable;
+  mao: InstanceUsageMeterWithBillable;
+  custom_domains: InstanceUsageMeter;
+  sms_messages: InstanceSmsUsage;
+  enterprise_connections: InstanceUsageMeter;
+};
+
+export type VerificationOtp = {
+  object?: "verification_otp";
+  status: "unverified" | "verified" | "failed" | "expired";
+  strategy: "phone_code" | "email_code" | "reset_password_email_code";
+  attempts: number | null;
+  expire_at: number | null;
+  verified_at_client?: string | null;
+};
+
+export type VerificationAdmin = {
+  object?: "verification_admin";
+  status: "verified";
+  strategy: "admin";
+  attempts: number | null;
+  expire_at: number | null;
+  verified_at_client?: string | null;
+};
+
+export type VerificationFromOauth = {
+  object?: "verification_from_oauth";
+  status: "unverified" | "verified";
+  strategy: string;
+  error?: ClerkError | null;
+  expire_at: number | null;
+  attempts: number | null;
+  verified_at_client?: string | null;
+};
+
+export type VerificationTicket = {
+  object?: "verification_ticket";
+  status: "unverified" | "verified" | "expired";
+  strategy: "ticket";
+  attempts: number | null;
+  expire_at: number | null;
+  verified_at_client?: string | null;
+};
+
+export type VerificationSaml = {
+  object?: "verification_saml";
+  status: "unverified" | "verified" | "failed" | "expired" | "transferable";
+  strategy: "saml";
+  external_verification_redirect_url?: string | null;
+  error?: ClerkError | null;
+  expire_at?: number | null;
+  attempts: number | null;
+  verified_at_client?: string | null;
+};
+
+export type VerificationEmailLink = {
+  object?: "verification_email_link";
+  status: "unverified" | "verified" | "failed" | "expired";
+  strategy: "email_link";
+  attempts: number | null;
+  expire_at: number | null;
+  verified_at_client?: string | null;
+};
+
+export type IdentificationLink = {
+  type: string;
+  id: string;
+};
+
+export type EmailAddress = {
+  id?: string;
+  /**
+   * String representing the object's type. Objects of the same type share the same value.
+   *
+   */
+  object: "email_address";
+  email_address: string;
+  reserved: boolean;
+  verification:
+    | ({
+        object: "verification_otp";
+      } & VerificationOtp)
+    | ({
+        object: "verification_admin";
+      } & VerificationAdmin)
+    | ({
+        object: "verification_from_oauth";
+      } & VerificationFromOauth)
+    | ({
+        object: "verification_ticket";
+      } & VerificationTicket)
+    | ({
+        object: "verification_saml";
+      } & VerificationSaml)
+    | ({
+        object: "verification_email_link";
+      } & VerificationEmailLink)
+    | null;
+  linked_to: Array<IdentificationLink>;
+  /**
+   * Indicates whether this email address domain matches an active enterprise connection.
+   *
+   */
+  matches_sso_connection?: boolean;
+  /**
+   * Unix timestamp of creation
+   *
+   */
+  created_at: number;
+  /**
+   * Unix timestamp of creation
+   *
+   */
+  updated_at: number;
+};
+
+export type PhoneNumber = {
+  id?: string;
+  /**
+   * String representing the object's type. Objects of the same type share the same value.
+   *
+   */
+  object: "phone_number";
+  phone_number: string;
+  reserved_for_second_factor?: boolean;
+  default_second_factor?: boolean;
+  reserved: boolean;
+  verification:
+    | ({
+        object: "verification_otp";
+      } & VerificationOtp)
+    | ({
+        object: "verification_admin";
+      } & VerificationAdmin)
+    | null;
+  linked_to: Array<IdentificationLink>;
+  backup_codes?: Array<string> | null;
+  /**
+   * Unix timestamp of creation
+   *
+   */
+  created_at: number;
+  /**
+   * Unix timestamp of creation
+   *
+   */
+  updated_at: number;
+};
+
+export type VerificationWeb3 = {
+  object?: "verification_web3";
+  status: "unverified" | "verified" | "failed" | "expired";
+  strategy:
+    | "web3_metamask_signature"
+    | "web3_base_signature"
+    | "web3_coinbase_wallet_signature"
+    | "web3_okx_wallet_signature"
+    | "web3_solana_signature";
+  nonce?: string | null;
+  message?: string | null;
+  attempts: number | null;
+  expire_at: number | null;
+  verified_at_client?: string | null;
+};
+
+export type Web3Wallet = {
+  id?: string;
+  /**
+   * String representing the object's type. Objects of the same type share the same value.
+   *
+   */
+  object: "web3_wallet";
+  web3_wallet: string;
+  verification:
+    | ({
+        object: "verification_web3";
+      } & VerificationWeb3)
+    | ({
+        object: "verification_admin";
+      } & VerificationAdmin)
+    | null;
+  /**
+   * Unix timestamp of creation
+   *
+   */
+  created_at: number;
+  /**
+   * Unix timestamp of creation
+   *
+   */
+  updated_at: number;
+};
+
+export type VerificationPasskey = {
+  object?: "verification_passkey";
+  status: "verified";
+  strategy: "passkey";
+  nonce?: "nonce";
+  message?: string | null;
+  attempts: number | null;
+  expire_at: number | null;
+  verified_at_client?: string | null;
+};
+
+export type Passkey = {
+  id?: string;
+  /**
+   * String representing the object's type. Objects of the same type share the same value.
+   *
+   */
+  object: "passkey";
+  name: string;
+  /**
+   * Unix timestamp of when the passkey was last used.
+   *
+   */
+  last_used_at: number;
+  verification:
+    | ({
+        object: "verification_passkey";
+      } & VerificationPasskey)
+    | null;
+};
+
+export type VerificationOauth = {
+  object?: "verification_oauth";
+  status: "unverified" | "verified" | "failed" | "expired" | "transferable";
+  strategy: string;
+  external_verification_redirect_url?: string;
+  error?: ClerkError | null;
+  expire_at: number;
+  attempts: number | null;
+  verified_at_client?: string | null;
+};
+
+export type VerificationGoogleOneTap = {
+  object?: "verification_google_one_tap";
+  status: "unverified" | "verified";
+  strategy: "google_one_tap";
+  expire_at: number | null;
+  attempts: number | null;
+  verified_at_client?: string | null;
+  error?: ClerkError | null;
+};
+
+export type ExternalAccountWithVerification = {
+  /**
+   * String representing the object's type. Objects of the same type share the same value.
+   */
+  object: "external_account" | "facebook_account" | "google_account";
+  id: string;
+  provider: string;
+  identification_id: string;
+  /**
+   * The unique ID of the user in the external provider's system
+   */
+  provider_user_id: string;
+  approved_scopes: string;
+  email_address: string;
+  /**
+   * Whether the email was verified by the OAuth provider at creation time. null = unknown (pre-migration data or custom OAuth providers), true = provider confirmed email was verified, false = provider confirmed email was NOT verified
+   *
+   */
+  email_address_verified?: boolean | null;
+  first_name: string;
+  last_name: string;
+  /**
+   * Please use `image_url` instead
+   *
+   * @deprecated
+   */
+  avatar_url?: string;
+  image_url?: string | null;
+  username?: string | null;
+  phone_number?: string | null;
+  public_metadata: {
+    [key: string]: unknown;
+  };
+  label?: string | null;
+  /**
+   * Unix timestamp of creation
+   *
+   */
+  created_at: number;
+  /**
+   * Unix timestamp of creation
+   *
+   */
+  updated_at: number;
+  verification:
+    | ({
+        object: "verification_oauth";
+      } & VerificationOauth)
+    | ({
+        object: "verification_google_one_tap";
+      } & VerificationGoogleOneTap)
+    | null;
+  [key: string]: unknown;
+};
+
+export type SamlConnection = unknown & {
+  id: string;
+  name: string;
+  /**
+   * @deprecated
+   */
+  domain?: string;
+  domains?: Array<string>;
+  active: boolean;
+  provider: string;
+  sync_user_attributes: boolean;
+  allow_subdomains?: boolean;
+  allow_idp_initiated?: boolean;
+  disable_additional_identifications?: boolean;
+  /**
+   * Unix timestamp of creation.
+   *
+   */
+  created_at: number;
+  /**
+   * Unix timestamp of last update.
+   *
+   */
+  updated_at: number;
+};
+
+export type SamlAccount = {
+  id: string;
+  /**
+   * String representing the object's type. Objects of the same type share the same value.
+   *
+   */
+  object: "saml_account";
+  provider: string;
+  active: boolean;
+  email_address: string;
+  first_name?: string | null;
+  last_name?: string | null;
+  provider_user_id?: string | null;
+  /**
+   * Unix timestamp of last authentication.
+   *
+   */
+  last_authenticated_at?: number | null;
+  public_metadata?: {
+    [key: string]: unknown;
+  };
+  verification:
+    | ({
+        object: "verification_saml";
+      } & VerificationSaml)
+    | ({
+        object: "verification_ticket";
+      } & VerificationTicket)
+    | null;
+  saml_connection?: SamlConnection | null;
+};
+
+export type EnterpriseConnection = unknown & {
+  id: string;
+  protocol: string;
+  provider: string;
+  name: string;
+  logo_public_url: string | null;
+  /**
+   * @deprecated
+   */
+  domain?: string;
+  domains?: Array<string>;
+  active: boolean;
+  sync_user_attributes: boolean;
+  allow_subdomains: boolean;
+  allow_idp_initiated: boolean;
+  disable_additional_identifications: boolean;
+  /**
+   * Unix timestamp of creation.
+   *
+   */
+  created_at: number;
+  /**
+   * Unix timestamp of last update.
+   *
+   */
+  updated_at: number;
+};
+
+export type EnterpriseAccount = {
+  id: string;
+  /**
+   * String representing the object's type. Objects of the same type share the same value.
+   *
+   */
+  object: "enterprise_account";
+  /**
+   * The authentication protocol used to sign in.
+   *
+   */
+  protocol?: "oauth" | "saml";
+  provider: string;
+  active: boolean;
+  email_address: string;
+  first_name?: string | null;
+  last_name?: string | null;
+  /**
+   * The unique ID of the user in the external provider's system
+   */
+  provider_user_id?: string | null;
+  enterprise_connection_id?: string | null;
+  public_metadata?: {
+    [key: string]: unknown;
+  };
+  verification:
+    | ({
+        object: "verification_ticket";
+      } & VerificationTicket)
+    | ({
+        object: "verification_saml";
+      } & VerificationSaml)
+    | ({
+        object: "verification_oauth";
+      } & VerificationOauth)
+    | null;
+  enterprise_connection?: EnterpriseConnection | null;
+  /**
+   * Unix timestamp of last authentication.
+   *
+   */
+  last_authenticated_at?: number | null;
+};
+
+export type Organization = {
+  object: "organization";
+  id: string;
+  name: string;
+  slug: string;
+  image_url?: string;
+  has_image: boolean;
+  members_count?: number;
+  missing_member_with_elevated_permissions?: boolean;
+  pending_invitations_count?: number;
+  max_allowed_memberships: number;
+  admin_delete_enabled: boolean;
+  public_metadata: {
+    [key: string]: unknown;
+  };
+  private_metadata?: {
+    [key: string]: unknown;
+  };
+  created_by?: string;
+  /**
+   * Unix timestamp of creation.
+   *
+   */
+  created_at: number;
+  /**
+   * Unix timestamp of last update.
+   *
+   */
+  updated_at: number;
+  /**
+   * Unix timestamp of last activity.
+   *
+   */
+  last_active_at?: number;
+  /**
+   * The key of the [role set](https://clerk.com/docs/guides/organizations/control-access/role-sets) assigned to this organization.
+   *
+   */
+  role_set_key?: string | null;
+};
+
+/**
+ * An organization membership with public user data populated
+ */
+export type OrganizationMembershipPublicUserData = {
+  user_id: string;
+  first_name: string | null;
+  last_name: string | null;
+  /**
+   * @deprecated
+   */
+  profile_image_url: string | null;
+  image_url: string;
+  has_image: boolean;
+  identifier?: string | null;
+  username?: string | null;
+};
+
+/**
+ * A user's membership in an organization
+ */
+export type OrganizationMembership = {
+  id: string;
+  /**
+   * String representing the object's type. Objects of the same type share the same value.
+   *
+   */
+  object: "organization_membership";
+  role: string;
+  role_name?: string;
+  permissions: Array<string>;
+  /**
+   * Metadata saved on the organization membership, accessible from both Frontend and Backend APIs
+   */
+  public_metadata: {
+    [key: string]: unknown;
+  };
+  /**
+   * Metadata saved on the organization membership, accessible only from the Backend API
+   */
+  private_metadata?: {
+    [key: string]: unknown;
+  };
+  organization: Organization;
+  public_user_data?: OrganizationMembershipPublicUserData;
+  /**
+   * Unix timestamp of creation.
+   */
+  created_at: number;
+  /**
+   * Unix timestamp of last update.
+   */
+  updated_at: number;
+};
+
+export type User = {
+  id: string;
+  /**
+   * String representing the object's type. Objects of the same type share the same value.
+   *
+   */
+  object: "user";
+  external_id: string | null;
+  primary_email_address_id: string | null;
+  primary_phone_number_id: string | null;
+  primary_web3_wallet_id: string | null;
+  username: string | null;
+  first_name: string | null;
+  last_name: string | null;
+  locale?: string | null;
+  /**
+   * @deprecated
+   */
+  profile_image_url?: string;
+  image_url?: string;
+  has_image: boolean;
+  public_metadata: {
+    [key: string]: unknown;
+  };
+  private_metadata?: {
+    [key: string]: unknown;
+  } | null;
+  unsafe_metadata?: {
+    [key: string]: unknown;
+  };
+  email_addresses: Array<EmailAddress>;
+  phone_numbers: Array<PhoneNumber>;
+  web3_wallets: Array<Web3Wallet>;
+  passkeys: Array<Passkey>;
+  password_enabled: boolean;
+  two_factor_enabled: boolean;
+  totp_enabled: boolean;
+  backup_code_enabled: boolean;
+  /**
+   * Unix timestamp of when MFA was last enabled for this user. It should be noted that this field is not nullified if MFA is disabled.
+   *
+   */
+  mfa_enabled_at: number | null;
+  /**
+   * Unix timestamp of when MFA was last disabled for this user. It should be noted that this field is not nullified if MFA is enabled again.
+   *
+   */
+  mfa_disabled_at: number | null;
+  /**
+   * Unix timestamp of when the user's password was last updated.
+   *
+   */
+  password_last_updated_at?: number | null;
+  external_accounts: Array<ExternalAccountWithVerification>;
+  saml_accounts: Array<SamlAccount>;
+  enterprise_accounts: Array<EnterpriseAccount>;
+  organization_memberships?: Array<OrganizationMembership>;
+  /**
+   * Unix timestamp of last sign-in.
+   *
+   */
+  last_sign_in_at: number | null;
+  /**
+   * Flag to denote whether user is banned or not.
+   *
+   */
+  banned: boolean;
+  /**
+   * Flag to denote whether user is currently locked, i.e. restricted from signing in or not.
+   *
+   */
+  locked: boolean;
+  /**
+   * The number of seconds remaining until the lockout period expires for a locked user. A null value for a locked user indicates that lockout never expires.
+   *
+   */
+  lockout_expires_in_seconds: number | null;
+  /**
+   * The number of verification attempts remaining until the user is locked. Null if account lockout is not enabled. Note: if a user is locked explicitly via the Backend API, they may still have verification attempts remaining.
+   *
+   */
+  verification_attempts_remaining: number | null;
+  /**
+   * Unix timestamp of last update.
+   *
+   */
+  updated_at: number;
+  /**
+   * Unix timestamp of creation.
+   *
+   */
+  created_at: number;
+  /**
+   * If enabled, user can delete themselves via FAPI.
+   *
+   */
+  delete_self_enabled: boolean;
+  /**
+   * If enabled, user can create organizations via FAPI.
+   *
+   */
+  create_organization_enabled: boolean;
+  /**
+   * The maximum number of organizations the user can create. 0 means unlimited.
+   *
+   */
+  create_organizations_limit?: number | null;
+  /**
+   * Unix timestamp of the latest session activity, with day precision.
+   *
+   */
+  last_active_at: number | null;
+  /**
+   * Unix timestamp of when the user accepted the legal requirements.
+   *
+   */
+  legal_accepted_at: number | null;
+  /**
+   * When set to `true`, the user will bypass client trust checks during sign-in.
+   */
+  bypass_client_trust?: boolean;
+};
+
+/**
+ * List Instance Users Response
+ *
+ * A paginated list of users for an application instance.
+ */
+export type PlatformListInstanceUsersResponse = {
+  /**
+   * The list of users.
+   */
+  data: Array<User>;
+  /**
+   * The total number of users in the instance.
+   */
+  total_count: number;
+};
+
+export type JwtTemplate = {
+  object: "jwt_template";
+  id: string;
+  name: string;
+  claims: {
+    [key: string]: unknown;
+  };
+  lifetime: number;
+  allowed_clock_skew: number;
+  custom_signing_key: boolean;
+  signing_algorithm: string;
+  /**
+   * Unix timestamp of creation.
+   *
+   */
+  created_at: number;
+  /**
+   * Unix timestamp of last update.
+   *
+   */
+  updated_at: number;
+};
+
+export type DeletedObject = {
+  object: string;
+  id?: string;
+  slug?: string;
+  deleted: boolean;
+  external_id?: string;
+};
+
+export type RedirectUrl = {
+  object: "redirect_url";
+  id: string;
+  url: string;
+  /**
+   * Unix timestamp of creation.
+   *
+   */
+  created_at: number;
+  /**
+   * Unix timestamp of last update.
+   *
+   */
+  updated_at: number;
+};
+
+/**
+ * List Redirect URLs Response
+ *
+ * A paginated list of redirect URLs for an application instance.
+ */
+export type PlatformListRedirectUrlsResponse = {
+  /**
+   * The list of redirect URLs.
+   */
+  data: Array<RedirectUrl>;
+  /**
+   * The total number of redirect URLs in the instance.
+   */
+  total_count: number;
+};
+
+/**
+ * Instance configuration response containing key-value pairs and metadata.
+ */
+export type PlatformConfigResponse = {
+  /**
+   * Configuration version for optimistic concurrency control.
+   */
+  config_version?: string;
+  [key: string]: unknown;
+};
+
+/**
+ * Configuration updates to apply. Keys should match config key names.
+ */
+export type PlatformConfigPatchRequest = {
+  [key: string]: unknown;
+};
+
+/**
+ * Configuration patch response containing the result of the operation.
+ */
+export type PlatformConfigPatchResponse = {
+  /**
+   * Updated configuration version.
+   */
+  config_version?: string;
+  /**
+   * Whether this was a dry run (changes were not applied).
+   */
+  dry_run?: boolean;
+  /**
+   * Configuration state before the patch was applied.
+   */
+  before?: {
+    [key: string]: unknown;
+  };
+  /**
+   * Configuration state after the patch was applied.
+   */
+  after?: {
+    [key: string]: unknown;
+  };
+  [key: string]: unknown;
+};
+
+/**
+ * JSON Schema describing the available configuration options.
+ */
+export type PlatformConfigSchemaResponse = {
+  /**
+   * JSON Schema version.
+   */
+  $schema?: string;
+  /**
+   * Schema identifier.
+   */
+  $id?: string;
+  type?: string;
+  /**
+   * Schema definitions for each configuration key.
+   */
+  properties?: {
+    [key: string]: unknown;
+  };
+  [key: string]: unknown;
 };
 
 export type PlatformListApplicationsData = {
@@ -495,6 +1412,202 @@ export type PlatformUpdateApplicationResponses = {
 export type PlatformUpdateApplicationResponse =
   PlatformUpdateApplicationResponses[keyof PlatformUpdateApplicationResponses];
 
+export type PlatformDeleteApplicationLogoData = {
+  body?: never;
+  path: {
+    /**
+     * Application ID.
+     */
+    applicationID: string;
+  };
+  query?: never;
+  url: "/platform/applications/{applicationID}/logo";
+};
+
+export type PlatformDeleteApplicationLogoErrors = {
+  /**
+   * Request was not successful
+   */
+  400: ClerkErrors;
+  /**
+   * Authentication invalid
+   */
+  401: ClerkErrors;
+  /**
+   * Authorization invalid
+   */
+  403: ClerkErrors;
+  /**
+   * Resource not found
+   */
+  404: ClerkErrors;
+};
+
+export type PlatformDeleteApplicationLogoError =
+  PlatformDeleteApplicationLogoErrors[keyof PlatformDeleteApplicationLogoErrors];
+
+export type PlatformDeleteApplicationLogoResponses = {
+  /**
+   * Application logo deleted successfully.
+   */
+  200: PlatformApplicationResponse;
+};
+
+export type PlatformDeleteApplicationLogoResponse =
+  PlatformDeleteApplicationLogoResponses[keyof PlatformDeleteApplicationLogoResponses];
+
+export type PlatformUploadApplicationLogoData = {
+  body: {
+    file: Blob | File;
+  };
+  path: {
+    /**
+     * Application ID.
+     */
+    applicationID: string;
+  };
+  query?: never;
+  url: "/platform/applications/{applicationID}/logo";
+};
+
+export type PlatformUploadApplicationLogoErrors = {
+  /**
+   * Request was not successful
+   */
+  400: ClerkErrors;
+  /**
+   * Authentication invalid
+   */
+  401: ClerkErrors;
+  /**
+   * Authorization invalid
+   */
+  403: ClerkErrors;
+  /**
+   * Resource not found
+   */
+  404: ClerkErrors;
+  /**
+   * Request was not successful
+   */
+  413: ClerkErrors;
+  /**
+   * Invalid request parameters
+   */
+  422: ClerkErrors;
+};
+
+export type PlatformUploadApplicationLogoError =
+  PlatformUploadApplicationLogoErrors[keyof PlatformUploadApplicationLogoErrors];
+
+export type PlatformUploadApplicationLogoResponses = {
+  /**
+   * Application logo uploaded successfully.
+   */
+  200: PlatformApplicationResponse;
+};
+
+export type PlatformUploadApplicationLogoResponse =
+  PlatformUploadApplicationLogoResponses[keyof PlatformUploadApplicationLogoResponses];
+
+export type PlatformDeleteApplicationFaviconData = {
+  body?: never;
+  path: {
+    /**
+     * Application ID.
+     */
+    applicationID: string;
+  };
+  query?: never;
+  url: "/platform/applications/{applicationID}/favicon";
+};
+
+export type PlatformDeleteApplicationFaviconErrors = {
+  /**
+   * Request was not successful
+   */
+  400: ClerkErrors;
+  /**
+   * Authentication invalid
+   */
+  401: ClerkErrors;
+  /**
+   * Authorization invalid
+   */
+  403: ClerkErrors;
+  /**
+   * Resource not found
+   */
+  404: ClerkErrors;
+};
+
+export type PlatformDeleteApplicationFaviconError =
+  PlatformDeleteApplicationFaviconErrors[keyof PlatformDeleteApplicationFaviconErrors];
+
+export type PlatformDeleteApplicationFaviconResponses = {
+  /**
+   * Application favicon deleted successfully.
+   */
+  200: PlatformApplicationResponse;
+};
+
+export type PlatformDeleteApplicationFaviconResponse =
+  PlatformDeleteApplicationFaviconResponses[keyof PlatformDeleteApplicationFaviconResponses];
+
+export type PlatformUploadApplicationFaviconData = {
+  body: {
+    file: Blob | File;
+  };
+  path: {
+    /**
+     * Application ID.
+     */
+    applicationID: string;
+  };
+  query?: never;
+  url: "/platform/applications/{applicationID}/favicon";
+};
+
+export type PlatformUploadApplicationFaviconErrors = {
+  /**
+   * Request was not successful
+   */
+  400: ClerkErrors;
+  /**
+   * Authentication invalid
+   */
+  401: ClerkErrors;
+  /**
+   * Authorization invalid
+   */
+  403: ClerkErrors;
+  /**
+   * Resource not found
+   */
+  404: ClerkErrors;
+  /**
+   * Request was not successful
+   */
+  413: ClerkErrors;
+  /**
+   * Invalid request parameters
+   */
+  422: ClerkErrors;
+};
+
+export type PlatformUploadApplicationFaviconError =
+  PlatformUploadApplicationFaviconErrors[keyof PlatformUploadApplicationFaviconErrors];
+
+export type PlatformUploadApplicationFaviconResponses = {
+  /**
+   * Application favicon uploaded successfully.
+   */
+  200: PlatformApplicationResponse;
+};
+
+export type PlatformUploadApplicationFaviconResponse =
+  PlatformUploadApplicationFaviconResponses[keyof PlatformUploadApplicationFaviconResponses];
+
 export type PlatformUpdateApplicationDomainData = {
   /**
    * Domain data to update.
@@ -545,6 +1658,153 @@ export type PlatformUpdateApplicationDomainResponses = {
 
 export type PlatformUpdateApplicationDomainResponse =
   PlatformUpdateApplicationDomainResponses[keyof PlatformUpdateApplicationDomainResponses];
+
+export type PlatformListApplicationDomainsData = {
+  body?: never;
+  path: {
+    /**
+     * Application ID.
+     */
+    applicationID: string;
+  };
+  query?: never;
+  url: "/platform/applications/{applicationID}/domains";
+};
+
+export type PlatformListApplicationDomainsErrors = {
+  /**
+   * Authentication invalid
+   */
+  401: ClerkErrors;
+  /**
+   * Authorization invalid
+   */
+  403: ClerkErrors;
+  /**
+   * Resource not found
+   */
+  404: ClerkErrors;
+};
+
+export type PlatformListApplicationDomainsError =
+  PlatformListApplicationDomainsErrors[keyof PlatformListApplicationDomainsErrors];
+
+export type PlatformListApplicationDomainsResponses = {
+  /**
+   * Application domains retrieved successfully.
+   */
+  200: PlatformListApplicationDomainsResponse;
+};
+
+export type PlatformListApplicationDomainsResponse2 =
+  PlatformListApplicationDomainsResponses[keyof PlatformListApplicationDomainsResponses];
+
+export type PlatformCreateApplicationDomainData = {
+  /**
+   * Domain data to create.
+   */
+  body: PlatformCreateApplicationDomainRequest;
+  path: {
+    /**
+     * Application ID.
+     */
+    applicationID: string;
+  };
+  query?: never;
+  url: "/platform/applications/{applicationID}/domains";
+};
+
+export type PlatformCreateApplicationDomainErrors = {
+  /**
+   * Request was not successful
+   */
+  400: ClerkErrors;
+  /**
+   * Authentication invalid
+   */
+  401: ClerkErrors;
+  /**
+   * Authorization invalid
+   */
+  403: ClerkErrors;
+  /**
+   * Resource not found
+   */
+  404: ClerkErrors;
+  /**
+   * Conflict
+   */
+  409: ClerkErrors;
+  /**
+   * Invalid request parameters
+   */
+  422: ClerkErrors;
+};
+
+export type PlatformCreateApplicationDomainError =
+  PlatformCreateApplicationDomainErrors[keyof PlatformCreateApplicationDomainErrors];
+
+export type PlatformCreateApplicationDomainResponses = {
+  /**
+   * Application domain created successfully.
+   */
+  201: PlatformDomainResponse;
+};
+
+export type PlatformCreateApplicationDomainResponse =
+  PlatformCreateApplicationDomainResponses[keyof PlatformCreateApplicationDomainResponses];
+
+export type PlatformDeleteApplicationDomainData = {
+  body?: never;
+  path: {
+    /**
+     * Application ID.
+     */
+    applicationID: string;
+    /**
+     * Domain ID or domain name.
+     */
+    domainIDOrName: string;
+  };
+  query?: never;
+  url: "/platform/applications/{applicationID}/domains/{domainIDOrName}";
+};
+
+export type PlatformDeleteApplicationDomainErrors = {
+  /**
+   * Request was not successful
+   */
+  400: ClerkErrors;
+  /**
+   * Authentication invalid
+   */
+  401: ClerkErrors;
+  /**
+   * Authorization invalid
+   */
+  403: ClerkErrors;
+  /**
+   * Resource not found
+   */
+  404: ClerkErrors;
+  /**
+   * Invalid request parameters
+   */
+  422: ClerkErrors;
+};
+
+export type PlatformDeleteApplicationDomainError =
+  PlatformDeleteApplicationDomainErrors[keyof PlatformDeleteApplicationDomainErrors];
+
+export type PlatformDeleteApplicationDomainResponses = {
+  /**
+   * Application domain deleted successfully.
+   */
+  200: PlatformDeletedObjectResponse;
+};
+
+export type PlatformDeleteApplicationDomainResponse =
+  PlatformDeleteApplicationDomainResponses[keyof PlatformDeleteApplicationDomainResponses];
 
 export type PlatformGetApplicationDomainData = {
   body?: never;
@@ -883,3 +2143,1004 @@ export type PlatformGetApplicationTransferResponses = {
 
 export type PlatformGetApplicationTransferResponse =
   PlatformGetApplicationTransferResponses[keyof PlatformGetApplicationTransferResponses];
+
+export type PlatformGetInstanceUsageData = {
+  body?: never;
+  path: {
+    /**
+     * Application ID.
+     */
+    applicationID: string;
+    /**
+     * Environment type (e.g., "development", "production") or instance ID.
+     *
+     */
+    envOrInsID: string;
+  };
+  query?: {
+    /**
+     * Start of the date range for usage data in YYYY-MM-DD format.
+     * Both `start` and `end` must be provided together.
+     * When omitted, the current billing cycle is used.
+     *
+     */
+    start?: string;
+    /**
+     * Inclusive end of the date range for usage data in YYYY-MM-DD format.
+     * Both `start` and `end` must be provided together.
+     * When omitted, the current billing cycle is used.
+     *
+     */
+    end?: string;
+  };
+  url: "/platform/applications/{applicationID}/instances/{envOrInsID}/usage";
+};
+
+export type PlatformGetInstanceUsageErrors = {
+  /**
+   * Authentication invalid
+   */
+  401: ClerkErrors;
+  /**
+   * Authorization invalid
+   */
+  403: ClerkErrors;
+  /**
+   * Resource not found
+   */
+  404: ClerkErrors;
+  /**
+   * Request was not successful
+   */
+  422: ClerkErrors;
+};
+
+export type PlatformGetInstanceUsageError =
+  PlatformGetInstanceUsageErrors[keyof PlatformGetInstanceUsageErrors];
+
+export type PlatformGetInstanceUsageResponses = {
+  /**
+   * Instance usage retrieved successfully.
+   */
+  200: PlatformInstanceUsageResponse;
+};
+
+export type PlatformGetInstanceUsageResponse =
+  PlatformGetInstanceUsageResponses[keyof PlatformGetInstanceUsageResponses];
+
+export type PlatformListInstanceUsersData = {
+  body?: never;
+  path: {
+    /**
+     * Application ID.
+     */
+    applicationID: string;
+    /**
+     * Environment type (e.g., "development", "production") or instance ID.
+     *
+     */
+    envOrInsID: string;
+  };
+  query?: {
+    /**
+     * A search query to filter users. Searches across email addresses, phone numbers,
+     * usernames, web3 wallets, user IDs, first names, and last names.
+     *
+     */
+    query?: string;
+    /**
+     * Field to order results by. Prefix with `+` for ascending or `-` for descending order.
+     * Valid fields: `created_at`, `updated_at`, `last_sign_in_at`, `last_active_at`, `email_address`,
+     * `first_name`, `last_name`, `username`, `phone_number`, `web3_wallet`.
+     *
+     */
+    order_by?: string;
+    /**
+     * Number of results to return per page (1-500, default 10).
+     */
+    limit?: number;
+    /**
+     * Number of results to skip for pagination.
+     */
+    offset?: number;
+  };
+  url: "/platform/applications/{applicationID}/instances/{envOrInsID}/users";
+};
+
+export type PlatformListInstanceUsersErrors = {
+  /**
+   * Request was not successful
+   */
+  400: ClerkErrors;
+  /**
+   * Authentication invalid
+   */
+  401: ClerkErrors;
+  /**
+   * Authorization invalid
+   */
+  403: ClerkErrors;
+  /**
+   * Resource not found
+   */
+  404: ClerkErrors;
+  /**
+   * Invalid request parameters
+   */
+  422: ClerkErrors;
+};
+
+export type PlatformListInstanceUsersError =
+  PlatformListInstanceUsersErrors[keyof PlatformListInstanceUsersErrors];
+
+export type PlatformListInstanceUsersResponses = {
+  /**
+   * Users retrieved successfully.
+   */
+  200: PlatformListInstanceUsersResponse;
+};
+
+export type PlatformListInstanceUsersResponse2 =
+  PlatformListInstanceUsersResponses[keyof PlatformListInstanceUsersResponses];
+
+export type PlatformBanUserData = {
+  body?: never;
+  path: {
+    /**
+     * Application ID.
+     */
+    applicationID: string;
+    /**
+     * Environment type (e.g., "development", "production") or instance ID.
+     *
+     */
+    envOrInsID: string;
+    /**
+     * User ID.
+     */
+    userID: string;
+  };
+  query?: never;
+  url: "/platform/applications/{applicationID}/instances/{envOrInsID}/users/{userID}/ban";
+};
+
+export type PlatformBanUserErrors = {
+  /**
+   * Request was not successful
+   */
+  400: ClerkErrors;
+  /**
+   * Authentication invalid
+   */
+  401: ClerkErrors;
+  /**
+   * Authorization invalid
+   */
+  403: ClerkErrors;
+  /**
+   * Resource not found
+   */
+  404: ClerkErrors;
+};
+
+export type PlatformBanUserError = PlatformBanUserErrors[keyof PlatformBanUserErrors];
+
+export type PlatformBanUserResponses = {
+  /**
+   * User banned successfully.
+   */
+  200: User;
+};
+
+export type PlatformBanUserResponse = PlatformBanUserResponses[keyof PlatformBanUserResponses];
+
+export type PlatformUnbanUserData = {
+  body?: never;
+  path: {
+    /**
+     * Application ID.
+     */
+    applicationID: string;
+    /**
+     * Environment type (e.g., "development", "production") or instance ID.
+     *
+     */
+    envOrInsID: string;
+    /**
+     * User ID.
+     */
+    userID: string;
+  };
+  query?: never;
+  url: "/platform/applications/{applicationID}/instances/{envOrInsID}/users/{userID}/unban";
+};
+
+export type PlatformUnbanUserErrors = {
+  /**
+   * Request was not successful
+   */
+  400: ClerkErrors;
+  /**
+   * Authentication invalid
+   */
+  401: ClerkErrors;
+  /**
+   * Authorization invalid
+   */
+  403: ClerkErrors;
+  /**
+   * Resource not found
+   */
+  404: ClerkErrors;
+};
+
+export type PlatformUnbanUserError = PlatformUnbanUserErrors[keyof PlatformUnbanUserErrors];
+
+export type PlatformUnbanUserResponses = {
+  /**
+   * User unbanned successfully.
+   */
+  200: User;
+};
+
+export type PlatformUnbanUserResponse =
+  PlatformUnbanUserResponses[keyof PlatformUnbanUserResponses];
+
+export type PlatformListJwtTemplatesData = {
+  body?: never;
+  path: {
+    /**
+     * Application ID.
+     */
+    applicationID: string;
+    /**
+     * Environment type (e.g., "development", "production") or instance ID.
+     *
+     */
+    envOrInsID: string;
+  };
+  query?: never;
+  url: "/platform/applications/{applicationID}/instances/{envOrInsID}/jwt_templates";
+};
+
+export type PlatformListJwtTemplatesErrors = {
+  /**
+   * Request was not successful
+   */
+  400: ClerkErrors;
+  /**
+   * Authentication invalid
+   */
+  401: ClerkErrors;
+  /**
+   * Authorization invalid
+   */
+  403: ClerkErrors;
+  /**
+   * Resource not found
+   */
+  404: ClerkErrors;
+};
+
+export type PlatformListJwtTemplatesError =
+  PlatformListJwtTemplatesErrors[keyof PlatformListJwtTemplatesErrors];
+
+export type PlatformListJwtTemplatesResponses = {
+  /**
+   * JWT templates retrieved successfully.
+   */
+  200: Array<JwtTemplate>;
+};
+
+export type PlatformListJwtTemplatesResponse =
+  PlatformListJwtTemplatesResponses[keyof PlatformListJwtTemplatesResponses];
+
+export type PlatformCreateJwtTemplateData = {
+  /**
+   * JWT template data to create.
+   */
+  body: {
+    /**
+     * JWT template name
+     */
+    name: string;
+    /**
+     * JWT template claims in JSON format
+     */
+    claims: {
+      [key: string]: unknown;
+    };
+    /**
+     * JWT token lifetime in seconds
+     */
+    lifetime?: number | null;
+    /**
+     * JWT allowed clock skew in seconds
+     */
+    allowed_clock_skew?: number | null;
+    /**
+     * Whether a custom signing key/algorithm is also provided for this template
+     */
+    custom_signing_key?: boolean;
+    /**
+     * The custom signing algorithm to use when minting JWTs. Required if `custom_signing_key` is `true`.
+     */
+    signing_algorithm?: string | null;
+    /**
+     * The custom signing private key to use when minting JWTs. Required if `custom_signing_key` is `true`.
+     */
+    signing_key?: string | null;
+  };
+  path: {
+    /**
+     * Application ID.
+     */
+    applicationID: string;
+    /**
+     * Environment type (e.g., "development", "production") or instance ID.
+     *
+     */
+    envOrInsID: string;
+  };
+  query?: never;
+  url: "/platform/applications/{applicationID}/instances/{envOrInsID}/jwt_templates";
+};
+
+export type PlatformCreateJwtTemplateErrors = {
+  /**
+   * Request was not successful
+   */
+  400: ClerkErrors;
+  /**
+   * Authentication invalid
+   */
+  401: ClerkErrors;
+  /**
+   * Payment required
+   */
+  402: ClerkErrors;
+  /**
+   * Authorization invalid
+   */
+  403: ClerkErrors;
+  /**
+   * Resource not found
+   */
+  404: ClerkErrors;
+  /**
+   * Invalid request parameters
+   */
+  422: ClerkErrors;
+};
+
+export type PlatformCreateJwtTemplateError =
+  PlatformCreateJwtTemplateErrors[keyof PlatformCreateJwtTemplateErrors];
+
+export type PlatformCreateJwtTemplateResponses = {
+  /**
+   * JWT template created successfully.
+   */
+  200: JwtTemplate;
+};
+
+export type PlatformCreateJwtTemplateResponse =
+  PlatformCreateJwtTemplateResponses[keyof PlatformCreateJwtTemplateResponses];
+
+export type PlatformDeleteJwtTemplateData = {
+  body?: never;
+  path: {
+    /**
+     * Application ID.
+     */
+    applicationID: string;
+    /**
+     * Environment type (e.g., "development", "production") or instance ID.
+     *
+     */
+    envOrInsID: string;
+    /**
+     * JWT Template ID.
+     */
+    templateID: string;
+  };
+  query?: never;
+  url: "/platform/applications/{applicationID}/instances/{envOrInsID}/jwt_templates/{templateID}";
+};
+
+export type PlatformDeleteJwtTemplateErrors = {
+  /**
+   * Request was not successful
+   */
+  400: ClerkErrors;
+  /**
+   * Authentication invalid
+   */
+  401: ClerkErrors;
+  /**
+   * Authorization invalid
+   */
+  403: ClerkErrors;
+  /**
+   * Resource not found
+   */
+  404: ClerkErrors;
+};
+
+export type PlatformDeleteJwtTemplateError =
+  PlatformDeleteJwtTemplateErrors[keyof PlatformDeleteJwtTemplateErrors];
+
+export type PlatformDeleteJwtTemplateResponses = {
+  /**
+   * Deleted Object
+   */
+  200: DeletedObject;
+};
+
+export type PlatformDeleteJwtTemplateResponse =
+  PlatformDeleteJwtTemplateResponses[keyof PlatformDeleteJwtTemplateResponses];
+
+export type PlatformGetJwtTemplateData = {
+  body?: never;
+  path: {
+    /**
+     * Application ID.
+     */
+    applicationID: string;
+    /**
+     * Environment type (e.g., "development", "production") or instance ID.
+     *
+     */
+    envOrInsID: string;
+    /**
+     * JWT Template ID.
+     */
+    templateID: string;
+  };
+  query?: never;
+  url: "/platform/applications/{applicationID}/instances/{envOrInsID}/jwt_templates/{templateID}";
+};
+
+export type PlatformGetJwtTemplateErrors = {
+  /**
+   * Request was not successful
+   */
+  400: ClerkErrors;
+  /**
+   * Authentication invalid
+   */
+  401: ClerkErrors;
+  /**
+   * Authorization invalid
+   */
+  403: ClerkErrors;
+  /**
+   * Resource not found
+   */
+  404: ClerkErrors;
+};
+
+export type PlatformGetJwtTemplateError =
+  PlatformGetJwtTemplateErrors[keyof PlatformGetJwtTemplateErrors];
+
+export type PlatformGetJwtTemplateResponses = {
+  /**
+   * JWT template retrieved successfully.
+   */
+  200: JwtTemplate;
+};
+
+export type PlatformGetJwtTemplateResponse =
+  PlatformGetJwtTemplateResponses[keyof PlatformGetJwtTemplateResponses];
+
+export type PlatformUpdateJwtTemplateData = {
+  /**
+   * JWT template data to update.
+   */
+  body: {
+    /**
+     * JWT template name
+     */
+    name: string;
+    /**
+     * JWT template claims in JSON format
+     */
+    claims: {
+      [key: string]: unknown;
+    };
+    /**
+     * JWT token lifetime in seconds
+     */
+    lifetime?: number | null;
+    /**
+     * JWT allowed clock skew in seconds
+     */
+    allowed_clock_skew?: number | null;
+    /**
+     * Whether a custom signing key/algorithm is also provided for this template
+     */
+    custom_signing_key?: boolean;
+    /**
+     * The custom signing algorithm to use when minting JWTs. Required if `custom_signing_key` is `true`.
+     */
+    signing_algorithm?: string | null;
+    /**
+     * The custom signing private key to use when minting JWTs. Required if `custom_signing_key` is `true`.
+     */
+    signing_key?: string | null;
+  };
+  path: {
+    /**
+     * Application ID.
+     */
+    applicationID: string;
+    /**
+     * Environment type (e.g., "development", "production") or instance ID.
+     *
+     */
+    envOrInsID: string;
+    /**
+     * JWT Template ID.
+     */
+    templateID: string;
+  };
+  query?: never;
+  url: "/platform/applications/{applicationID}/instances/{envOrInsID}/jwt_templates/{templateID}";
+};
+
+export type PlatformUpdateJwtTemplateErrors = {
+  /**
+   * Request was not successful
+   */
+  400: ClerkErrors;
+  /**
+   * Authentication invalid
+   */
+  401: ClerkErrors;
+  /**
+   * Payment required
+   */
+  402: ClerkErrors;
+  /**
+   * Authorization invalid
+   */
+  403: ClerkErrors;
+  /**
+   * Resource not found
+   */
+  404: ClerkErrors;
+  /**
+   * Invalid request parameters
+   */
+  422: ClerkErrors;
+};
+
+export type PlatformUpdateJwtTemplateError =
+  PlatformUpdateJwtTemplateErrors[keyof PlatformUpdateJwtTemplateErrors];
+
+export type PlatformUpdateJwtTemplateResponses = {
+  /**
+   * JWT template updated successfully.
+   */
+  200: JwtTemplate;
+};
+
+export type PlatformUpdateJwtTemplateResponse =
+  PlatformUpdateJwtTemplateResponses[keyof PlatformUpdateJwtTemplateResponses];
+
+export type PlatformListRedirectUrlsData = {
+  body?: never;
+  path: {
+    /**
+     * Application ID.
+     */
+    applicationID: string;
+    /**
+     * Environment type (e.g., "development", "production") or instance ID.
+     *
+     */
+    envOrInsID: string;
+  };
+  query?: {
+    /**
+     * Number of results to return per page (1-500, default 10).
+     */
+    limit?: number;
+    /**
+     * Number of results to skip for pagination.
+     */
+    offset?: number;
+  };
+  url: "/platform/applications/{applicationID}/instances/{envOrInsID}/redirect_urls";
+};
+
+export type PlatformListRedirectUrlsErrors = {
+  /**
+   * Request was not successful
+   */
+  400: ClerkErrors;
+  /**
+   * Authentication invalid
+   */
+  401: ClerkErrors;
+  /**
+   * Authorization invalid
+   */
+  403: ClerkErrors;
+  /**
+   * Resource not found
+   */
+  404: ClerkErrors;
+  /**
+   * Invalid request parameters
+   */
+  422: ClerkErrors;
+};
+
+export type PlatformListRedirectUrlsError =
+  PlatformListRedirectUrlsErrors[keyof PlatformListRedirectUrlsErrors];
+
+export type PlatformListRedirectUrlsResponses = {
+  /**
+   * Redirect URLs retrieved successfully.
+   */
+  200: PlatformListRedirectUrlsResponse;
+};
+
+export type PlatformListRedirectUrlsResponse2 =
+  PlatformListRedirectUrlsResponses[keyof PlatformListRedirectUrlsResponses];
+
+export type PlatformCreateRedirectUrlData = {
+  /**
+   * Redirect URL data to create.
+   */
+  body: {
+    /**
+     * The full URL value prefixed with `https://` or a custom scheme e.g. `"https://my-app.com/oauth-callback"` or `"my-app://oauth-callback"`.
+     */
+    url: string;
+  };
+  path: {
+    /**
+     * Application ID.
+     */
+    applicationID: string;
+    /**
+     * Environment type (e.g., "development", "production") or instance ID.
+     *
+     */
+    envOrInsID: string;
+  };
+  query?: never;
+  url: "/platform/applications/{applicationID}/instances/{envOrInsID}/redirect_urls";
+};
+
+export type PlatformCreateRedirectUrlErrors = {
+  /**
+   * Request was not successful
+   */
+  400: ClerkErrors;
+  /**
+   * Authentication invalid
+   */
+  401: ClerkErrors;
+  /**
+   * Authorization invalid
+   */
+  403: ClerkErrors;
+  /**
+   * Resource not found
+   */
+  404: ClerkErrors;
+  /**
+   * Invalid request parameters
+   */
+  422: ClerkErrors;
+};
+
+export type PlatformCreateRedirectUrlError =
+  PlatformCreateRedirectUrlErrors[keyof PlatformCreateRedirectUrlErrors];
+
+export type PlatformCreateRedirectUrlResponses = {
+  /**
+   * Redirect URL created successfully.
+   */
+  200: RedirectUrl;
+};
+
+export type PlatformCreateRedirectUrlResponse =
+  PlatformCreateRedirectUrlResponses[keyof PlatformCreateRedirectUrlResponses];
+
+export type PlatformDeleteRedirectUrlData = {
+  body?: never;
+  path: {
+    /**
+     * Application ID.
+     */
+    applicationID: string;
+    /**
+     * Environment type (e.g., "development", "production") or instance ID.
+     *
+     */
+    envOrInsID: string;
+    /**
+     * Redirect URL ID.
+     */
+    redirectURLID: string;
+  };
+  query?: never;
+  url: "/platform/applications/{applicationID}/instances/{envOrInsID}/redirect_urls/{redirectURLID}";
+};
+
+export type PlatformDeleteRedirectUrlErrors = {
+  /**
+   * Request was not successful
+   */
+  400: ClerkErrors;
+  /**
+   * Authentication invalid
+   */
+  401: ClerkErrors;
+  /**
+   * Authorization invalid
+   */
+  403: ClerkErrors;
+  /**
+   * Resource not found
+   */
+  404: ClerkErrors;
+};
+
+export type PlatformDeleteRedirectUrlError =
+  PlatformDeleteRedirectUrlErrors[keyof PlatformDeleteRedirectUrlErrors];
+
+export type PlatformDeleteRedirectUrlResponses = {
+  /**
+   * Deleted Object
+   */
+  200: DeletedObject;
+};
+
+export type PlatformDeleteRedirectUrlResponse =
+  PlatformDeleteRedirectUrlResponses[keyof PlatformDeleteRedirectUrlResponses];
+
+export type PlatformGetRedirectUrlData = {
+  body?: never;
+  path: {
+    /**
+     * Application ID.
+     */
+    applicationID: string;
+    /**
+     * Environment type (e.g., "development", "production") or instance ID.
+     *
+     */
+    envOrInsID: string;
+    /**
+     * Redirect URL ID.
+     */
+    redirectURLID: string;
+  };
+  query?: never;
+  url: "/platform/applications/{applicationID}/instances/{envOrInsID}/redirect_urls/{redirectURLID}";
+};
+
+export type PlatformGetRedirectUrlErrors = {
+  /**
+   * Request was not successful
+   */
+  400: ClerkErrors;
+  /**
+   * Authentication invalid
+   */
+  401: ClerkErrors;
+  /**
+   * Authorization invalid
+   */
+  403: ClerkErrors;
+  /**
+   * Resource not found
+   */
+  404: ClerkErrors;
+};
+
+export type PlatformGetRedirectUrlError =
+  PlatformGetRedirectUrlErrors[keyof PlatformGetRedirectUrlErrors];
+
+export type PlatformGetRedirectUrlResponses = {
+  /**
+   * Redirect URL retrieved successfully.
+   */
+  200: RedirectUrl;
+};
+
+export type PlatformGetRedirectUrlResponse =
+  PlatformGetRedirectUrlResponses[keyof PlatformGetRedirectUrlResponses];
+
+export type PlatformGetConfigData = {
+  body?: never;
+  path: {
+    /**
+     * Application ID.
+     */
+    applicationID: string;
+    /**
+     * Environment type (e.g., "development", "production") or instance ID.
+     *
+     */
+    envOrInsID: string;
+  };
+  query?: {
+    /**
+     * Config keys to retrieve. If not specified, all keys are returned.
+     */
+    keys?: Array<string>;
+  };
+  url: "/platform/applications/{applicationID}/instances/{envOrInsID}/config";
+};
+
+export type PlatformGetConfigErrors = {
+  /**
+   * Request was not successful
+   */
+  400: ClerkErrors;
+  /**
+   * Authentication invalid
+   */
+  401: ClerkErrors;
+  /**
+   * Authorization invalid
+   */
+  403: ClerkErrors;
+  /**
+   * Resource not found
+   */
+  404: ClerkErrors;
+};
+
+export type PlatformGetConfigError = PlatformGetConfigErrors[keyof PlatformGetConfigErrors];
+
+export type PlatformGetConfigResponses = {
+  /**
+   * Instance config retrieved successfully.
+   */
+  200: PlatformConfigResponse;
+};
+
+export type PlatformGetConfigResponse =
+  PlatformGetConfigResponses[keyof PlatformGetConfigResponses];
+
+export type PlatformPatchConfigData = {
+  /**
+   * Config updates to apply.
+   */
+  body: PlatformConfigPatchRequest;
+  headers?: {
+    /**
+     * Config version for optimistic concurrency control.
+     */
+    "If-Match"?: string;
+  };
+  path: {
+    /**
+     * Application ID.
+     */
+    applicationID: string;
+    /**
+     * Environment type (e.g., "development", "production") or instance ID.
+     *
+     */
+    envOrInsID: string;
+  };
+  query?: {
+    /**
+     * If true, preview the changes without applying them.
+     */
+    dry_run?: boolean;
+    /**
+     * If true, allow clearing config keys by setting them to null.
+     */
+    destructive?: boolean;
+    /**
+     * Config keys to return in the response. If not specified, only updated keys are returned.
+     */
+    keys?: Array<string>;
+  };
+  url: "/platform/applications/{applicationID}/instances/{envOrInsID}/config";
+};
+
+export type PlatformPatchConfigErrors = {
+  /**
+   * Request was not successful
+   */
+  400: ClerkErrors;
+  /**
+   * Authentication invalid
+   */
+  401: ClerkErrors;
+  /**
+   * Payment required
+   */
+  402: ClerkErrors;
+  /**
+   * Authorization invalid
+   */
+  403: ClerkErrors;
+  /**
+   * Resource not found
+   */
+  404: ClerkErrors;
+  /**
+   * Conflict
+   */
+  409: ClerkErrors;
+  /**
+   * Invalid request parameters
+   */
+  422: ClerkErrors;
+};
+
+export type PlatformPatchConfigError = PlatformPatchConfigErrors[keyof PlatformPatchConfigErrors];
+
+export type PlatformPatchConfigResponses = {
+  /**
+   * Instance config updated successfully.
+   */
+  200: PlatformConfigPatchResponse;
+};
+
+export type PlatformPatchConfigResponse =
+  PlatformPatchConfigResponses[keyof PlatformPatchConfigResponses];
+
+export type PlatformGetConfigSchemaData = {
+  body?: never;
+  path: {
+    /**
+     * Application ID.
+     */
+    applicationID: string;
+    /**
+     * Environment type (e.g., "development", "production") or instance ID.
+     *
+     */
+    envOrInsID: string;
+  };
+  query?: {
+    /**
+     * Config keys to retrieve schema for. If not specified, all keys are returned.
+     */
+    keys?: Array<string>;
+  };
+  url: "/platform/applications/{applicationID}/instances/{envOrInsID}/config/schema";
+};
+
+export type PlatformGetConfigSchemaErrors = {
+  /**
+   * Request was not successful
+   */
+  400: ClerkErrors;
+  /**
+   * Authentication invalid
+   */
+  401: ClerkErrors;
+  /**
+   * Authorization invalid
+   */
+  403: ClerkErrors;
+  /**
+   * Resource not found
+   */
+  404: ClerkErrors;
+};
+
+export type PlatformGetConfigSchemaError =
+  PlatformGetConfigSchemaErrors[keyof PlatformGetConfigSchemaErrors];
+
+export type PlatformGetConfigSchemaResponses = {
+  /**
+   * Instance config schema retrieved successfully.
+   */
+  200: PlatformConfigSchemaResponse;
+};
+
+export type PlatformGetConfigSchemaResponse =
+  PlatformGetConfigSchemaResponses[keyof PlatformGetConfigSchemaResponses];
