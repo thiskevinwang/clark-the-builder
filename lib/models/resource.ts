@@ -1,5 +1,6 @@
 export interface Resource {
   id: string;
+  userId: string;
   type: string;
   externalId: string;
   conversationId: string | null;
@@ -9,6 +10,7 @@ export interface Resource {
 }
 
 export interface CreateResourceInput {
+  userId: string;
   type: string;
   externalId: string;
   conversationId?: string | null;

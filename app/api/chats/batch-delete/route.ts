@@ -1,9 +1,9 @@
-import { inArray } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import z from "zod";
 
+import { getCurrentLocalUser } from "@/lib/auth";
 import { db } from "@/lib/database/db";
-import { conversations } from "@/lib/database/schema";
+import { createConversationRepository } from "@/lib/repositories/conversation-repository-impl";
 
 const BatchDeleteChatsBodySchema = z
   .object({
@@ -12,6 +12,11 @@ const BatchDeleteChatsBodySchema = z
   .strict();
 
 export async function POST(req: Request) {
+  const currentUser = await getCurrentLocalUser();
+  if (!currentUser) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const body = await req.json().catch(() => null);
   const parsed = BatchDeleteChatsBodySchema.safeParse(body);
 
@@ -22,15 +27,12 @@ export async function POST(req: Request) {
   // Deduplicate IDs for safety.
   const chatIds = Array.from(new Set(parsed.data.chatIds));
 
-  const deleted = await db
-    .delete(conversations)
-    .where(inArray(conversations.id, chatIds))
-    .returning({ id: conversations.id });
+  const deletedIds = await createConversationRepository(db).deleteMany(currentUser.id, chatIds);
 
   return NextResponse.json<POSTResponse>(
     {
-      deletedIds: deleted.map((r) => r.id),
-      deletedCount: deleted.length,
+      deletedIds,
+      deletedCount: deletedIds.length,
     },
     { status: 200 },
   );

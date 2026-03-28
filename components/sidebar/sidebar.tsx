@@ -1,5 +1,6 @@
 "use client";
 
+import { UserButton, useUser } from "@clerk/nextjs";
 import {
   ArchiveIcon,
   MessagesSquareIcon,
@@ -24,6 +25,7 @@ interface SidebarProps {
 export function Sidebar({ className }: SidebarProps) {
   const { isOpen, close, open } = useSidebar();
   const pathname = usePathname();
+  const { isSignedIn } = useUser();
   const isCollapsed = !isOpen;
 
   const isChatsActive = pathname === "/chats" || pathname.startsWith("/chats/");
@@ -197,6 +199,25 @@ export function Sidebar({ className }: SidebarProps) {
             </div>
           </div>
         </ScrollArea>
+
+        {isSignedIn ? (
+          <div className={cn("border-t border-border p-2", isCollapsed && "md:px-1")}>
+            {isCollapsed ? (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="flex justify-center">
+                    <UserButton />
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent side="right">Account</TooltipContent>
+              </Tooltip>
+            ) : (
+              <div className="flex items-center justify-start px-1 py-1">
+                <UserButton />
+              </div>
+            )}
+          </div>
+        ) : null}
       </div>
     </>
   );

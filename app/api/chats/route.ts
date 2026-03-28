@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import z from "zod";
 
+import { getCurrentLocalUser } from "@/lib/auth";
 import { db } from "@/lib/database/db";
 import { Conversation, ConversationWithMessageCount } from "@/lib/models/conversation";
 import { createConversationRepository } from "@/lib/repositories/conversation-repository-impl";
@@ -16,6 +17,11 @@ const CreateChatBodySchema = z.object({
 });
 
 export async function GET(request: NextRequest) {
+  const currentUser = await getCurrentLocalUser();
+  if (!currentUser) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const parsed = ListChatsQuerySchema.safeParse({
     limit: request.nextUrl.searchParams.get("limit") ?? undefined,
     offset: request.nextUrl.searchParams.get("offset") ?? undefined,
@@ -27,6 +33,7 @@ export async function GET(request: NextRequest) {
   }
 
   const conversations = await createConversationRepository(db).listRecentWithMessageCount(
+    currentUser.id,
     parsed.data.limit,
     parsed.data.offset,
     parsed.data.q,
@@ -36,6 +43,11 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(req: Request) {
+  const currentUser = await getCurrentLocalUser();
+  if (!currentUser) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const body = await req.json().catch(() => null);
   const parsed = CreateChatBodySchema.safeParse(body);
 
@@ -44,6 +56,7 @@ export async function POST(req: Request) {
   }
 
   const chat = await createConversationRepository(db).create({
+    userId: currentUser.id,
     title: parsed.data.title ?? null,
   });
 

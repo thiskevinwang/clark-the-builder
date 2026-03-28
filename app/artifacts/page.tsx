@@ -1,3 +1,4 @@
+import { AppAuthGuard } from "@/components/auth/app-auth-guard";
 import { Sidebar, SidebarInset, SidebarProvider } from "@/components/sidebar";
 
 import { Header } from "../header";
@@ -11,12 +12,13 @@ export default function Page() {
 
         <SidebarInset className="flex flex-1 flex-col overflow-hidden p-3">
           <Header className="flex items-center w-full px-1" />
-
-          <div className="w-full max-w-4xl mx-auto">
-            <div className="flex flex-1 min-h-0 w-full flex-col overflow-hidden px-1">
-              <ArtifactsTabs />
+          <AppAuthGuard>
+            <div className="mx-auto w-full max-w-4xl">
+              <div className="flex min-h-0 w-full flex-1 flex-col overflow-hidden px-1">
+                <ArtifactsTabs />
+              </div>
             </div>
-          </div>
+          </AppAuthGuard>
         </SidebarInset>
       </div>
     </SidebarProvider>

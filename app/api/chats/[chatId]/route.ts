@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import z from "zod";
 
+import { getCurrentLocalUser } from "@/lib/auth";
 import { db } from "@/lib/database/db";
 import { Conversation } from "@/lib/models/conversation";
 import { createConversationRepository } from "@/lib/repositories/conversation-repository-impl";
@@ -16,13 +17,21 @@ const UpdateChatBodySchema = z
   .strict();
 
 export async function GET(_req: Request, { params }: { params: Promise<{ chatId: string }> }) {
+  const currentUser = await getCurrentLocalUser();
+  if (!currentUser) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const { chatId } = await params;
   const parsedParams = ParamsSchema.safeParse({ chatId });
   if (!parsedParams.success) {
     return NextResponse.json({ error: "Invalid chatId" }, { status: 400 });
   }
 
-  const chat = await createConversationRepository(db).getById(parsedParams.data.chatId);
+  const chat = await createConversationRepository(db).getById(
+    currentUser.id,
+    parsedParams.data.chatId,
+  );
   if (!chat) {
     return NextResponse.json({ error: "Chat not found" }, { status: 404 });
   }
@@ -31,6 +40,11 @@ export async function GET(_req: Request, { params }: { params: Promise<{ chatId:
 }
 
 export async function PATCH(req: Request, { params }: { params: Promise<{ chatId: string }> }) {
+  const currentUser = await getCurrentLocalUser();
+  if (!currentUser) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const { chatId } = await params;
   const parsedParams = ParamsSchema.safeParse({ chatId });
   if (!parsedParams.success) {
@@ -45,7 +59,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ chatId
     return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
   }
 
-  const chat = await conversationRepo.update(parsedParams.data.chatId, {
+  const chat = await conversationRepo.update(currentUser.id, parsedParams.data.chatId, {
     ...(Object.prototype.hasOwnProperty.call(parsedBody.data, "title")
       ? { title: parsedBody.data.title ?? null }
       : {}),
@@ -59,6 +73,11 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ chatId
 }
 
 export async function DELETE(_req: Request, { params }: { params: Promise<{ chatId: string }> }) {
+  const currentUser = await getCurrentLocalUser();
+  if (!currentUser) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const { chatId } = await params;
   const parsedParams = ParamsSchema.safeParse({ chatId });
   if (!parsedParams.success) {
@@ -66,7 +85,7 @@ export async function DELETE(_req: Request, { params }: { params: Promise<{ chat
   }
 
   const conversationRepo = createConversationRepository(db);
-  const deleted = await conversationRepo.delete(parsedParams.data.chatId);
+  const deleted = await conversationRepo.delete(currentUser.id, parsedParams.data.chatId);
   if (!deleted) {
     return NextResponse.json({ error: "Chat not found" }, { status: 404 });
   }

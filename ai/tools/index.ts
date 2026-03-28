@@ -12,14 +12,15 @@ import { waitTool } from "./wait";
 interface Params {
   chatId: string;
   modelId: ModelId;
+  userId: string;
   writer: UIMessageStreamWriter<UIMessage<never, DataPart>>;
 }
 
-export function tools({ chatId, modelId, writer }: Params) {
+export function tools({ chatId, modelId, userId, writer }: Params) {
   console.log("Creating tools for chatId:", chatId);
   return {
-    createClerkApp: createClerkApp({ writer, conversationId: chatId }),
-    createSandbox: createSandbox({ writer, conversationId: chatId }),
+    createClerkApp: createClerkApp({ writer, conversationId: chatId, userId }),
+    createSandbox: createSandbox({ writer, conversationId: chatId, userId }),
     generateFiles: generateFiles({ writer, modelId }),
     getSandboxURL: getSandboxURL({ writer }),
     runCommand: runCommand({ writer }),

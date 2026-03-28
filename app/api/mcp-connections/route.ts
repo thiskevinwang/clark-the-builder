@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import z from "zod";
 
+import { getCurrentLocalUser } from "@/lib/auth";
 import { db } from "@/lib/database/db";
 import type { MCPConnection, MCPConnectionAuth } from "@/lib/models/mcp-connection";
 import { createMCPConnectionRepository } from "@/lib/repositories/mcp-connection-repository-impl";
@@ -48,6 +49,11 @@ const CreateConnectionBodySchema = z
   .strict();
 
 export async function GET(request: NextRequest) {
+  const currentUser = await getCurrentLocalUser();
+  if (!currentUser) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const parsed = ListConnectionsQuerySchema.safeParse({
     limit: request.nextUrl.searchParams.get("limit") ?? undefined,
     offset: request.nextUrl.searchParams.get("offset") ?? undefined,
@@ -59,6 +65,7 @@ export async function GET(request: NextRequest) {
   }
 
   const connections = await createMCPConnectionRepository(db).listRecent(
+    currentUser.id,
     parsed.data.limit,
     parsed.data.offset,
     parsed.data.q,
@@ -68,6 +75,11 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(req: Request) {
+  const currentUser = await getCurrentLocalUser();
+  if (!currentUser) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const body = await req.json().catch(() => null);
   const parsed = CreateConnectionBodySchema.safeParse(body);
 
@@ -76,6 +88,7 @@ export async function POST(req: Request) {
   }
 
   const connection = await createMCPConnectionRepository(db).create({
+    userId: currentUser.id,
     name: parsed.data.name,
     url: parsed.data.url,
     ...(Object.prototype.hasOwnProperty.call(parsed.data, "auth")

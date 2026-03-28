@@ -13,9 +13,10 @@ import { getRichError } from "./get-rich-error";
 interface Params {
   writer: UIMessageStreamWriter<UIMessage<never, DataPart>>;
   conversationId: string;
+  userId: string;
 }
 
-export const createSandbox = ({ writer, conversationId }: Params) =>
+export const createSandbox = ({ writer, conversationId, userId }: Params) =>
   tool({
     description,
     inputSchema: z.object({
@@ -41,7 +42,7 @@ export const createSandbox = ({ writer, conversationId }: Params) =>
           "Environment variables to set in the sandbox. Use this to pass secrets and configuration like NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY and CLERK_SECRET_KEY for Clerk authentication, or any other environment variables the application needs.",
         ),
     }),
-    execute: async ({ timeout, ports, env }, { toolCallId }) => {
+    execute: async ({ timeout, ports }, { toolCallId }) => {
       writer.write({
         id: toolCallId,
         type: "data-create-sandbox",
@@ -70,6 +71,7 @@ export const createSandbox = ({ writer, conversationId }: Params) =>
         // Save the Vercel sandbox as a resource
         const resourceRepository = createResourceRepository(db);
         await resourceRepository.create({
+          userId,
           type: "vercel_sandbox",
           externalId: sandbox.sandboxId,
           conversationId,
