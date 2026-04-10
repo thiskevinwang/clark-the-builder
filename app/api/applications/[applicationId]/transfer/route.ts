@@ -1,14 +1,32 @@
 import { NextResponse } from "next/server";
 
 import { platformCreateApplicationTransfer } from "@/lib/api";
+import { getCurrentLocalUser } from "@/lib/auth";
 import { createClient, createConfig } from "@/lib/api/client";
+import { getOwnedResourceByExternalId } from "@/lib/resource-ownership";
 
 interface Params {
   params: Promise<{ applicationId: string }>;
 }
 
+const CLERK_APPLICATION_RESOURCE_TYPE = "clerk_application";
+
 export async function POST(_req: Request, { params }: Params) {
+  const currentUser = await getCurrentLocalUser();
+  if (!currentUser) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const { applicationId } = await params;
+  const ownedResource = await getOwnedResourceByExternalId(
+    currentUser.id,
+    CLERK_APPLICATION_RESOURCE_TYPE,
+    applicationId,
+  );
+  if (!ownedResource) {
+    return NextResponse.json({ error: "Application not found" }, { status: 404 });
+  }
+
   const clerkPlatformToken = process.env.CLERK_PLATFORM_ACCESS_TOKEN;
 
   if (!clerkPlatformToken) {
@@ -32,7 +50,7 @@ export async function POST(_req: Request, { params }: Params) {
     const response = await platformCreateApplicationTransfer({
       client,
       path: {
-        applicationID: applicationId,
+        applicationID: ownedResource.externalId,
       },
       // @ts-expect-error - body is not used for this request,
       // we pass something other than `undefined` to bypass heyapi's
