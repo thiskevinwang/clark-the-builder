@@ -1,5 +1,8 @@
 import { NextResponse, type NextRequest } from "next/server";
 
+import { getCurrentLocalUser } from "@/lib/auth";
+import { getOwnedResourceByExternalId } from "@/lib/resource-ownership";
+
 import { sandboxProvider } from "../../../../../../../lib/sandbox";
 
 interface Params {
@@ -8,7 +11,21 @@ interface Params {
 }
 
 export async function GET(_request: NextRequest, { params }: { params: Promise<Params> }) {
+  const currentUser = await getCurrentLocalUser();
+  if (!currentUser) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const logParams = await params;
+  const ownedResource = await getOwnedResourceByExternalId(
+    currentUser.id,
+    "vercel_sandbox",
+    logParams.sandboxId,
+  );
+  if (!ownedResource) {
+    return NextResponse.json({ error: "Sandbox not found" }, { status: 404 });
+  }
+
   const encoder = new TextEncoder();
   const sandbox = await sandboxProvider.get(logParams);
   const command = await sandbox.getCommand(logParams.cmdId);

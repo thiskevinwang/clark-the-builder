@@ -15,6 +15,7 @@ const rowToModel = (row: MessageRow): Message => ({
   parts: row.parts,
   metadata: row.metadata,
   parentId: row.parentId,
+  ...(row.externalId ? { externalId: row.externalId } : {}),
 });
 
 const buildInsertValues = (input: CreateMessageInput): typeof messages.$inferInsert => ({
@@ -98,7 +99,8 @@ export const createMessageRepository = (db: DB): MessageRepository => ({
     }
 
     const insertValues = buildInsertValues(input);
-    const { id: _id, ...upsertValues } = insertValues;
+    const upsertValues: Partial<typeof messages.$inferInsert> = { ...insertValues };
+    delete upsertValues.id;
 
     const row = await db
       .insert(messages)

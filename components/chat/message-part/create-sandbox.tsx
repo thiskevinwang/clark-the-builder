@@ -7,11 +7,13 @@ interface Props {
 }
 
 export function CreateSandbox({ message }: Props) {
+  const hasError = message.status === "error" || Boolean(message.error?.message);
+
   return (
     <DataPartComponent
       title="Create Sandbox"
-      loading={message.status == "loading"}
-      error={message.error?.message || message.status == "error"}
+      loading={message.status === "loading"}
+      error={hasError}
     >
       <div className="relative">
         <span>

@@ -16,6 +16,8 @@ import {
   useCreateChatMutation,
   useListChatsQuery,
 } from "@/app/api/hooks";
+import type { GETResponse, POSTResponse } from "@/app/api/chats/route";
+import { AppAuthGuard } from "@/components/auth/app-auth-guard";
 import { Sidebar, SidebarInset, SidebarProvider } from "@/components/sidebar";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -34,10 +36,28 @@ import { cn } from "@/lib/utils";
 
 import { Header } from "../header";
 
-type NonUndefined<T> = T extends undefined ? never : T;
-type ConversationJson = NonUndefined<ReturnType<typeof useCreateChatMutation>["data"]>["chat"];
+type ConversationJson = POSTResponse["chat"];
+
+const EMPTY_CHATS: GETResponse["chats"] = [];
 
 export default function ChatsPage() {
+  return (
+    <SidebarProvider>
+      <div className="flex h-screen max-h-screen overflow-hidden bg-background">
+        <Sidebar />
+
+        <SidebarInset className="flex flex-1 flex-col overflow-hidden p-3">
+          <Header className="flex items-center w-full px-1" />
+          <AppAuthGuard>
+            <ChatsPageContent />
+          </AppAuthGuard>
+        </SidebarInset>
+      </div>
+    </SidebarProvider>
+  );
+}
+
+function ChatsPageContent() {
   const router = useRouter();
   const [query, setQuery] = useState("");
   const [selectionMode, setSelectionMode] = useState(false);
@@ -52,7 +72,7 @@ export default function ChatsPage() {
   const [isDeleting, setIsDeleting] = useState(false);
 
   const list = useListChatsQuery({ query });
-  const chats = list.data?.chats ?? [];
+  const chats = list.data?.chats ?? EMPTY_CHATS;
 
   const createChat = useCreateChatMutation();
 
@@ -115,166 +135,120 @@ export default function ChatsPage() {
   const deleteMany = useBatchDeleteChatsMutation();
 
   return (
-    <SidebarProvider>
-      <div className="flex h-screen max-h-screen overflow-hidden bg-background">
-        <Sidebar />
+    <>
+      <div className="mx-auto flex min-h-0 w-full max-w-4xl flex-1 flex-col">
+        <div className="flex min-h-0 w-full flex-col overflow-hidden">
+          <div className="flex items-center justify-between px-1 py-2">
+            <div>
+              <h1 className="text-lg font-semibold text-foreground">Chats</h1>
+              <p className="text-sm text-muted-foreground">Browse and search your recent chats.</p>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                onClick={() => {
+                  if (selectionMode) exitSelectionMode();
+                  else setSelectionMode(true);
+                }}
+              >
+                {selectionMode ? "Done" : "Select"}
+              </Button>
 
-        <SidebarInset className="flex flex-1 flex-col overflow-hidden p-3">
-          <Header className="flex items-center w-full px-1" />
+              <Button
+                onClick={async () => {
+                  const data = await createChat.trigger({ title: "New Chat" });
+                  if (data?.chat?.id) {
+                    router.push(`/chats/${data.chat.id}`);
+                  }
+                }}
+                disabled={createChat.isMutating}
+              >
+                <PlusIcon className="h-4 w-4" />
+                New
+              </Button>
+            </div>
+          </div>
 
-          <div className="flex w-full max-w-4xl mx-auto flex-1 min-h-0 flex-col">
-            <div className="flex min-h-0 w-full flex-col overflow-hidden">
-              <div className="flex items-center justify-between px-1 py-2">
-                <div>
-                  <h1 className="text-lg font-semibold text-foreground">Chats</h1>
-                  <p className="text-sm text-muted-foreground">
-                    Browse and search your recent chats.
-                  </p>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="ghost"
-                    onClick={() => {
-                      if (selectionMode) exitSelectionMode();
-                      else setSelectionMode(true);
-                    }}
-                  >
-                    {selectionMode ? "Done" : "Select"}
-                  </Button>
+          <div className="px-1 pb-3">
+            <div className="relative">
+              <SearchIcon className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Search by title or id…"
+                className="pl-9"
+              />
+            </div>
+          </div>
 
-                  <Button
-                    onClick={async () => {
-                      const data = await createChat.trigger({ title: "New Chat" });
-                      if (data?.chat?.id) {
-                        router.push(`/chats/${data.chat.id}`);
-                      }
-                    }}
-                    disabled={createChat.isMutating}
-                  >
-                    <PlusIcon className="h-4 w-4" />
-                    New
-                  </Button>
-                </div>
+          {selectionMode ? (
+            <div className="flex items-center justify-between px-1 pb-3">
+              <div className="flex items-center gap-3">
+                <Checkbox
+                  aria-label={allVisibleSelected ? "Deselect all" : "Select all"}
+                  checked={allVisibleSelected ? true : someVisibleSelected ? "indeterminate" : false}
+                  onCheckedChange={(value) => {
+                    setAllVisibleSelected(value === true);
+                  }}
+                />
+                <span className="text-sm text-muted-foreground">{selectedVisibleCount} selected</span>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  disabled={selectedChatIds.size === 0 || deleteMany.isMutating}
+                  onClick={() => setBatchDeleteDialogOpen(true)}
+                >
+                  <Trash2Icon className="h-4 w-4" />
+                  <span className="sr-only">Delete selected</span>
+                </Button>
               </div>
 
-              <div className="px-1 pb-3">
-                <div className="relative">
-                  <SearchIcon className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                  <Input
-                    value={query}
-                    onChange={(e) => setQuery(e.target.value)}
-                    placeholder="Search by title or id…"
-                    className="pl-9"
-                  />
-                </div>
-              </div>
+              <Button variant="ghost" size="icon" onClick={exitSelectionMode}>
+                <XIcon className="h-4 w-4" />
+                <span className="sr-only">Exit selection mode</span>
+              </Button>
+            </div>
+          ) : null}
 
-              {selectionMode ? (
-                <div className="flex items-center justify-between px-1 pb-3">
-                  <div className="flex items-center gap-3">
-                    <Checkbox
-                      aria-label={allVisibleSelected ? "Deselect all" : "Select all"}
-                      checked={
-                        allVisibleSelected ? true : someVisibleSelected ? "indeterminate" : false
-                      }
-                      onCheckedChange={(value) => {
-                        setAllVisibleSelected(value === true);
-                      }}
-                    />
-                    <span className="text-sm text-muted-foreground">
-                      {selectedVisibleCount} selected
-                    </span>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      disabled={selectedChatIds.size === 0 || deleteMany.isMutating}
-                      onClick={() => setBatchDeleteDialogOpen(true)}
-                    >
-                      <Trash2Icon className="h-4 w-4" />
-                      <span className="sr-only">Delete selected</span>
-                    </Button>
+          <div className="flex min-h-0 flex-1 overflow-hidden px-1">
+            <ScrollArea className="h-full w-full rounded-lg border border-border bg-card">
+              <div className="divide-y divide-border">
+                {list.isLoading ? (
+                  <div className="p-4 text-sm text-muted-foreground">Loading chats…</div>
+                ) : chats.length === 0 ? (
+                  <div className="p-4 text-sm text-muted-foreground">
+                    {query.trim() ? "No chats match your search." : "No chats yet."}
                   </div>
-
-                  <Button variant="ghost" size="icon" onClick={exitSelectionMode}>
-                    <XIcon className="h-4 w-4" />
-                    <span className="sr-only">Exit selection mode</span>
-                  </Button>
-                </div>
-              ) : null}
-
-              <div className="flex flex-1 min-h-0 overflow-hidden px-1">
-                <ScrollArea className="h-full w-full rounded-lg border border-border bg-card">
-                  <div className="divide-y divide-border">
-                    {list.isLoading ? (
-                      <div className="p-4 text-sm text-muted-foreground">Loading chats…</div>
-                    ) : chats.length === 0 ? (
-                      <div className="p-4 text-sm text-muted-foreground">
-                        {query.trim() ? "No chats match your search." : "No chats yet."}
-                      </div>
-                    ) : (
-                      chats.map((chat) => {
-                        if (selectionMode) {
-                          const isSelected = selectedChatIds.has(chat.id);
-                          return (
-                            <div
-                              key={chat.id}
-                              role="button"
-                              tabIndex={0}
-                              onClick={() => toggleSelected(chat.id)}
-                              onKeyDown={(e) => {
-                                if (e.key === "Enter" || e.key === " ") {
-                                  e.preventDefault();
-                                  toggleSelected(chat.id);
-                                }
-                              }}
-                              className={cn(
-                                "flex items-start justify-between gap-3 px-4 py-3 transition-colors",
-                                isSelected ? "bg-accent" : "hover:bg-accent",
-                                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
-                              )}
-                            >
-                              <div className="flex min-w-0 items-start gap-3">
-                                <Checkbox
-                                  aria-label={isSelected ? "Deselect chat" : "Select chat"}
-                                  checked={isSelected}
-                                  onCheckedChange={() => toggleSelected(chat.id)}
-                                  onClick={(e) => e.stopPropagation()}
-                                  className="mt-1"
-                                />
-                                <div className="min-w-0">
-                                  <p className="truncate font-medium text-foreground">
-                                    {chat.title?.trim() ? chat.title : "Untitled"}
-                                  </p>
-                                  <p className="mt-0.5 truncate text-xs text-muted-foreground">
-                                    {chat.id}
-                                  </p>
-                                </div>
-                              </div>
-
-                              <div className="shrink-0 text-right text-xs text-muted-foreground">
-                                <div>{formatRelative(new Date(chat.updatedAt).toISOString())}</div>
-                                <div className="mt-1">
-                                  {chat.messageCount} message{chat.messageCount === 1 ? "" : "s"}
-                                </div>
-                              </div>
-                            </div>
-                          );
-                        }
-
-                        return (
-                          <div
-                            key={chat.id}
-                            role="link"
-                            tabIndex={0}
-                            onClick={() => router.push(`/chats/${chat.id}`)}
-                            onKeyDown={(e) => {
-                              if (e.key === "Enter") router.push(`/chats/${chat.id}`);
-                            }}
-                            className={cn(
-                              "flex items-start justify-between gap-3 px-4 py-3 transition-colors hover:bg-accent",
-                              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
-                            )}
-                          >
+                ) : (
+                  chats.map((chat) => {
+                    if (selectionMode) {
+                      const isSelected = selectedChatIds.has(chat.id);
+                      return (
+                        <div
+                          key={chat.id}
+                          role="button"
+                          tabIndex={0}
+                          onClick={() => toggleSelected(chat.id)}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter" || e.key === " ") {
+                              e.preventDefault();
+                              toggleSelected(chat.id);
+                            }
+                          }}
+                          className={cn(
+                            "flex items-start justify-between gap-3 px-4 py-3 transition-colors",
+                            isSelected ? "bg-accent" : "hover:bg-accent",
+                            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+                          )}
+                        >
+                          <div className="flex min-w-0 items-start gap-3">
+                            <Checkbox
+                              aria-label={isSelected ? "Deselect chat" : "Select chat"}
+                              checked={isSelected}
+                              onCheckedChange={() => toggleSelected(chat.id)}
+                              onClick={(e) => e.stopPropagation()}
+                              className="mt-1"
+                            />
                             <div className="min-w-0">
                               <p className="truncate font-medium text-foreground">
                                 {chat.title?.trim() ? chat.title : "Untitled"}
@@ -283,34 +257,66 @@ export default function ChatsPage() {
                                 {chat.id}
                               </p>
                             </div>
+                          </div>
 
-                            <div className="flex shrink-0 items-start gap-3">
-                              <div className="text-right text-xs text-muted-foreground">
-                                <div>{formatRelative(new Date(chat.updatedAt).toISOString())}</div>
-                                <div className="mt-1">
-                                  {chat.messageCount} message{chat.messageCount === 1 ? "" : "s"}
-                                </div>
-                              </div>
-
-                              <ChatRowMenu
-                                onRename={() => openRename(chat)}
-                                onDelete={() => openDelete(chat)}
-                              />
+                          <div className="shrink-0 text-right text-xs text-muted-foreground">
+                            <div>{formatRelative(new Date(chat.updatedAt).toISOString())}</div>
+                            <div className="mt-1">
+                              {chat.messageCount} message{chat.messageCount === 1 ? "" : "s"}
                             </div>
                           </div>
-                        );
-                      })
-                    )}
+                        </div>
+                      );
+                    }
 
-                    {!list.isLoading && list.error ? (
-                      <div className="p-4 text-sm text-destructive">Failed to load chats.</div>
-                    ) : null}
-                  </div>
-                </ScrollArea>
+                    return (
+                      <div
+                        key={chat.id}
+                        role="link"
+                        tabIndex={0}
+                        onClick={() => router.push(`/chats/${chat.id}`)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") router.push(`/chats/${chat.id}`);
+                        }}
+                        className={cn(
+                          "flex items-start justify-between gap-3 px-4 py-3 transition-colors hover:bg-accent",
+                          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+                        )}
+                      >
+                        <div className="min-w-0">
+                          <p className="truncate font-medium text-foreground">
+                            {chat.title?.trim() ? chat.title : "Untitled"}
+                          </p>
+                          <p className="mt-0.5 truncate text-xs text-muted-foreground">
+                            {chat.id}
+                          </p>
+                        </div>
+
+                        <div className="flex shrink-0 items-start gap-3">
+                          <div className="text-right text-xs text-muted-foreground">
+                            <div>{formatRelative(new Date(chat.updatedAt).toISOString())}</div>
+                            <div className="mt-1">
+                              {chat.messageCount} message{chat.messageCount === 1 ? "" : "s"}
+                            </div>
+                          </div>
+
+                          <ChatRowMenu
+                            onRename={() => openRename(chat)}
+                            onDelete={() => openDelete(chat)}
+                          />
+                        </div>
+                      </div>
+                    );
+                  })
+                )}
+
+                {!list.isLoading && list.error ? (
+                  <div className="p-4 text-sm text-destructive">Failed to load chats.</div>
+                ) : null}
               </div>
-            </div>
+            </ScrollArea>
           </div>
-        </SidebarInset>
+        </div>
       </div>
 
       {/* Rename dialog */}
@@ -453,7 +459,7 @@ export default function ChatsPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </SidebarProvider>
+    </>
   );
 }
 

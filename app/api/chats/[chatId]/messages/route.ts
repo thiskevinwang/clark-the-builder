@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import z from "zod";
 
+import { getCurrentLocalUser } from "@/lib/auth";
 import { db } from "@/lib/database/db";
 import { CreateMessageInput, Message } from "@/lib/models/message";
 import { createConversationRepository } from "@/lib/repositories/conversation-repository-impl";
@@ -15,6 +16,11 @@ export interface CreateMessageBody {
 }
 
 export async function GET(_req: Request, { params }: { params: Promise<{ chatId: string }> }) {
+  const currentUser = await getCurrentLocalUser();
+  if (!currentUser) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const { chatId } = await params;
   const parsedParams = ParamsSchema.safeParse({ chatId });
   if (!parsedParams.success) {
@@ -22,7 +28,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ chatId:
   }
 
   const conversationRepo = createConversationRepository(db);
-  const conversation = await conversationRepo.getById(parsedParams.data.chatId);
+  const conversation = await conversationRepo.getById(currentUser.id, parsedParams.data.chatId);
   if (!conversation) {
     return NextResponse.json({ error: "Chat not found" }, { status: 404 });
   }
@@ -35,8 +41,13 @@ export async function GET(_req: Request, { params }: { params: Promise<{ chatId:
 
 export async function POST(req: Request, { params }: { params: Promise<{ chatId: string }> }) {
   const { chatId } = await params;
+  const currentUser = await getCurrentLocalUser();
+  if (!currentUser) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const conversationRepo = createConversationRepository(db);
-  const conversation = await conversationRepo.getById(chatId);
+  const conversation = await conversationRepo.getById(currentUser.id, chatId);
   if (!conversation) {
     return NextResponse.json({ error: "Chat not found" }, { status: 404 });
   }

@@ -14,9 +14,10 @@ import { getRichError } from "./get-rich-error";
 interface Params {
   writer: UIMessageStreamWriter<UIMessage<never, DataPart>>;
   conversationId: string;
+  userId: string;
 }
 
-export const createClerkApp = ({ writer, conversationId }: Params) =>
+export const createClerkApp = ({ writer, conversationId, userId }: Params) =>
   tool({
     description,
     inputSchema: z.object({
@@ -127,6 +128,7 @@ export const createClerkApp = ({ writer, conversationId }: Params) =>
         // Save the Clerk application as a resource
         const resourceRepository = createResourceRepository(db);
         await resourceRepository.create({
+          userId,
           type: "clerk_application",
           externalId: application.application_id,
           conversationId,

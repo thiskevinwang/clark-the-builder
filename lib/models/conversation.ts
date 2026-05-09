@@ -1,5 +1,6 @@
 export interface Conversation {
   id: string;
+  userId: string;
   title: string | null;
   createdAt: Date;
   updatedAt: Date;
@@ -11,6 +12,7 @@ export interface ConversationWithMessageCount extends Conversation {
 }
 
 export interface CreateConversationInput {
+  userId: string;
   title?: string | null;
   /** Optional override (normally server-generated). */
   id?: string;

@@ -2,7 +2,9 @@ import { NextResponse } from "next/server";
 
 import type { PlatformApplicationResponse, PlatformApplicationTransferResponse } from "@/lib/api";
 import { platformListApplicationTransfers, platformListApplications } from "@/lib/api";
+import { getCurrentLocalUser } from "@/lib/auth";
 import { createClient, createConfig } from "@/lib/api/client";
+import { listOwnedExternalIdsByType } from "@/lib/resource-ownership";
 
 export interface ApplicationWithTransfers extends PlatformApplicationResponse {
   transfers?: PlatformApplicationTransferResponse[];
@@ -12,7 +14,22 @@ export interface ApplicationsResponse {
   applications: ApplicationWithTransfers[];
 }
 
+const CLERK_APPLICATION_RESOURCE_TYPE = "clerk_application";
+
 export async function GET() {
+  const currentUser = await getCurrentLocalUser();
+  if (!currentUser) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const ownedApplicationIds = await listOwnedExternalIdsByType(
+    currentUser.id,
+    CLERK_APPLICATION_RESOURCE_TYPE,
+  );
+  if (ownedApplicationIds.size === 0) {
+    return NextResponse.json({ applications: [] satisfies ApplicationWithTransfers[] });
+  }
+
   const clerkPlatformToken = process.env.CLERK_PLATFORM_ACCESS_TOKEN;
 
   if (!clerkPlatformToken) {
@@ -55,13 +72,18 @@ export async function GET() {
       return NextResponse.json({ error: errorMessage }, { status: 400 });
     }
 
-    const applications = applicationsResponse.data ?? [];
+    const applications = (applicationsResponse.data ?? []).filter((app) =>
+      ownedApplicationIds.has(app.application_id),
+    );
 
     // Build a map of application_id -> transfers for efficient lookup
     const transfersByAppId = new Map<string, PlatformApplicationTransferResponse[]>();
 
     if (transfersResponse.data) {
       for (const transfer of transfersResponse.data.data) {
+        if (!ownedApplicationIds.has(transfer.application_id)) {
+          continue;
+        }
         const existing = transfersByAppId.get(transfer.application_id) ?? [];
         existing.push(transfer);
         transfersByAppId.set(transfer.application_id, existing);

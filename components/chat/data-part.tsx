@@ -34,7 +34,7 @@ export function DataPartComponent(props: {
           <div className="flex items-center gap-2 px-3 py-2 text-muted-foreground relative">
             <div className="pl-5">{props.title}</div>
             <span className="absolute flex items-center justify-center">
-              <Spinner className="w-3.5 h-3.5" loading={props.loading}>
+              <Spinner className="w-3.5 h-3.5" loading={props.loading ?? false}>
                 {props.error ? (
                   <XIcon className="w-3.5 h-3.5" />
                 ) : (

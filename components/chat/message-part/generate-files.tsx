@@ -11,6 +11,7 @@ interface Props {
 
 export function GenerateFiles({ message }: Props) {
   const lastInProgress = ["error", "uploading", "generating"].includes(message.status);
+  const hasError = message.status === "error" || Boolean(message.error?.message);
 
   const generated = lastInProgress
     ? message.paths.slice(0, message.paths.length - 1)
@@ -21,8 +22,8 @@ export function GenerateFiles({ message }: Props) {
   return (
     <DataPartComponent
       title="Generate Files"
-      loading={message.status == "generating" || message.status == "uploading"}
-      error={message.error?.message || message.status == "error"}
+      loading={message.status === "generating" || message.status === "uploading"}
+      error={hasError}
     >
       <div className="relative">
         {generated.map((path) => (

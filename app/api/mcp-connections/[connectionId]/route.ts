@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import z from "zod";
 
+import { getCurrentLocalUser } from "@/lib/auth";
 import { db } from "@/lib/database/db";
 import type {
   MCPConnection,
@@ -53,6 +54,11 @@ export async function GET(
   _req: Request,
   { params }: { params: Promise<{ connectionId: string }> },
 ) {
+  const currentUser = await getCurrentLocalUser();
+  if (!currentUser) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const { connectionId } = await params;
   const parsedParams = ParamsSchema.safeParse({ connectionId });
   if (!parsedParams.success) {
@@ -60,6 +66,7 @@ export async function GET(
   }
 
   const connection = await createMCPConnectionRepository(db).getById(
+    currentUser.id,
     parsedParams.data.connectionId,
   );
   if (!connection) {
@@ -73,6 +80,11 @@ export async function PATCH(
   req: Request,
   { params }: { params: Promise<{ connectionId: string }> },
 ) {
+  const currentUser = await getCurrentLocalUser();
+  if (!currentUser) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const { connectionId } = await params;
   const parsedParams = ParamsSchema.safeParse({ connectionId });
   if (!parsedParams.success) {
@@ -94,6 +106,7 @@ export async function PATCH(
   }
 
   const connection = await createMCPConnectionRepository(db).update(
+    currentUser.id,
     parsedParams.data.connectionId,
     input,
   );
@@ -109,13 +122,21 @@ export async function DELETE(
   _req: Request,
   { params }: { params: Promise<{ connectionId: string }> },
 ) {
+  const currentUser = await getCurrentLocalUser();
+  if (!currentUser) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const { connectionId } = await params;
   const parsedParams = ParamsSchema.safeParse({ connectionId });
   if (!parsedParams.success) {
     return NextResponse.json({ error: "Invalid connectionId" }, { status: 400 });
   }
 
-  const deleted = await createMCPConnectionRepository(db).delete(parsedParams.data.connectionId);
+  const deleted = await createMCPConnectionRepository(db).delete(
+    currentUser.id,
+    parsedParams.data.connectionId,
+  );
   if (!deleted) {
     return NextResponse.json({ error: "Connection not found" }, { status: 404 });
   }

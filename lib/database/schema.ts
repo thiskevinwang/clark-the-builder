@@ -1,17 +1,58 @@
 import { UIMessagePart } from "ai";
 import { sql } from "drizzle-orm";
-import { boolean, check, index, jsonb, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import {
+  boolean,
+  check,
+  index,
+  jsonb,
+  pgTable,
+  text,
+  timestamp,
+  uniqueIndex,
+} from "drizzle-orm/pg-core";
 
 import type { DataPart } from "@/ai/messages/data-parts";
 import type { ToolSet } from "@/ai/tools";
 
-import { genConversationId, genMcpConnectionId, genMessageId } from "@/lib/identifiers/generator";
+import {
+  genConversationId,
+  genMcpConnectionId,
+  genMessageId,
+  genUserId,
+} from "@/lib/identifiers/generator";
 import { genResourceId } from "@/lib/identifiers/generator";
+
+export const users = pgTable(
+  "users",
+  {
+    id: text("id").primaryKey().$defaultFn(genUserId),
+    externalUserId: text("external_user_id").notNull(),
+    emailAddress: text("email_address"),
+    firstName: text("first_name"),
+    lastName: text("last_name"),
+    imageUrl: text("image_url"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (t) => [
+    uniqueIndex("uniq_users_external_user_id").on(t.externalUserId),
+    index("idx_users_updated_at").on(t.updatedAt),
+  ],
+);
+
+export type UserRow = typeof users.$inferSelect;
+export type NewUserRow = typeof users.$inferInsert;
 
 export const conversations = pgTable(
   "conversations",
   {
     id: text("id").primaryKey().$defaultFn(genConversationId),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
     title: text("title"),
     metadata: jsonb("metadata").$type<Record<string, unknown>>().notNull().default({}),
     createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -20,7 +61,7 @@ export const conversations = pgTable(
       .$onUpdate(() => new Date())
       .notNull(),
   },
-  (t) => [index("idx_conversations_updated_at").on(t.updatedAt)],
+  (t) => [index("idx_conversations_user_id_updated_at").on(t.userId, t.updatedAt)],
 );
 
 export type ConversationRow = typeof conversations.$inferSelect;
@@ -64,7 +105,10 @@ export const mcpConnections = pgTable(
   "mcp_connections",
   {
     id: text("id").primaryKey().$defaultFn(genMcpConnectionId),
-    name: text("name").notNull().unique("uniq_mcp_connections_name"),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    name: text("name").notNull(),
     url: text("url").notNull(),
     auth: jsonb("auth").$type<Record<string, unknown> | null>().default(null),
     enabled: boolean("enabled").notNull().default(true),
@@ -74,7 +118,10 @@ export const mcpConnections = pgTable(
       .$onUpdate(() => new Date())
       .notNull(),
   },
-  (t) => [index("idx_mcp_connections_updated_at").on(t.updatedAt)],
+  (t) => [
+    uniqueIndex("uniq_mcp_connections_user_id_name").on(t.userId, t.name),
+    index("idx_mcp_connections_user_id_updated_at").on(t.userId, t.updatedAt),
+  ],
 );
 
 export type MCPConnectionRow = typeof mcpConnections.$inferSelect;
@@ -84,6 +131,9 @@ export const resources = pgTable(
   "resources",
   {
     id: text("id").primaryKey().$defaultFn(genResourceId),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
     type: text("type").notNull(),
     externalId: text("external_id").notNull(),
     conversationId: text("conversation_id").references(() => conversations.id, {
@@ -97,9 +147,9 @@ export const resources = pgTable(
       .notNull(),
   },
   (t) => [
-    index("idx_resources_type").on(t.type),
-    index("idx_resources_conversation_id").on(t.conversationId),
-    index("idx_resources_external_id").on(t.externalId),
+    index("idx_resources_user_id_type").on(t.userId, t.type),
+    index("idx_resources_user_id_conversation_id").on(t.userId, t.conversationId),
+    index("idx_resources_user_id_external_id").on(t.userId, t.externalId),
   ],
 );
 

@@ -48,7 +48,7 @@ function mergeApplications(
 
     mergedApps.push({
       applicationId: apiApp.application_id,
-      name: storedApp?.name ?? `App ${apiApp.application_id.slice(0, 8)}`,
+      name: apiApp.name || storedApp?.name || `App ${apiApp.application_id.slice(0, 8)}`,
       createdAt: storedApp?.createdAt ?? Date.now(),
       publishableKey: devInstance?.publishable_key,
       secretKey: devInstance?.secret_key,

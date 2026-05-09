@@ -1,14 +1,34 @@
 import { NextResponse } from "next/server";
 
 import { platformDeleteApplication } from "@/lib/api";
+import { getCurrentLocalUser } from "@/lib/auth";
 import { createClient, createConfig } from "@/lib/api/client";
+import { createResourceRepository } from "@/lib/repositories/resource-repository-impl";
+import { getOwnedResourceByExternalId } from "@/lib/resource-ownership";
+import { db } from "@/lib/database/db";
 
 interface Params {
   params: Promise<{ applicationId: string }>;
 }
 
+const CLERK_APPLICATION_RESOURCE_TYPE = "clerk_application";
+
 export async function DELETE(_req: Request, { params }: Params) {
+  const currentUser = await getCurrentLocalUser();
+  if (!currentUser) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const { applicationId } = await params;
+  const ownedResource = await getOwnedResourceByExternalId(
+    currentUser.id,
+    CLERK_APPLICATION_RESOURCE_TYPE,
+    applicationId,
+  );
+  if (!ownedResource) {
+    return NextResponse.json({ error: "Application not found" }, { status: 404 });
+  }
+
   const clerkPlatformToken = process.env.CLERK_PLATFORM_ACCESS_TOKEN;
 
   if (!clerkPlatformToken) {
@@ -40,6 +60,8 @@ export async function DELETE(_req: Request, { params }: Params) {
         response.error.errors?.[0]?.message ?? "Unknown error deleting application";
       return NextResponse.json({ error: errorMessage }, { status: 400 });
     }
+
+    await createResourceRepository(db).delete(currentUser.id, ownedResource.id);
 
     return NextResponse.json(response.data);
   } catch (error) {

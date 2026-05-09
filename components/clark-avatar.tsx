@@ -27,10 +27,12 @@ export function ClarkAvatar({ size = 28, className }: ClarkAvatarProps) {
     setTheme(isDark ? "light" : "dark");
   };
 
+  const alt = mounted && isDark ? "Karl the builder" : "Clark the builder";
+
   return (
     <Image
       src={imageSrc}
-      alt="Clark the builder"
+      alt={alt}
       width={size}
       height={size}
       className={cn("cursor-pointer select-none", className)}
@@ -38,4 +40,24 @@ export function ClarkAvatar({ size = 28, className }: ClarkAvatarProps) {
       title="Double-click to toggle dark mode"
     />
   );
+}
+
+export function ClarkName() {
+  const { resolvedTheme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const isDark = resolvedTheme === "dark";
+  // Show clark.png by default (before hydration) to avoid flash
+
+  const handleDoubleClick = () => {
+    setTheme(isDark ? "light" : "dark");
+  };
+
+  const name = mounted && isDark ? "Karl" : "Clark";
+
+  return <>{name}</>;
 }

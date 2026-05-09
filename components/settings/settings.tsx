@@ -26,9 +26,13 @@ const OPTIONS = [
   { value: "xhigh", label: "Extra high" },
 ] as const;
 
+type ReasoningEffort = (typeof OPTIONS)[number]["value"];
+
 export function Settings() {
   const [fixErrors, setFixErrors] = useFixErrors();
   const [reasoningEffort, setReasoningEffort] = useReasoningEffort();
+  const selectedReasoningEffort = reasoningEffort ?? "low";
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -46,7 +50,7 @@ export function Settings() {
 
         <DropdownMenuCheckboxItem
           checked={fixErrors}
-          onCheckedChange={(checked) => setFixErrors(checked === "indeterminate" ? false : checked)}
+          onCheckedChange={(checked) => void setFixErrors(checked === true)}
         >
           Auto-fix errors
         </DropdownMenuCheckboxItem>
@@ -55,12 +59,15 @@ export function Settings() {
         <DropdownMenuSub>
           <DropdownMenuLabel>Reasoning Effort</DropdownMenuLabel>
           <DropdownMenuSubTrigger>
-            {OPTIONS.find((option) => option.value === reasoningEffort)?.label ||
+            {OPTIONS.find((option) => option.value === selectedReasoningEffort)?.label ||
               "Reasoning Effort"}
           </DropdownMenuSubTrigger>
           <DropdownMenuPortal>
             <DropdownMenuSubContent>
-              <DropdownMenuRadioGroup value={reasoningEffort} onValueChange={setReasoningEffort}>
+              <DropdownMenuRadioGroup
+                value={selectedReasoningEffort}
+                onValueChange={(value) => void setReasoningEffort(value as ReasoningEffort)}
+              >
                 {OPTIONS.map((level) => (
                   <DropdownMenuRadioItem key={level.value} value={level.value}>
                     {level.label}

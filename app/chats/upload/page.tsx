@@ -3,6 +3,7 @@
 import { AlertTriangleIcon, FileTextIcon, UploadCloudIcon } from "lucide-react";
 import { useCallback, useMemo, useRef, useState, type DragEvent } from "react";
 
+import { AppAuthGuard } from "@/components/auth/app-auth-guard";
 import { Sidebar, SidebarInset, SidebarProvider } from "@/components/sidebar";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -325,232 +326,233 @@ export default function ChatUploadPage() {
 
         <SidebarInset className="flex flex-1 flex-col overflow-hidden p-3">
           <Header className="flex items-center w-full px-1" />
-
-          <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden">
-            <div className="pointer-events-none absolute inset-0">
-              <div className="absolute -top-16 left-8 h-40 w-40 rounded-full bg-primary/10 blur-3xl" />
-              <div className="absolute bottom-12 right-10 h-48 w-48 rounded-full bg-accent/50 blur-[90px]" />
-            </div>
-
-            <div className="relative z-10 flex flex-1 flex-col gap-6 overflow-hidden">
-              <div className="flex flex-wrap items-end justify-between gap-4 px-1">
-                <div>
-                  <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-                    Chat upload
-                  </p>
-                  <h1 className="text-2xl font-semibold text-foreground">Preview a session file</h1>
-                  <p className="text-sm text-muted-foreground">
-                    Drop a JSON or JSONL export from Codex or Claude to see a structured preview.
-                  </p>
-                </div>
+          <AppAuthGuard>
+            <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden">
+              <div className="pointer-events-none absolute inset-0">
+                <div className="absolute -top-16 left-8 h-40 w-40 rounded-full bg-primary/10 blur-3xl" />
+                <div className="absolute bottom-12 right-10 h-48 w-48 rounded-full bg-accent/50 blur-[90px]" />
               </div>
 
-              <div
-                className={cn(
-                  "relative flex flex-col gap-3 rounded-2xl border border-dashed p-6 transition-all",
-                  "bg-card/80 shadow-sm",
-                  dragActive ? "border-primary bg-primary/5" : "border-border",
-                )}
-                onDrop={onDrop}
-                onDragOver={onDragOver}
-                onDragLeave={onDragLeave}
-              >
-                <input
-                  ref={inputRef}
-                  type="file"
-                  accept=".json,.jsonl,application/json"
-                  className="hidden"
-                  onChange={(event) => {
-                    const file = event.target.files?.[0];
-                    if (file) void handleFile(file);
-                  }}
-                />
-                <div className="flex flex-wrap items-center justify-between gap-4">
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10">
-                      <UploadCloudIcon className="h-5 w-5 text-primary" />
-                    </div>
-                    <div>
-                      <TextShimmer className="text-base font-semibold">
-                        Drag & drop a session file
-                      </TextShimmer>
-                      <p className="text-sm text-muted-foreground">
-                        JSON or JSONL files from Codex CLI or Claude projects.
-                      </p>
-                    </div>
+              <div className="relative z-10 flex flex-1 flex-col gap-6 overflow-hidden">
+                <div className="flex flex-wrap items-end justify-between gap-4 px-1">
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+                      Chat upload
+                    </p>
+                    <h1 className="text-2xl font-semibold text-foreground">Preview a session file</h1>
+                    <p className="text-sm text-muted-foreground">
+                      Drop a JSON or JSONL export from Codex or Claude to see a structured preview.
+                    </p>
                   </div>
-                  <Button onClick={triggerPicker} className="gap-2">
-                    <FileTextIcon className="h-4 w-4" />
-                    Choose file
-                  </Button>
                 </div>
 
-                {fileName && (
-                  <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
-                    <FileTextIcon className="h-4 w-4" />
-                    <span>{fileName}</span>
-                    <span className="rounded-full bg-muted px-2 py-0.5 text-xs uppercase tracking-wide">
-                      {format}
-                    </span>
-                    {summary && (
-                      <span className="rounded-full bg-accent/50 px-2 py-0.5 text-xs">
-                        Session {summary}
+                <div
+                  className={cn(
+                    "relative flex flex-col gap-3 rounded-2xl border border-dashed p-6 transition-all",
+                    "bg-card/80 shadow-sm",
+                    dragActive ? "border-primary bg-primary/5" : "border-border",
+                  )}
+                  onDrop={onDrop}
+                  onDragOver={onDragOver}
+                  onDragLeave={onDragLeave}
+                >
+                  <input
+                    ref={inputRef}
+                    type="file"
+                    accept=".json,.jsonl,application/json"
+                    className="hidden"
+                    onChange={(event) => {
+                      const file = event.target.files?.[0];
+                      if (file) void handleFile(file);
+                    }}
+                  />
+                  <div className="flex flex-wrap items-center justify-between gap-4">
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10">
+                        <UploadCloudIcon className="h-5 w-5 text-primary" />
+                      </div>
+                      <div>
+                        <TextShimmer className="text-base font-semibold">
+                          Drag & drop a session file
+                        </TextShimmer>
+                        <p className="text-sm text-muted-foreground">
+                          JSON or JSONL files from Codex CLI or Claude projects.
+                        </p>
+                      </div>
+                    </div>
+                    <Button onClick={triggerPicker} className="gap-2">
+                      <FileTextIcon className="h-4 w-4" />
+                      Choose file
+                    </Button>
+                  </div>
+
+                  {fileName && (
+                    <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
+                      <FileTextIcon className="h-4 w-4" />
+                      <span>{fileName}</span>
+                      <span className="rounded-full bg-muted px-2 py-0.5 text-xs uppercase tracking-wide">
+                        {format}
                       </span>
-                    )}
-                  </div>
-                )}
-
-                {parseError && (
-                  <div className="flex items-start gap-2 rounded-lg border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
-                    <AlertTriangleIcon className="mt-0.5 h-4 w-4" />
-                    <span>{parseError}</span>
-                  </div>
-                )}
-              </div>
-
-              {normalized.length > 0 ? (
-                <div className="grid min-h-0 flex-1 gap-6 lg:grid-cols-[minmax(0,1.9fr)_minmax(0,1fr)]">
-                  <div className="flex min-h-0 flex-col gap-4">
-                    <div className="flex flex-wrap gap-3">
-                      <div className="rounded-xl border border-border bg-card px-4 py-3 shadow-sm">
-                        <p className="text-xs uppercase tracking-wide text-muted-foreground">
-                          Entries
-                        </p>
-                        <p className="text-lg font-semibold text-foreground">{normalized.length}</p>
-                      </div>
-                      <div className="rounded-xl border border-border bg-card px-4 py-3 shadow-sm">
-                        <p className="text-xs uppercase tracking-wide text-muted-foreground">
-                          Messages
-                        </p>
-                        <p className="text-lg font-semibold text-foreground">{messages.length}</p>
-                      </div>
-                      <div className="rounded-xl border border-border bg-card px-4 py-3 shadow-sm">
-                        <p className="text-xs uppercase tracking-wide text-muted-foreground">
-                          Format
-                        </p>
-                        <p className="text-lg font-semibold text-foreground">{format}</p>
-                      </div>
-                    </div>
-
-                    <Tabs defaultValue="conversation" className="flex min-h-0 flex-1 flex-col">
-                      <TabsList className="w-fit">
-                        <TabsTrigger value="conversation">Conversation</TabsTrigger>
-                        <TabsTrigger value="timeline">Timeline</TabsTrigger>
-                      </TabsList>
-
-                      <TabsContent value="conversation" className="min-h-0 flex-1">
-                        <ScrollArea className="h-full rounded-2xl border border-border bg-card/60 p-4">
-                          <div className="flex flex-col gap-4">
-                            {messages.length === 0 && (
-                              <p className="text-sm text-muted-foreground">No messages detected.</p>
-                            )}
-                            {messages.map((entry) => (
-                              <button
-                                key={entry.id}
-                                type="button"
-                                onClick={() => setSelectedId(entry.id)}
-                                className={cn(
-                                  "group flex flex-col gap-2 rounded-2xl border px-4 py-3 text-left transition",
-                                  entry.role === "user"
-                                    ? "self-end border-primary/30 bg-primary text-primary-foreground"
-                                    : "border-border bg-background",
-                                  selectedId === entry.id
-                                    ? "ring-2 ring-primary/40"
-                                    : "hover:border-primary/40",
-                                )}
-                              >
-                                <div className="flex items-center justify-between text-xs uppercase tracking-wide opacity-70">
-                                  <span>{summarizeRole(entry.role)}</span>
-                                  {entry.timestamp && <span>{entry.timestamp}</span>}
-                                </div>
-                                <p className="whitespace-pre-wrap break-words text-sm leading-relaxed">
-                                  {entry.text || "(no text)"}
-                                </p>
-                              </button>
-                            ))}
-                          </div>
-                        </ScrollArea>
-                      </TabsContent>
-
-                      <TabsContent value="timeline" className="min-h-0 flex-1">
-                        <ScrollArea className="h-full rounded-2xl border border-border bg-card/60 p-4">
-                          <div className="flex flex-col gap-3">
-                            {normalized.map((entry) => (
-                              <button
-                                key={entry.id}
-                                type="button"
-                                onClick={() => setSelectedId(entry.id)}
-                                className={cn(
-                                  "rounded-xl border border-border bg-background px-3 py-2 text-left text-sm transition",
-                                  selectedId === entry.id
-                                    ? "border-primary/50 ring-2 ring-primary/20"
-                                    : "hover:border-primary/40",
-                                )}
-                              >
-                                <div className="flex items-center justify-between text-xs text-muted-foreground">
-                                  <span className="uppercase tracking-wide">{entry.kind}</span>
-                                  {entry.timestamp && <span>{entry.timestamp}</span>}
-                                </div>
-                                <div className="mt-1 text-sm text-foreground">
-                                  {entry.text || summarizeRole(entry.role)}
-                                </div>
-                              </button>
-                            ))}
-                          </div>
-                        </ScrollArea>
-                      </TabsContent>
-                    </Tabs>
-                  </div>
-
-                  <div className="flex min-h-0 flex-col gap-4">
-                    <div className="rounded-2xl border border-border bg-card/80 p-4 shadow-sm">
-                      <p className="text-xs uppercase tracking-wide text-muted-foreground">
-                        Selected entry
-                      </p>
-                      {selectedEntry ? (
-                        <div className="mt-2 flex flex-col gap-2">
-                          <div className="flex flex-wrap items-center gap-2 text-sm">
-                            <span className="rounded-full bg-muted px-2 py-0.5 text-xs uppercase tracking-wide">
-                              {selectedEntry.kind}
-                            </span>
-                            {selectedEntry.role && (
-                              <span className="rounded-full bg-accent/50 px-2 py-0.5 text-xs uppercase tracking-wide">
-                                {summarizeRole(selectedEntry.role)}
-                              </span>
-                            )}
-                          </div>
-                          <p className="text-sm text-muted-foreground">
-                            {selectedEntry.timestamp ?? "No timestamp"}
-                          </p>
-                        </div>
-                      ) : (
-                        <p className="mt-2 text-sm text-muted-foreground">
-                          Click a message or event to inspect details.
-                        </p>
+                      {summary && (
+                        <span className="rounded-full bg-accent/50 px-2 py-0.5 text-xs">
+                          Session {summary}
+                        </span>
                       )}
                     </div>
+                  )}
 
-                    <div className="min-h-0 flex-1 rounded-2xl border border-border bg-card/60 p-4 shadow-sm">
-                      <p className="text-xs uppercase tracking-wide text-muted-foreground">
-                        Raw JSON
-                      </p>
-                      <ScrollArea className="mt-3 h-full rounded-xl border border-border bg-background/80 p-3">
-                        <pre className="text-xs leading-relaxed text-foreground">
-                          {selectedEntry
-                            ? JSON.stringify(selectedEntry.raw, null, JSON_INDENT)
-                            : "Select an entry to view the raw payload."}
-                        </pre>
-                      </ScrollArea>
+                  {parseError && (
+                    <div className="flex items-start gap-2 rounded-lg border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
+                      <AlertTriangleIcon className="mt-0.5 h-4 w-4" />
+                      <span>{parseError}</span>
+                    </div>
+                  )}
+                </div>
+
+                {normalized.length > 0 ? (
+                  <div className="grid min-h-0 flex-1 gap-6 lg:grid-cols-[minmax(0,1.9fr)_minmax(0,1fr)]">
+                    <div className="flex min-h-0 flex-col gap-4">
+                      <div className="flex flex-wrap gap-3">
+                        <div className="rounded-xl border border-border bg-card px-4 py-3 shadow-sm">
+                          <p className="text-xs uppercase tracking-wide text-muted-foreground">
+                            Entries
+                          </p>
+                          <p className="text-lg font-semibold text-foreground">{normalized.length}</p>
+                        </div>
+                        <div className="rounded-xl border border-border bg-card px-4 py-3 shadow-sm">
+                          <p className="text-xs uppercase tracking-wide text-muted-foreground">
+                            Messages
+                          </p>
+                          <p className="text-lg font-semibold text-foreground">{messages.length}</p>
+                        </div>
+                        <div className="rounded-xl border border-border bg-card px-4 py-3 shadow-sm">
+                          <p className="text-xs uppercase tracking-wide text-muted-foreground">
+                            Format
+                          </p>
+                          <p className="text-lg font-semibold text-foreground">{format}</p>
+                        </div>
+                      </div>
+
+                      <Tabs defaultValue="conversation" className="flex min-h-0 flex-1 flex-col">
+                        <TabsList className="w-fit">
+                          <TabsTrigger value="conversation">Conversation</TabsTrigger>
+                          <TabsTrigger value="timeline">Timeline</TabsTrigger>
+                        </TabsList>
+
+                        <TabsContent value="conversation" className="min-h-0 flex-1">
+                          <ScrollArea className="h-full rounded-2xl border border-border bg-card/60 p-4">
+                            <div className="flex flex-col gap-4">
+                              {messages.length === 0 && (
+                                <p className="text-sm text-muted-foreground">No messages detected.</p>
+                              )}
+                              {messages.map((entry) => (
+                                <button
+                                  key={entry.id}
+                                  type="button"
+                                  onClick={() => setSelectedId(entry.id)}
+                                  className={cn(
+                                    "group flex flex-col gap-2 rounded-2xl border px-4 py-3 text-left transition",
+                                    entry.role === "user"
+                                      ? "self-end border-primary/30 bg-primary text-primary-foreground"
+                                      : "border-border bg-background",
+                                    selectedId === entry.id
+                                      ? "ring-2 ring-primary/40"
+                                      : "hover:border-primary/40",
+                                  )}
+                                >
+                                  <div className="flex items-center justify-between text-xs uppercase tracking-wide opacity-70">
+                                    <span>{summarizeRole(entry.role)}</span>
+                                    {entry.timestamp && <span>{entry.timestamp}</span>}
+                                  </div>
+                                  <p className="whitespace-pre-wrap break-words text-sm leading-relaxed">
+                                    {entry.text || "(no text)"}
+                                  </p>
+                                </button>
+                              ))}
+                            </div>
+                          </ScrollArea>
+                        </TabsContent>
+
+                        <TabsContent value="timeline" className="min-h-0 flex-1">
+                          <ScrollArea className="h-full rounded-2xl border border-border bg-card/60 p-4">
+                            <div className="flex flex-col gap-3">
+                              {normalized.map((entry) => (
+                                <button
+                                  key={entry.id}
+                                  type="button"
+                                  onClick={() => setSelectedId(entry.id)}
+                                  className={cn(
+                                    "rounded-xl border border-border bg-background px-3 py-2 text-left text-sm transition",
+                                    selectedId === entry.id
+                                      ? "border-primary/50 ring-2 ring-primary/20"
+                                      : "hover:border-primary/40",
+                                  )}
+                                >
+                                  <div className="flex items-center justify-between text-xs text-muted-foreground">
+                                    <span className="uppercase tracking-wide">{entry.kind}</span>
+                                    {entry.timestamp && <span>{entry.timestamp}</span>}
+                                  </div>
+                                  <div className="mt-1 text-sm text-foreground">
+                                    {entry.text || summarizeRole(entry.role)}
+                                  </div>
+                                </button>
+                              ))}
+                            </div>
+                          </ScrollArea>
+                        </TabsContent>
+                      </Tabs>
+                    </div>
+
+                    <div className="flex min-h-0 flex-col gap-4">
+                      <div className="rounded-2xl border border-border bg-card/80 p-4 shadow-sm">
+                        <p className="text-xs uppercase tracking-wide text-muted-foreground">
+                          Selected entry
+                        </p>
+                        {selectedEntry ? (
+                          <div className="mt-2 flex flex-col gap-2">
+                            <div className="flex flex-wrap items-center gap-2 text-sm">
+                              <span className="rounded-full bg-muted px-2 py-0.5 text-xs uppercase tracking-wide">
+                                {selectedEntry.kind}
+                              </span>
+                              {selectedEntry.role && (
+                                <span className="rounded-full bg-accent/50 px-2 py-0.5 text-xs uppercase tracking-wide">
+                                  {summarizeRole(selectedEntry.role)}
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-sm text-muted-foreground">
+                              {selectedEntry.timestamp ?? "No timestamp"}
+                            </p>
+                          </div>
+                        ) : (
+                          <p className="mt-2 text-sm text-muted-foreground">
+                            Click a message or event to inspect details.
+                          </p>
+                        )}
+                      </div>
+
+                      <div className="min-h-0 flex-1 rounded-2xl border border-border bg-card/60 p-4 shadow-sm">
+                        <p className="text-xs uppercase tracking-wide text-muted-foreground">
+                          Raw JSON
+                        </p>
+                        <ScrollArea className="mt-3 h-full rounded-xl border border-border bg-background/80 p-3">
+                          <pre className="text-xs leading-relaxed text-foreground">
+                            {selectedEntry
+                              ? JSON.stringify(selectedEntry.raw, null, JSON_INDENT)
+                              : "Select an entry to view the raw payload."}
+                          </pre>
+                        </ScrollArea>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ) : (
-                <div className="rounded-2xl border border-border bg-card/60 p-6 text-sm text-muted-foreground">
-                  Upload a JSON or JSONL session file to see the preview panels.
-                </div>
-              )}
+                ) : (
+                  <div className="rounded-2xl border border-border bg-card/60 p-6 text-sm text-muted-foreground">
+                    Upload a JSON or JSONL session file to see the preview panels.
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
+          </AppAuthGuard>
         </SidebarInset>
       </div>
     </SidebarProvider>

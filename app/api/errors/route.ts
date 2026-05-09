@@ -1,5 +1,6 @@
 import { generateText, Output } from "ai";
 import { checkBotId } from "botid/server";
+import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
 import { DEFAULT_MODEL } from "@/ai/constants";
@@ -13,6 +14,11 @@ export async function POST(req: Request) {
   const checkResult = await checkBotId();
   if (checkResult.isBot) {
     return NextResponse.json({ error: `Bot detected` }, { status: 403 });
+  }
+
+  const { userId } = await auth();
+  if (!userId) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   const body = await req.json();

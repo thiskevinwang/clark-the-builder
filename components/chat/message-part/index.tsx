@@ -1,5 +1,5 @@
 import type { UIMessage } from "ai";
-import { ChevronDown, WrenchIcon, ZapIcon } from "lucide-react";
+import { ChevronDown, ZapIcon } from "lucide-react";
 import { memo } from "react";
 import { Streamdown } from "streamdown";
 
@@ -20,22 +20,27 @@ import { TextPart } from "./text";
 
 interface Props {
   part: UIMessage<Metadata, DataPart, ToolSet>["parts"][number];
-  partIndex: number;
 }
 
-function tryMapToolToName(partType: string): string | null {
-  const mapping: Record<string, string> = {
-    "tool-createClerkApp": "Provision Clerk Application",
-    "tool-createSandbox": "Create Sandbox Environment",
-    "tool-getSandboxURL": "Get Sandbox URL",
-    "tool-runCommand": "Run Command",
-    "tool-generateFiles": "Generate Files",
-    "tool-waitTool": "Wait",
-  };
-  return mapping[partType] || partType;
+function stringifyToolValue(value: unknown): string | null {
+  if (value == null) return null;
+  if (typeof value === "string") return value;
+  if (
+    typeof value === "number" ||
+    typeof value === "boolean" ||
+    typeof value === "bigint"
+  ) {
+    return String(value);
+  }
+
+  try {
+    return JSON.stringify(value, null, 2);
+  } catch {
+    return String(value);
+  }
 }
 
-export const MessagePart = memo(function _MessagePart({ part, partIndex }: Props) {
+export const MessagePart = memo(function _MessagePart({ part }: Props) {
   if (part.type === "reasoning") {
     // Cursed classnames
     if (!part.text) return null;
@@ -91,7 +96,13 @@ export const MessagePart = memo(function _MessagePart({ part, partIndex }: Props
   }
 
   if (part.type === "dynamic-tool") {
-    const text = part.output?.content?.[0].text;
+    const text =
+      part.state === "output-error"
+        ? part.errorText
+        : part.state === "output-available"
+          ? stringifyToolValue(part.output)
+          : null;
+
     return (
       <div
         className={cn(
@@ -129,43 +140,6 @@ export const MessagePart = memo(function _MessagePart({ part, partIndex }: Props
   // tool- parts
   if (part.type.startsWith("tool-")) {
     return null;
-    return (
-      <div
-        className={cn(
-          "text-sm bg-background cursor-pointer hover:bg-accent/30 transition-colors",
-          // CSS rules:
-          // - adjacent tool parts merge into one rounded group
-          "border border-border rounded-md",
-          "[&+&]:border-t-0",
-          "[&+&]:rounded-t-none",
-          "[&:has(+&)]:border-b-0",
-          "[&:has(+&)]:rounded-b-none",
-        )}
-      >
-        <Collapsible>
-          <CollapsibleTrigger asChild>
-            <div className="flex items-center gap-2 px-3 py-2 text-muted-foreground relative">
-              <div className="pl-5">{tryMapToolToName(part.type)}</div>
-              <span className="absolute">
-                <WrenchIcon className="w-3.5 h-3.5 shrink-0" />
-              </span>
-            </div>
-          </CollapsibleTrigger>
-          <CollapsibleContent className="max-h-50 px-3 pb-2 overflow-y-scroll [&[data-state=open]]:animate-collapsible-down [&[data-state=closed]]:animate-collapsible-up">
-            <div className="relative">
-              <Streamdown className="pl-5 whitespace-pre-wrap wrap-anywhere text-xs **:text-xs! text-muted-foreground">
-                {part.output
-                  ? typeof part.output === "string"
-                    ? part.output
-                    : JSON.stringify(part.output)
-                  : null}
-              </Streamdown>
-              <div className="absolute ml-1 left-0 h-full w-px bg-muted top-0" />
-            </div>
-          </CollapsibleContent>
-        </Collapsible>
-      </div>
-    );
   }
 
   switch (part.type) {

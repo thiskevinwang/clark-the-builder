@@ -6,14 +6,21 @@ import type {
 } from "../models/conversation";
 
 export interface ConversationRepository {
-  getById(id: string): Promise<Conversation | null>;
-  listRecent(limit: number, offset?: number, query?: string): Promise<Conversation[]>;
+  getById(userId: string, id: string): Promise<Conversation | null>;
+  listRecent(
+    userId: string,
+    limit: number,
+    offset?: number,
+    query?: string,
+  ): Promise<Conversation[]>;
   listRecentWithMessageCount(
+    userId: string,
     limit: number,
     offset?: number,
     query?: string,
   ): Promise<ConversationWithMessageCount[]>;
   create(input: CreateConversationInput): Promise<Conversation>;
-  update(id: string, input: UpdateConversationInput): Promise<Conversation | null>;
-  delete(id: string): Promise<boolean>;
+  update(userId: string, id: string, input: UpdateConversationInput): Promise<Conversation | null>;
+  delete(userId: string, id: string): Promise<boolean>;
+  deleteMany(userId: string, ids: string[]): Promise<string[]>;
 }

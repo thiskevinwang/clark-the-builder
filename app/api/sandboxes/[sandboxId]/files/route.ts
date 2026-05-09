@@ -1,6 +1,9 @@
 import { NextResponse, type NextRequest } from "next/server";
 import z from "zod";
 
+import { getCurrentLocalUser } from "@/lib/auth";
+import { getOwnedResourceByExternalId } from "@/lib/resource-ownership";
+
 import { sandboxProvider } from "../../../../../lib/sandbox";
 
 const FileParamsSchema = z.object({
@@ -12,7 +15,21 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ sandboxId: string }> },
 ) {
+  const currentUser = await getCurrentLocalUser();
+  if (!currentUser) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const { sandboxId } = await params;
+  const ownedResource = await getOwnedResourceByExternalId(
+    currentUser.id,
+    "vercel_sandbox",
+    sandboxId,
+  );
+  if (!ownedResource) {
+    return NextResponse.json({ error: "Sandbox not found" }, { status: 404 });
+  }
+
   const fileParams = FileParamsSchema.safeParse({
     path: request.nextUrl.searchParams.get("path"),
     sandboxId,

@@ -1,3 +1,4 @@
+import { ClerkProvider } from "@clerk/nextjs";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, IBM_Plex_Serif } from "next/font/google";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
@@ -10,6 +11,11 @@ import { SandboxState } from "@/components/modals/sandbox-state";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { ChatProvider } from "@/lib/chat-context";
+import {
+  CLERK_SIGN_IN_PATH,
+  CLERK_SIGN_UP_PATH,
+  DEFAULT_AUTH_REDIRECT_PATH,
+} from "@/lib/clerk-routing";
 
 import "./globals.css";
 
@@ -44,23 +50,29 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
       <body
         className={`${sansfont.variable} ${monofont.variable} ${seriffont.variable} font-sans antialiased`}
       >
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
+        <ClerkProvider
+          signInUrl={CLERK_SIGN_IN_PATH}
+          signUpUrl={CLERK_SIGN_UP_PATH}
+          afterSignOutUrl={DEFAULT_AUTH_REDIRECT_PATH}
         >
-          <Suspense fallback={null}>
-            <NuqsAdapter>
-              <ChatProvider>
-                <ErrorMonitor>{children}</ErrorMonitor>
-              </ChatProvider>
-            </NuqsAdapter>
-          </Suspense>
-          <Toaster />
-          <CommandLogsStream />
-          <SandboxState />
-        </ThemeProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <Suspense fallback={null}>
+              <NuqsAdapter>
+                <ChatProvider>
+                  <ErrorMonitor>{children}</ErrorMonitor>
+                </ChatProvider>
+              </NuqsAdapter>
+            </Suspense>
+            <Toaster />
+            <CommandLogsStream />
+            <SandboxState />
+          </ThemeProvider>
+        </ClerkProvider>
       </body>
     </html>
   );

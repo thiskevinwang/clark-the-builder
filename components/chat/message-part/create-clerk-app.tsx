@@ -24,13 +24,14 @@ export function CreateClerkApp({ message }: Props) {
     ? apps.find((a) => a.applicationId === message.applicationId)
     : null;
   const isTransferred = app?.ownership === "transferred";
+  const hasError = message.status === "error" || Boolean(message.error?.message);
 
   return (
     <DataPartComponent
       title={"Create Clerk App"}
       defaultOpen
-      loading={message.status == "loading"}
-      error={message.error?.message || message.status == "error"}
+      loading={message.status === "loading"}
+      error={hasError}
     >
       <div className="flex items-center gap-3">
         <span>

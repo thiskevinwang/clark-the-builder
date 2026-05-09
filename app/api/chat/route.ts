@@ -16,8 +16,10 @@ import { getMCPClient } from "@/ai/mcp-client";
 import { tools } from "@/ai/tools";
 
 import { type ChatUIMessage } from "@/components/chat/types";
+import { getCurrentLocalUser } from "@/lib/auth";
 import { db } from "@/lib/database/db";
 import { genMessageId } from "@/lib/identifiers/generator";
+import { createConversationRepository } from "@/lib/repositories/conversation-repository-impl";
 import { createMCPConnectionRepository } from "@/lib/repositories/mcp-connection-repository-impl";
 import { createMessageRepository } from "@/lib/repositories/message-repository-impl";
 
@@ -48,12 +50,23 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: `Bot detected` }, { status: 403 });
   }
 
+  const currentUser = await getCurrentLocalUser();
+  if (!currentUser) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const [models, { messages, chatId, modelId = DEFAULT_MODEL, reasoningEffort }] =
     await Promise.all([getAvailableModels(), req.json() as Promise<ChatRequestBody>]);
 
+  const conversationRepo = createConversationRepository(db);
   const messageRepo = createMessageRepository(db);
   const mcpConnectionRepo = createMCPConnectionRepository(db);
-  const connectors = await mcpConnectionRepo.listRecent(10, 0, undefined);
+  const conversation = await conversationRepo.getById(currentUser.id, chatId);
+  if (!conversation) {
+    return NextResponse.json({ error: "Chat not found" }, { status: 404 });
+  }
+
+  const connectors = await mcpConnectionRepo.listRecent(currentUser.id, 10, 0, undefined);
 
   // Load persisted UI messages from the messages table.
   // const persistedRows = await messageRepo.listByConversationId(chatId);
@@ -119,7 +132,7 @@ export async function POST(req: Request) {
         instructions: systemMessage,
         stopWhen: stepCountIs(20),
         tools: {
-          ...tools({ modelId, writer, chatId }),
+          ...tools({ modelId, writer, chatId, userId: currentUser.id }),
           ...dynamicTools,
         },
         onFinish: async ({ usage, reasoningText, totalUsage, reasoning }) => {
