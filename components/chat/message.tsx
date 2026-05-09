@@ -27,6 +27,14 @@ export const useReasoningContext = () => {
 
 export const Message = memo(function Message({ message }: Props) {
   const [expandedReasoningIndex, setExpandedReasoningIndex] = useState<number | null>(null);
+  const modelName = message.metadata?.model;
+  const totalTokens = message.metadata?.totalTokens;
+  const messageDetails = [
+    modelName,
+    typeof totalTokens === "number" ? `${totalTokens} tokens` : null,
+  ]
+    .filter((detail): detail is string => Boolean(detail))
+    .join(" · ");
 
   const reasoningParts = message.parts
     .map((part, index) => ({ part, index }))
@@ -65,14 +73,14 @@ export const Message = memo(function Message({ message }: Props) {
         {/* Message Content */}
         <div data-component="MessageContent" className="max-w-full group">
           {message.parts.map((part, index) => (
-            <MessagePart key={index} part={part} partIndex={index} />
+            <MessagePart key={index} part={part} />
           ))}
         </div>
 
         {/* Model + token count */}
-        {message.role !== "user" && (
+        {message.role !== "user" && messageDetails && (
           <div className="opacity-0 group-hover:opacity-100! transition-opacity flex justify-end text-xs text-muted-foreground">
-            {message.metadata?.model} · {message.metadata.totalTokens} tokens
+            {messageDetails}
           </div>
         )}
 

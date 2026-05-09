@@ -1,7 +1,4 @@
-import type { ReactNode } from "react";
-import Link from "next/link";
-
-import { ClarkAvatar } from "@/components/clark-avatar";
+import { ClarkAvatar, ClarkName } from "@/components/clark-avatar";
 
 interface AuthPageShellProps {
   eyebrow: string;
@@ -27,13 +24,15 @@ export function AuthPageShell({
 
       <div className="relative mx-auto flex min-h-screen w-full max-w-6xl flex-col px-4 py-6 sm:px-6 lg:flex-row lg:items-center lg:gap-12">
         <div className="flex max-w-xl flex-1 flex-col justify-center">
-          <Link href="/" className="mb-8 inline-flex w-fit items-center gap-3">
+          <div className="mb-8 inline-flex w-fit items-center gap-3">
             <ClarkAvatar size={36} className="rounded-xl shadow-lg" />
             <div>
-              <p className="text-sm font-semibold text-foreground">Karl</p>
+              <p className="text-sm font-semibold text-foreground">
+                <ClarkName />
+              </p>
               <p className="text-xs text-muted-foreground">Build apps with AI</p>
             </div>
-          </Link>
+          </div>
 
           <p className="text-xs font-medium uppercase tracking-[0.24em] text-muted-foreground">
             {eyebrow}
@@ -41,9 +40,7 @@ export function AuthPageShell({
           <h1 className="mt-4 text-4xl font-semibold tracking-tight text-foreground sm:text-5xl">
             {title}
           </h1>
-          <p className="mt-4 max-w-lg text-base leading-7 text-muted-foreground">
-            {description}
-          </p>
+          <p className="mt-4 max-w-lg text-base leading-7 text-muted-foreground">{description}</p>
         </div>
 
         <div className="mt-10 flex flex-1 items-center justify-center lg:mt-0">

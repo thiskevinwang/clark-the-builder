@@ -3,19 +3,23 @@ import useSWR from "swr";
 import type { SWRConfiguration } from "swr/_internal";
 import useSWRMutation, { type SWRMutationConfiguration } from "swr/mutation";
 
+import { type GETResponse as ListMessagesResponse } from "@/app/api/chats/[chatId]/messages/route";
 import { type GETResponse, type POSTResponse } from "@/app/api/chats/route";
 
-export const useListMessagesQuery = (chatId: string | null, config?: SWRConfiguration) => {
-  return useSWR(
+export const useListMessagesQuery = (
+  chatId: string | null,
+  config?: SWRConfiguration<ListMessagesResponse, Error>,
+) => {
+  return useSWR<ListMessagesResponse>(
     chatId ? `/api/chats/${chatId}/messages` : null,
-    async (key) => {
+    async (key): Promise<ListMessagesResponse> => {
       const res = await fetch(key);
       if (!res.ok) {
         const error = new Error(`Failed to load messages (${res.status})`);
         (error as Error & { status?: number }).status = res.status;
         throw error;
       }
-      return res.json();
+      return (await res.json()) as ListMessagesResponse;
     },
     {
       refreshInterval: 0,

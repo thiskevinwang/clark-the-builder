@@ -11,7 +11,7 @@ import { DataPart } from "@/ai/messages/data-parts";
 import { type ChatRequestBody } from "@/app/api/chat/route";
 import { useListMessagesQuery } from "@/app/api/hooks";
 import { useDataStateMapper } from "@/app/state";
-import { type ChatUIMessage } from "@/components/chat/types";
+import { toChatUIMessage, type ChatUIMessage } from "@/components/chat/types";
 
 import { genMessageId } from "./identifiers/generator";
 
@@ -39,11 +39,18 @@ export function ChatProvider({ children }: { children: ReactNode }) {
   const mapDataToState = useDataStateMapper();
   const mapDataToStateRef = useRef(mapDataToState);
   mapDataToStateRef.current = mapDataToState;
+  const initialMessages = useMemo(
+    () =>
+      listMessagesQuery.data?.messages
+        .map(toChatUIMessage)
+        .filter((message): message is ChatUIMessage => message !== null),
+    [listMessagesQuery.data?.messages],
+  );
 
   const transport = useMemo(() => {
     if (!chatId) return null;
 
-    return new DefaultChatTransport({
+    return new DefaultChatTransport<ChatUIMessage>({
       api: "/api/chat",
       body: {
         chatId,
@@ -62,16 +69,11 @@ export function ChatProvider({ children }: { children: ReactNode }) {
 
   const messageIds = useMemo(() => {
     return (
-      listMessagesQuery.data?.messages
-        ?.map((m: ChatUIMessage) => m.id)
-        .sort((a: string, b: string) => a.localeCompare(b)) ?? null
+      initialMessages
+        ?.map((message) => message.id)
+        .sort((left, right) => left.localeCompare(right)) ?? null
     );
-  }, [
-    listMessagesQuery.data?.messages
-      ?.map((m: ChatUIMessage) => m.id)
-      .sort((a: string, b: string) => a.localeCompare(b))
-      .join("|") ?? null,
-  ]);
+  }, [initialMessages]);
 
   // Be careful of how we memoize the chat instance to avoid losing state and/or
   // recreating it too often.
@@ -84,7 +86,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     if (!chatId || !transport) return null;
 
     return new Chat<ChatUIMessage>({
-      messages: listMessagesQuery.data?.messages ?? undefined,
+      messages: initialMessages ?? undefined,
       generateId: genMessageId,
       id: chatId,
       transport,
@@ -96,7 +98,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
         console.error("Error sending message:", error);
       },
     });
-  }, [chatId, transport, JSON.stringify(messageIds)]);
+  }, [chatId, initialMessages, messageIds, transport]);
 
   return (
     <ChatContext.Provider
