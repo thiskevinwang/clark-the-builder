@@ -19,7 +19,7 @@ export function useModelId() {
 export function useReasoningEffort() {
   return useQueryState(
     "effort",
-    parseAsStringLiteral(["none", "low", "medium", "high", "xhigh"]).withDefault("low"),
+    parseAsStringLiteral(["none", "low", "medium", "high", "xhigh"]).withDefault("xhigh"),
   );
 }
 
