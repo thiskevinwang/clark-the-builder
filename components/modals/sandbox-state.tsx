@@ -16,6 +16,26 @@ interface DirtyCheckerProps {
 }
 
 function DirtyChecker({ sandboxId, setStatus }: DirtyCheckerProps) {
+  useEffect(() => {
+    let cancelled = false;
+
+    async function resumeSandbox() {
+      const response = await fetch(`/api/sandboxes/${sandboxId}`, { method: "POST" });
+      if (!response.ok || cancelled) {
+        return;
+      }
+
+      const { status } = (await response.json()) as { status?: string };
+      setStatus(status === "stopped" ? "stopped" : "running");
+    }
+
+    void resumeSandbox();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [sandboxId, setStatus]);
+
   const content = useSWR<string>(
     `/api/sandboxes/${sandboxId}`,
     async (pathname: string, init: RequestInit) => {

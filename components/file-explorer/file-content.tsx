@@ -54,9 +54,12 @@ export const FileContent = memo(function FileContent({ sandboxId, path }: Props)
   const searchParams = new URLSearchParams({ path });
   const content = useSWR(
     `/api/sandboxes/${sandboxId}/files?${searchParams.toString()}`,
-    async (pathname: string, init: RequestInit) => {
+    async (pathname: string, init?: RequestInit) => {
       const response = await fetch(pathname, init);
       const text = await response.text();
+      if (!response.ok) {
+        throw new Error(text || `Failed to load ${path}`);
+      }
       return text;
     },
     { refreshInterval: 1000 },
@@ -67,14 +70,22 @@ export const FileContent = memo(function FileContent({ sandboxId, path }: Props)
   }, []);
 
   const displayContent = useMemo(() => {
-    if (!content.data) return "";
+    if (content.data === undefined) return "";
     if (isEnv && !showSensitive) {
       return maskEnvContent(content.data);
     }
     return content.data;
   }, [content.data, isEnv, showSensitive]);
 
-  if (content.isLoading || !content.data) {
+  if (content.error) {
+    return (
+      <div className="p-4 text-sm text-destructive whitespace-pre-wrap">
+        {content.error instanceof Error ? content.error.message : "Failed to load file"}
+      </div>
+    );
+  }
+
+  if (content.isLoading || content.data === undefined) {
     return (
       <div className="absolute w-full h-full flex items-center text-center">
         <div className="flex-1">

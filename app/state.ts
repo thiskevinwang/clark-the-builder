@@ -134,7 +134,7 @@ export function useDataStateMapper() {
         }
         break;
       case "data-generating-files":
-        if (data.data.status === "uploaded") {
+        if (data.data.status === "uploaded" || data.data.status === "done") {
           setCursor(errors.length);
           addPaths(data.data.paths);
           addGeneratedFiles(data.data.paths);

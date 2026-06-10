@@ -3,7 +3,7 @@
 import { Chat } from "@ai-sdk/react";
 import { DataUIPart, DefaultChatTransport } from "ai";
 import { useParams } from "next/navigation";
-import { createContext, useContext, useMemo, useRef, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useMemo, useRef, type ReactNode } from "react";
 import { toast } from "sonner";
 
 import { DataPart } from "@/ai/messages/data-parts";
@@ -21,6 +21,10 @@ interface ChatContextValue {
 }
 
 const ChatContext = createContext<ChatContextValue | undefined>(undefined);
+
+function isDataUIPart(part: ChatUIMessage["parts"][number]): part is DataUIPart<DataPart> {
+  return part.type.startsWith("data-");
+}
 
 /**
  * https://ai-sdk.dev/cookbook/next/use-shared-chat-context
@@ -74,6 +78,23 @@ export function ChatProvider({ children }: { children: ReactNode }) {
         .sort((left, right) => left.localeCompare(right)) ?? null
     );
   }, [initialMessages]);
+
+  const hydrateKey = useMemo(() => {
+    if (!chatId || !messageIds) return null;
+    return `${chatId}:${messageIds.join(",")}`;
+  }, [chatId, messageIds]);
+
+  useEffect(() => {
+    if (!initialMessages || !hydrateKey) return;
+
+    for (const message of initialMessages) {
+      for (const part of message.parts) {
+        if (isDataUIPart(part)) {
+          mapDataToStateRef.current(part);
+        }
+      }
+    }
+  }, [hydrateKey, initialMessages]);
 
   // Be careful of how we memoize the chat instance to avoid losing state and/or
   // recreating it too often.

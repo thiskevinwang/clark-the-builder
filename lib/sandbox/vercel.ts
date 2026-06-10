@@ -61,6 +61,7 @@ function wrapCommand(cmd: VercelCommand | VercelCommandFinished): SandboxCommand
 
 function wrapSandbox(sandbox: VercelSandbox): Sandbox {
   return {
+    cwd: sandbox.cwd,
     sandboxId: sandbox.name,
     sandboxName: sandbox.name,
     status: sandbox.status,
@@ -76,7 +77,7 @@ function wrapSandbox(sandbox: VercelSandbox): Sandbox {
     async writeFiles(files: SandboxWriteFile[]): Promise<void> {
       await sandbox.writeFiles(files);
     },
-    async readFile(options: { path: string }): Promise<NodeJS.ReadableStream | null> {
+    async readFile(options: { path: string; cwd?: string }): Promise<NodeJS.ReadableStream | null> {
       return sandbox.readFile(options);
     },
   };

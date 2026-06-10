@@ -11,7 +11,7 @@ interface Props {
 
 export function PreviewPanel({ className }: Props) {
   const { chat } = useSharedChatContext();
-  const { sandboxId, status, url, urlUUID, paths } = useSandboxStore();
+  const { sandboxId, setStatus, status, url, urlUUID, paths } = useSandboxStore();
   return (
     <PreviewPanelComponent
       key={urlUUID}
@@ -21,6 +21,7 @@ export function PreviewPanel({ className }: Props) {
       paths={paths}
       sandboxId={sandboxId}
       chatId={chat?.id}
+      onSandboxStatusChange={setStatus}
     />
   );
 }

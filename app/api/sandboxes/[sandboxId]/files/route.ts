@@ -42,8 +42,11 @@ export async function GET(
     );
   }
 
-  const sandbox = await sandboxProvider.get(fileParams.data);
-  const stream = await sandbox.readFile(fileParams.data);
+  const sandbox = await sandboxProvider.get({ sandboxId: fileParams.data.sandboxId });
+  const stream = await sandbox.readFile({
+    path: fileParams.data.path,
+    cwd: sandbox.cwd,
+  });
   if (!stream) {
     return NextResponse.json({ error: "File not found in the Sandbox" }, { status: 404 });
   }

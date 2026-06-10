@@ -2,7 +2,7 @@
 
 import { ScrollArea } from "@radix-ui/react-scroll-area";
 import { CompassIcon, RefreshCwIcon } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { BarLoader } from "react-spinners";
 
 import { Panel, PanelHeader } from "@/components/panels/panels";
@@ -11,10 +11,12 @@ import { cn } from "@/lib/utils";
 interface Props {
   className?: string;
   disabled?: boolean;
+  sandboxId?: string;
   url?: string;
+  onSandboxStatusChange?: (status: "running" | "stopped") => void;
 }
 
-export function Preview({ className, disabled, url }: Props) {
+export function Preview({ className, disabled, sandboxId, url, onSandboxStatusChange }: Props) {
   const [currentUrl, setCurrentUrl] = useState(url);
   const [error, setError] = useState<string | null>(null);
   const [inputValue, setInputValue] = useState(url || "");
@@ -27,19 +29,60 @@ export function Preview({ className, disabled, url }: Props) {
     setInputValue(url || "");
   }, [url]);
 
-  const refreshIframe = () => {
-    if (iframeRef.current && currentUrl) {
-      setIsLoading(true);
-      setError(null);
-      loadStartTime.current = Date.now();
-      iframeRef.current.src = "";
-      setTimeout(() => {
-        if (iframeRef.current) {
-          iframeRef.current.src = currentUrl;
-        }
-      }, 10);
+  const refreshIframe = useCallback(async () => {
+    if (!currentUrl) {
+      return;
     }
-  };
+
+    setIsLoading(true);
+    setError(null);
+    loadStartTime.current = Date.now();
+
+    if (disabled) {
+      if (!sandboxId) {
+        setIsLoading(false);
+        setError("Sandbox is stopped");
+        return;
+      }
+
+      const response = await fetch(`/api/sandboxes/${sandboxId}`, { method: "POST" });
+      if (!response.ok) {
+        setIsLoading(false);
+        setError("Failed to resume sandbox");
+        return;
+      }
+
+      onSandboxStatusChange?.("running");
+      setCurrentUrl((previousUrl) => {
+        if (!previousUrl) {
+          return previousUrl;
+        }
+        const nextUrl = new URL(previousUrl);
+        nextUrl.searchParams.set("t", Date.now().toString());
+        return nextUrl.toString();
+      });
+      return;
+    }
+
+    if (!iframeRef.current) {
+      setCurrentUrl((previousUrl) => {
+        if (!previousUrl) {
+          return previousUrl;
+        }
+        const nextUrl = new URL(previousUrl);
+        nextUrl.searchParams.set("t", Date.now().toString());
+        return nextUrl.toString();
+      });
+      return;
+    }
+
+    iframeRef.current.src = "";
+    setTimeout(() => {
+      if (iframeRef.current) {
+        iframeRef.current.src = currentUrl;
+      }
+    }, 10);
+  }, [currentUrl, disabled, onSandboxStatusChange, sandboxId]);
 
   const loadNewUrl = () => {
     if (iframeRef.current && inputValue) {
@@ -49,7 +92,7 @@ export function Preview({ className, disabled, url }: Props) {
         loadStartTime.current = Date.now();
         iframeRef.current.src = inputValue;
       } else {
-        refreshIframe();
+        void refreshIframe();
       }
     }
   };
@@ -76,7 +119,9 @@ export function Preview({ className, disabled, url }: Props) {
             <CompassIcon className="w-4 h-4" />
           </a>
           <button
-            onClick={refreshIframe}
+            onClick={() => {
+              void refreshIframe();
+            }}
             type="button"
             className={cn(
               "p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors",
@@ -134,13 +179,7 @@ export function Preview({ className, disabled, url }: Props) {
                   className="text-primary hover:underline text-sm font-medium"
                   type="button"
                   onClick={() => {
-                    if (currentUrl) {
-                      setIsLoading(true);
-                      setError(null);
-                      const newUrl = new URL(currentUrl);
-                      newUrl.searchParams.set("t", Date.now().toString());
-                      setCurrentUrl(newUrl.toString());
-                    }
+                    void refreshIframe();
                   }}
                 >
                   Try again

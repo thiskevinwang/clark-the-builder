@@ -9,13 +9,15 @@ interface Props {
 }
 
 export function Preview({ className }: Props) {
-  const { status, url, urlUUID } = useSandboxStore();
+  const { sandboxId, setStatus, status, url, urlUUID } = useSandboxStore();
   return (
     <PreviewComponent
       key={urlUUID}
       className={className}
       disabled={status === "stopped"}
+      sandboxId={sandboxId}
       url={url}
+      onSandboxStatusChange={setStatus}
     />
   );
 }

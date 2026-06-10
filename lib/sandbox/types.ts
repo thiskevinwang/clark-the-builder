@@ -47,6 +47,7 @@ export interface SandboxLogLine {
 }
 
 export interface Sandbox {
+  cwd: string;
   sandboxId: string;
   sandboxName: string;
   status: "pending" | "running" | "stopping" | "stopped" | "failed" | "aborted" | "snapshotting";
@@ -54,7 +55,7 @@ export interface Sandbox {
   runCommand(options: SandboxRunCommandOptions): Promise<SandboxCommand>;
   getCommand(cmdId: string): Promise<SandboxCommand>;
   writeFiles(files: SandboxWriteFile[]): Promise<void>;
-  readFile(options: { path: string }): Promise<NodeJS.ReadableStream | null>;
+  readFile(options: { path: string; cwd?: string }): Promise<NodeJS.ReadableStream | null>;
 }
 
 export interface SandboxProvider {
