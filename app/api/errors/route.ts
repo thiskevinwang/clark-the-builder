@@ -1,6 +1,6 @@
+import { auth } from "@clerk/nextjs/server";
 import { generateText, Output } from "ai";
 import { checkBotId } from "botid/server";
-import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
 import { DEFAULT_MODEL } from "@/ai/constants";

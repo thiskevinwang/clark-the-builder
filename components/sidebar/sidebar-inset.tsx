@@ -19,9 +19,5 @@ interface SidebarInsetProps {
 export function SidebarInset({ className, children }: SidebarInsetProps) {
   const { isOpen } = useSidebar();
 
-  return (
-    <div className={cn(isOpen ? "md:pl-72" : "md:pl-16", className)}>
-      {children}
-    </div>
-  );
+  return <div className={cn(isOpen ? "md:pl-72" : "md:pl-16", className)}>{children}</div>;
 }

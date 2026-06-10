@@ -2,8 +2,8 @@ import { NextResponse } from "next/server";
 
 import type { PlatformApplicationResponse, PlatformApplicationTransferResponse } from "@/lib/api";
 import { platformListApplicationTransfers, platformListApplications } from "@/lib/api";
-import { getCurrentLocalUser } from "@/lib/auth";
 import { createClient, createConfig } from "@/lib/api/client";
+import { getCurrentLocalUser } from "@/lib/auth";
 import { listOwnedExternalIdsByType } from "@/lib/resource-ownership";
 
 export interface ApplicationWithTransfers extends PlatformApplicationResponse {

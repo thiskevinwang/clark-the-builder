@@ -11,12 +11,12 @@ import {
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 
+import type { GETResponse, POSTResponse } from "@/app/api/chats/route";
 import {
   useBatchDeleteChatsMutation,
   useCreateChatMutation,
   useListChatsQuery,
 } from "@/app/api/hooks";
-import type { GETResponse, POSTResponse } from "@/app/api/chats/route";
 import { AppAuthGuard } from "@/components/auth/app-auth-guard";
 import { Sidebar, SidebarInset, SidebarProvider } from "@/components/sidebar";
 import { Button } from "@/components/ui/button";
@@ -186,12 +186,16 @@ function ChatsPageContent() {
               <div className="flex items-center gap-3">
                 <Checkbox
                   aria-label={allVisibleSelected ? "Deselect all" : "Select all"}
-                  checked={allVisibleSelected ? true : someVisibleSelected ? "indeterminate" : false}
+                  checked={
+                    allVisibleSelected ? true : someVisibleSelected ? "indeterminate" : false
+                  }
                   onCheckedChange={(value) => {
                     setAllVisibleSelected(value === true);
                   }}
                 />
-                <span className="text-sm text-muted-foreground">{selectedVisibleCount} selected</span>
+                <span className="text-sm text-muted-foreground">
+                  {selectedVisibleCount} selected
+                </span>
                 <Button
                   variant="ghost"
                   size="icon"
@@ -287,9 +291,7 @@ function ChatsPageContent() {
                           <p className="truncate font-medium text-foreground">
                             {chat.title?.trim() ? chat.title : "Untitled"}
                           </p>
-                          <p className="mt-0.5 truncate text-xs text-muted-foreground">
-                            {chat.id}
-                          </p>
+                          <p className="mt-0.5 truncate text-xs text-muted-foreground">{chat.id}</p>
                         </div>
 
                         <div className="flex shrink-0 items-start gap-3">

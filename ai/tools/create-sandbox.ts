@@ -79,7 +79,10 @@ export const createSandbox = ({ writer, conversationId, userId }: Params) =>
 
         // Save the Vercel sandbox as a resource
         const resourceRepository = createResourceRepository(db);
-        const existingResource = await resourceRepository.getByExternalId(userId, sandbox.sandboxId);
+        const existingResource = await resourceRepository.getByExternalId(
+          userId,
+          sandbox.sandboxId,
+        );
         const metadata = {
           persistent: true,
           sandboxName: sandbox.sandboxName,

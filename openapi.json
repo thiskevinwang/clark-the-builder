@@ -73,9 +73,7 @@
         "operationId": "PlatformListApplications",
         "x-speakeasy-group": "platform",
         "x-speakeasy-name-override": "listApplications",
-        "tags": [
-          "Applications"
-        ],
+        "tags": ["Applications"],
         "summary": "List applications",
         "description": "List applications.\n",
         "security": [
@@ -131,9 +129,7 @@
         "operationId": "PlatformCreateApplication",
         "x-speakeasy-group": "platform",
         "x-speakeasy-name-override": "createApplication",
-        "tags": [
-          "Applications"
-        ],
+        "tags": ["Applications"],
         "summary": "Create an application",
         "description": "Create a new application.\n",
         "security": [
@@ -195,9 +191,7 @@
         "operationId": "PlatformGetApplication",
         "x-speakeasy-group": "platform",
         "x-speakeasy-name-override": "getApplication",
-        "tags": [
-          "Applications"
-        ],
+        "tags": ["Applications"],
         "summary": "Get an application",
         "description": "Get application details.\n",
         "security": [
@@ -265,9 +259,7 @@
         "operationId": "PlatformUpdateApplication",
         "x-speakeasy-group": "platform",
         "x-speakeasy-name-override": "updateApplication",
-        "tags": [
-          "Applications"
-        ],
+        "tags": ["Applications"],
         "summary": "Update an application",
         "description": "Update an application.\n",
         "security": [
@@ -339,9 +331,7 @@
         "operationId": "PlatformDeleteApplication",
         "x-speakeasy-group": "platform",
         "x-speakeasy-name-override": "deleteApplication",
-        "tags": [
-          "Applications"
-        ],
+        "tags": ["Applications"],
         "summary": "Delete an application",
         "description": "Delete an application.\n",
         "security": [
@@ -401,9 +391,7 @@
         "operationId": "PlatformUploadApplicationLogo",
         "x-speakeasy-group": "platform",
         "x-speakeasy-name-override": "uploadApplicationLogo",
-        "tags": [
-          "Applications"
-        ],
+        "tags": ["Applications"],
         "summary": "Upload application logo",
         "description": "Set or replace an application's logo by uploading an image file.\n",
         "security": [
@@ -434,9 +422,7 @@
                     "format": "binary"
                   }
                 },
-                "required": [
-                  "file"
-                ]
+                "required": ["file"]
               }
             },
             "application/octet-stream": {
@@ -482,9 +468,7 @@
         "operationId": "PlatformDeleteApplicationLogo",
         "x-speakeasy-group": "platform",
         "x-speakeasy-name-override": "deleteApplicationLogo",
-        "tags": [
-          "Applications"
-        ],
+        "tags": ["Applications"],
         "summary": "Delete application logo",
         "description": "Delete an application's logo.\n",
         "security": [
@@ -534,9 +518,7 @@
         "operationId": "PlatformUploadApplicationFavicon",
         "x-speakeasy-group": "platform",
         "x-speakeasy-name-override": "uploadApplicationFavicon",
-        "tags": [
-          "Applications"
-        ],
+        "tags": ["Applications"],
         "summary": "Upload application favicon",
         "description": "Set or replace an application's favicon by uploading an image file.\n",
         "security": [
@@ -567,9 +549,7 @@
                     "format": "binary"
                   }
                 },
-                "required": [
-                  "file"
-                ]
+                "required": ["file"]
               }
             },
             "application/octet-stream": {
@@ -615,9 +595,7 @@
         "operationId": "PlatformDeleteApplicationFavicon",
         "x-speakeasy-group": "platform",
         "x-speakeasy-name-override": "deleteApplicationFavicon",
-        "tags": [
-          "Applications"
-        ],
+        "tags": ["Applications"],
         "summary": "Delete application favicon",
         "description": "Delete an application's favicon.\n",
         "security": [
@@ -667,9 +645,7 @@
         "operationId": "PlatformUpdateApplicationDomain",
         "x-speakeasy-group": "platform",
         "x-speakeasy-name-override": "updateApplicationDomain",
-        "tags": [
-          "Domains"
-        ],
+        "tags": ["Domains"],
         "summary": "Update application domain",
         "description": "Update the production domain for an application.\n",
         "security": [
@@ -743,9 +719,7 @@
         "operationId": "PlatformListApplicationDomains",
         "x-speakeasy-group": "platform",
         "x-speakeasy-name-override": "listApplicationDomains",
-        "tags": [
-          "Domains"
-        ],
+        "tags": ["Domains"],
         "summary": "List application domains",
         "description": "List all domains for an application's production instance.\n",
         "security": [
@@ -790,9 +764,7 @@
         "operationId": "PlatformCreateApplicationDomain",
         "x-speakeasy-group": "platform",
         "x-speakeasy-name-override": "createApplicationDomain",
-        "tags": [
-          "Domains"
-        ],
+        "tags": ["Domains"],
         "summary": "Create application domain",
         "description": "Create a provider domain for an application's production instance.\n",
         "security": [
@@ -859,9 +831,7 @@
         "operationId": "PlatformGetApplicationDomain",
         "x-speakeasy-group": "platform",
         "x-speakeasy-name-override": "getApplicationDomain",
-        "tags": [
-          "Domains"
-        ],
+        "tags": ["Domains"],
         "summary": "Get application domain",
         "description": "Get domain information for an application.\n",
         "security": [
@@ -929,9 +899,7 @@
         "operationId": "PlatformDeleteApplicationDomain",
         "x-speakeasy-group": "platform",
         "x-speakeasy-name-override": "deleteApplicationDomain",
-        "tags": [
-          "Domains"
-        ],
+        "tags": ["Domains"],
         "summary": "Delete application domain",
         "description": "Delete a provider domain from an application's production instance.\n\nOnly provider domains can be deleted. The primary domain cannot be deleted.\n",
         "security": [
@@ -994,9 +962,7 @@
         "operationId": "PlatformGetApplicationDomainStatus",
         "x-speakeasy-group": "platform",
         "x-speakeasy-name-override": "getApplicationDomainStatus",
-        "tags": [
-          "Domains"
-        ],
+        "tags": ["Domains"],
         "summary": "Get application domain status",
         "description": "Get the status of a domain for an application.\n",
         "security": [
@@ -1066,9 +1032,7 @@
         "operationId": "PlatformTriggerDNSCheck",
         "x-speakeasy-group": "platform",
         "x-speakeasy-name-override": "triggerDNSCheck",
-        "tags": [
-          "Domains"
-        ],
+        "tags": ["Domains"],
         "summary": "Trigger DNS check",
         "description": "Triggers a DNS check for a domain and returns the current domain status.\n\nThis endpoint ensures that at most one DNS check job is in-flight at any time.\nIf a check is already running or was recently performed, a 409 Conflict is returned.\n\nUse this endpoint to trigger a new DNS verification check after configuring DNS records.\n",
         "security": [
@@ -1131,9 +1095,7 @@
         "operationId": "PlatformListDomains",
         "x-speakeasy-group": "platform",
         "x-speakeasy-name-override": "listDomains",
-        "tags": [
-          "Domains"
-        ],
+        "tags": ["Domains"],
         "summary": "List domains",
         "description": "List production instance domains for applications in the authenticated workspace.\nResults are sorted by domain creation time in descending order (most recent first).\n\nSet `include_development` to include development instance domains.\n",
         "security": [
@@ -1158,9 +1120,7 @@
             "required": false,
             "schema": {
               "type": "string",
-              "enum": [
-                "true"
-              ]
+              "enum": ["true"]
             }
           },
           {
@@ -1222,9 +1182,7 @@
         "operationId": "PlatformGetDomain",
         "x-speakeasy-group": "platform",
         "x-speakeasy-name-override": "getDomain",
-        "tags": [
-          "Domains"
-        ],
+        "tags": ["Domains"],
         "summary": "Get domain",
         "description": "Retrieve a single domain by ID or name for the authenticated workspace.\n",
         "security": [
@@ -1273,9 +1231,7 @@
         "x-speakeasy-group": "platform",
         "x-speakeasy-name-override": "getDomainAvailability",
         "x-internal": true,
-        "tags": [
-          "Domains"
-        ],
+        "tags": ["Domains"],
         "summary": "Check domain availability",
         "description": "Checks whether a domain name is available for use.\n",
         "security": [
@@ -1325,9 +1281,7 @@
         "operationId": "PlatformListDomainIntents",
         "x-speakeasy-group": "platform",
         "x-speakeasy-name-override": "listDomainIntents",
-        "tags": [
-          "Domain Intents"
-        ],
+        "tags": ["Domain Intents"],
         "summary": "List domain intents",
         "description": "List all domain intents created by the authenticated workspace. Returns\nintents sorted by creation date in descending order (most recent first).\n",
         "security": [
@@ -1356,12 +1310,7 @@
               "type": "array",
               "items": {
                 "type": "string",
-                "enum": [
-                  "pending",
-                  "completed",
-                  "expired",
-                  "canceled"
-                ]
+                "enum": ["pending", "completed", "expired", "canceled"]
               }
             }
           },
@@ -1422,9 +1371,7 @@
         "operationId": "PlatformCreateDomainIntent",
         "x-speakeasy-group": "platform",
         "x-speakeasy-name-override": "createDomainIntent",
-        "tags": [
-          "Domain Intents"
-        ],
+        "tags": ["Domain Intents"],
         "summary": "Create a domain intent",
         "description": "Create a pending domain intent and receive DNS records for\nthe domain name.\n",
         "security": [
@@ -1474,9 +1421,7 @@
         "operationId": "PlatformGetDomainIntent",
         "x-speakeasy-group": "platform",
         "x-speakeasy-name-override": "getDomainIntent",
-        "tags": [
-          "Domain Intents"
-        ],
+        "tags": ["Domain Intents"],
         "summary": "Get a domain intent",
         "description": "Retrieve a domain intent by ID.\n",
         "security": [
@@ -1521,9 +1466,7 @@
         "operationId": "PlatformCancelDomainIntent",
         "x-speakeasy-group": "platform",
         "x-speakeasy-name-override": "cancelDomainIntent",
-        "tags": [
-          "Domain Intents"
-        ],
+        "tags": ["Domain Intents"],
         "summary": "Cancel a domain intent",
         "description": "Cancel a pending domain intent.\n",
         "security": [
@@ -1573,9 +1516,7 @@
         "operationId": "PlatformListApplicationTransfers",
         "x-speakeasy-group": "platform",
         "x-speakeasy-name-override": "listApplicationTransfers",
-        "tags": [
-          "Application Transfers"
-        ],
+        "tags": ["Application Transfers"],
         "summary": "List application transfers",
         "description": "List all transfer requests created by the authenticated workspace. Returns\ntransfers sorted by creation date in descending order (most recent first).\n\nUse the `status` parameter to filter by transfer status.\n",
         "security": [
@@ -1595,12 +1536,7 @@
               "type": "array",
               "items": {
                 "type": "string",
-                "enum": [
-                  "pending",
-                  "completed",
-                  "canceled",
-                  "expired"
-                ]
+                "enum": ["pending", "completed", "canceled", "expired"]
               }
             }
           },
@@ -1663,9 +1599,7 @@
         "operationId": "PlatformCreateApplicationTransfer",
         "x-speakeasy-group": "platform",
         "x-speakeasy-name-override": "createApplicationTransfer",
-        "tags": [
-          "Application Transfers"
-        ],
+        "tags": ["Application Transfers"],
         "summary": "Create an application transfer",
         "description": "Create a new transfer request for an application. This initiates the process of\ntransferring ownership of the application to another workspace.\n\nOnly one pending transfer can exist for an application at a time. The transfer\nwill expire after 24 hours if not completed.\n",
         "security": [
@@ -1712,9 +1646,7 @@
         "operationId": "PlatformGetApplicationTransfer",
         "x-speakeasy-group": "platform",
         "x-speakeasy-name-override": "getApplicationTransfer",
-        "tags": [
-          "Application Transfers"
-        ],
+        "tags": ["Application Transfers"],
         "summary": "Get an application transfer",
         "description": "Retrieve details of an application transfer by its ID.\n",
         "security": [
@@ -1768,9 +1700,7 @@
         "operationId": "PlatformCancelApplicationTransfer",
         "x-speakeasy-group": "platform",
         "x-speakeasy-name-override": "cancelApplicationTransfer",
-        "tags": [
-          "Application Transfers"
-        ],
+        "tags": ["Application Transfers"],
         "summary": "Cancel an application transfer",
         "description": "Cancel an existing application transfer. Only transfers in 'pending' status can be canceled.\n",
         "security": [
@@ -1829,9 +1759,7 @@
         "operationId": "PlatformGetOrCreateUser",
         "x-speakeasy-group": "platform",
         "x-speakeasy-name-override": "getOrCreateUser",
-        "tags": [
-          "Users"
-        ],
+        "tags": ["Users"],
         "summary": "Get or create a user",
         "x-internal": true,
         "description": "Get an existing user by email address or create a new user if one does not exist.\n",
@@ -1904,9 +1832,7 @@
         "operationId": "PlatformCreateOrganization",
         "x-speakeasy-group": "platform",
         "x-speakeasy-name-override": "createOrganization",
-        "tags": [
-          "Organizations"
-        ],
+        "tags": ["Organizations"],
         "summary": "Create an organization",
         "x-internal": true,
         "description": "Create a new organization.\n",
@@ -1962,9 +1888,7 @@
         "operationId": "PlatformUpdateOrganization",
         "x-speakeasy-group": "platform",
         "x-speakeasy-name-override": "updateOrganization",
-        "tags": [
-          "Organizations"
-        ],
+        "tags": ["Organizations"],
         "summary": "Update a Vercel-managed organization subscription",
         "x-internal": true,
         "description": "Create or update a V3 workspace-scoped externally-paid subscription for a\nVercel-managed organization.\n",
@@ -2015,9 +1939,7 @@
         "operationId": "PlatformDeleteOrganization",
         "x-speakeasy-group": "platform",
         "x-speakeasy-name-override": "deleteOrganization",
-        "tags": [
-          "Organizations"
-        ],
+        "tags": ["Organizations"],
         "summary": "Delete an organization",
         "x-internal": true,
         "description": "Delete an organization.\n",
@@ -2068,9 +1990,7 @@
         "operationId": "PlatformCreateOrganizationSubscription",
         "x-speakeasy-group": "platform",
         "x-speakeasy-name-override": "createOrganizationSubscription",
-        "tags": [
-          "Organizations"
-        ],
+        "tags": ["Organizations"],
         "summary": "Create a Stripe-billed workspace subscription",
         "x-internal": true,
         "description": "Create a V3 workspace-scoped Stripe subscription for an existing organization\nusing a Shared Payment Token (SPT) from Stripe agentic provisioning.\n",
@@ -2159,9 +2079,7 @@
         "operationId": "PlatformRotateSecretKeys",
         "x-speakeasy-group": "platform",
         "x-speakeasy-name-override": "rotateSecretKeys",
-        "tags": [
-          "Applications"
-        ],
+        "tags": ["Applications"],
         "summary": "Rotate application secret keys",
         "x-internal": true,
         "description": "Rotate the secret keys for an application's instances.\n",
@@ -2243,9 +2161,7 @@
         "operationId": "PlatformGetApplicationSubscription",
         "x-speakeasy-group": "platform",
         "x-speakeasy-name-override": "getApplicationSubscription",
-        "tags": [
-          "Applications"
-        ],
+        "tags": ["Applications"],
         "summary": "Get application subscription",
         "x-internal": true,
         "description": "Get the subscription for an application.\n",
@@ -2315,9 +2231,7 @@
         "operationId": "PlatformGetApplicationUsage",
         "x-speakeasy-group": "platform",
         "x-speakeasy-name-override": "getApplicationUsage",
-        "tags": [
-          "Applications"
-        ],
+        "tags": ["Applications"],
         "summary": "Get application usage",
         "x-internal": true,
         "description": "Get usage information for an application.\n",
@@ -2376,9 +2290,7 @@
         "operationId": "PlatformTransferOwnership",
         "x-speakeasy-group": "platform",
         "x-speakeasy-name-override": "transferOwnership",
-        "tags": [
-          "Applications"
-        ],
+        "tags": ["Applications"],
         "summary": "Transfer application ownership",
         "x-internal": true,
         "description": "Transfer ownership of an application to another organization.\n",
@@ -2432,9 +2344,7 @@
                     "nullable": true
                   }
                 },
-                "required": [
-                  "organization_id"
-                ]
+                "required": ["organization_id"]
               }
             }
           }
@@ -2470,9 +2380,7 @@
         "operationId": "PlatformGetInstanceUsage",
         "x-speakeasy-group": "platform",
         "x-speakeasy-name-override": "getInstanceUsage",
-        "tags": [
-          "Applications"
-        ],
+        "tags": ["Applications"],
         "summary": "Get instance usage",
         "description": "Get usage totals for an application instance across meters such as MAU, MAO,\nSMS, custom domains, and enterprise connections.\n\nThe `envOrInsID` parameter can be either an environment type (e.g., \"development\", \"production\")\nor an instance ID.\n\nRequires the `application_usage:read` scope.\n",
         "security": [
@@ -2551,9 +2459,7 @@
         "operationId": "PlatformListInstanceUsers",
         "x-speakeasy-group": "platform",
         "x-speakeasy-name-override": "listInstanceUsers",
-        "tags": [
-          "Users"
-        ],
+        "tags": ["Users"],
         "summary": "List instance users",
         "description": "List all users for an application instance.\n\nThe `envOrInsID` parameter can be either an environment type (e.g., \"development\", \"production\")\nor an instance ID.\n\nUse the `query` parameter to filter users by searching across email addresses, phone numbers,\nusernames, web3 wallets, user IDs, first names, and last names.\n\nUse the `order_by` parameter to sort the results. Prefix with `+` for ascending or `-` for descending order.\nValid fields: `created_at`, `updated_at`, `last_sign_in_at`, `last_active_at`, `email_address`, `first_name`,\n`last_name`, `username`, `phone_number`, `web3_wallet`. Default is `-created_at` (most recent first).\n\nRequires the `users:read` scope.\n",
         "security": [
@@ -2657,9 +2563,7 @@
         "operationId": "PlatformDeleteUser",
         "x-speakeasy-group": "platform",
         "x-speakeasy-name-override": "deleteUser",
-        "tags": [
-          "Users"
-        ],
+        "tags": ["Users"],
         "summary": "Delete a user",
         "description": "Delete a user within an application instance. Returns the deleted user object.\n\nDeleting a user that does not exist (or has already been deleted) returns 404.\n\nThe `envOrInsID` parameter can be either an environment type (e.g., \"development\", \"production\")\nor an instance ID.\n\nRequires the `users:delete` scope.\n",
         "security": [
@@ -2720,9 +2624,7 @@
         "operationId": "PlatformBanUser",
         "x-speakeasy-group": "platform",
         "x-speakeasy-name-override": "banUser",
-        "tags": [
-          "Users"
-        ],
+        "tags": ["Users"],
         "summary": "Ban a user",
         "description": "Marks a user as banned within an application instance. This terminates their active sessions\n(marks them as revoked) and prevents them from signing in again.\n\nRequires the `users:manage` scope.\n",
         "security": [
@@ -2790,9 +2692,7 @@
         "operationId": "PlatformUnbanUser",
         "x-speakeasy-group": "platform",
         "x-speakeasy-name-override": "unbanUser",
-        "tags": [
-          "Users"
-        ],
+        "tags": ["Users"],
         "summary": "Unban a user",
         "description": "Removes the ban from a user within an application instance. This allows them to sign in again.\n\nRequires the `users:manage` scope.\n",
         "security": [
@@ -2860,9 +2760,7 @@
         "operationId": "PlatformListJWTTemplates",
         "x-speakeasy-group": "platform",
         "x-speakeasy-name-override": "listJWTTemplates",
-        "tags": [
-          "JWT Templates"
-        ],
+        "tags": ["JWT Templates"],
         "summary": "List JWT templates",
         "description": "List all JWT templates for an application instance.\n\nRequires the `jwt_templates:read` scope.\n",
         "security": [
@@ -2922,9 +2820,7 @@
         "operationId": "PlatformCreateJWTTemplate",
         "x-speakeasy-group": "platform",
         "x-speakeasy-name-override": "createJWTTemplate",
-        "tags": [
-          "JWT Templates"
-        ],
+        "tags": ["JWT Templates"],
         "summary": "Create a JWT template",
         "description": "Create a new JWT template for an application instance.\n\nRequires the `jwt_templates:manage` scope.\n",
         "security": [
@@ -2997,10 +2893,7 @@
                     "nullable": true
                   }
                 },
-                "required": [
-                  "name",
-                  "claims"
-                ]
+                "required": ["name", "claims"]
               }
             }
           }
@@ -3042,9 +2935,7 @@
         "operationId": "PlatformGetJWTTemplate",
         "x-speakeasy-group": "platform",
         "x-speakeasy-name-override": "getJWTTemplate",
-        "tags": [
-          "JWT Templates"
-        ],
+        "tags": ["JWT Templates"],
         "summary": "Get a JWT template",
         "description": "Retrieve a specific JWT template for an application instance.\n\nRequires the `jwt_templates:read` scope.\n",
         "security": [
@@ -3110,9 +3001,7 @@
         "operationId": "PlatformUpdateJWTTemplate",
         "x-speakeasy-group": "platform",
         "x-speakeasy-name-override": "updateJWTTemplate",
-        "tags": [
-          "JWT Templates"
-        ],
+        "tags": ["JWT Templates"],
         "summary": "Update a JWT template",
         "description": "Update an existing JWT template for an application instance.\n\nRequires the `jwt_templates:manage` scope.\n",
         "security": [
@@ -3194,10 +3083,7 @@
                     "nullable": true
                   }
                 },
-                "required": [
-                  "name",
-                  "claims"
-                ]
+                "required": ["name", "claims"]
               }
             }
           }
@@ -3237,9 +3123,7 @@
         "operationId": "PlatformDeleteJWTTemplate",
         "x-speakeasy-group": "platform",
         "x-speakeasy-name-override": "deleteJWTTemplate",
-        "tags": [
-          "JWT Templates"
-        ],
+        "tags": ["JWT Templates"],
         "summary": "Delete a JWT template",
         "description": "Delete a JWT template from an application instance.\n\nRequires the `jwt_templates:manage` scope.\n",
         "security": [
@@ -3300,9 +3184,7 @@
         "operationId": "PlatformListRedirectURLs",
         "x-speakeasy-group": "platform",
         "x-speakeasy-name-override": "listRedirectURLs",
-        "tags": [
-          "Redirect URLs"
-        ],
+        "tags": ["Redirect URLs"],
         "summary": "List redirect URLs",
         "description": "List all redirect URLs for an application instance.\n\nThe `envOrInsID` parameter can be either an environment type (e.g., \"development\", \"production\")\nor an instance ID.\n\nRequires the `applications:read` scope.\n",
         "security": [
@@ -3385,9 +3267,7 @@
         "operationId": "PlatformCreateRedirectURL",
         "x-speakeasy-group": "platform",
         "x-speakeasy-name-override": "createRedirectURL",
-        "tags": [
-          "Redirect URLs"
-        ],
+        "tags": ["Redirect URLs"],
         "summary": "Create a redirect URL",
         "description": "Create a redirect URL for an application instance.\n\nThe `envOrInsID` parameter can be either an environment type (e.g., \"development\", \"production\")\nor an instance ID.\n\nRequires the `applications:manage` scope.\n",
         "security": [
@@ -3429,9 +3309,7 @@
                     "description": "The full URL value prefixed with `https://` or a custom scheme e.g. `\"https://my-app.com/oauth-callback\"` or `\"my-app://oauth-callback\"`."
                   }
                 },
-                "required": [
-                  "url"
-                ]
+                "required": ["url"]
               }
             }
           }
@@ -3470,9 +3348,7 @@
         "operationId": "PlatformGetRedirectURL",
         "x-speakeasy-group": "platform",
         "x-speakeasy-name-override": "getRedirectURL",
-        "tags": [
-          "Redirect URLs"
-        ],
+        "tags": ["Redirect URLs"],
         "summary": "Get a redirect URL",
         "description": "Retrieve a redirect URL for an application instance.\n\nThe `envOrInsID` parameter can be either an environment type (e.g., \"development\", \"production\")\nor an instance ID.\n\nRequires the `applications:read` scope.\n",
         "security": [
@@ -3538,9 +3414,7 @@
         "operationId": "PlatformDeleteRedirectURL",
         "x-speakeasy-group": "platform",
         "x-speakeasy-name-override": "deleteRedirectURL",
-        "tags": [
-          "Redirect URLs"
-        ],
+        "tags": ["Redirect URLs"],
         "summary": "Delete a redirect URL",
         "description": "Delete a redirect URL from an application instance.\n\nThe `envOrInsID` parameter can be either an environment type (e.g., \"development\", \"production\")\nor an instance ID.\n\nRequires the `applications:manage` scope.\n",
         "security": [
@@ -3601,9 +3475,7 @@
         "operationId": "PlatformGetConfig",
         "x-speakeasy-group": "platform",
         "x-speakeasy-name-override": "getConfig",
-        "tags": [
-          "Config"
-        ],
+        "tags": ["Config"],
         "summary": "Get instance config",
         "description": "Get the configuration for an application instance.\n\nThe `envOrInsID` parameter can be either an environment type (e.g., \"development\", \"production\")\nor an instance ID.\n\nOptionally filter to specific config keys using the `keys` query parameter.\n\nRequires the `applications:manage` scope.\n",
         "security": [
@@ -3674,9 +3546,7 @@
         "operationId": "PlatformPatchConfig",
         "x-speakeasy-group": "platform",
         "x-speakeasy-name-override": "patchConfig",
-        "tags": [
-          "Config"
-        ],
+        "tags": ["Config"],
         "summary": "Update instance config",
         "description": "Update the configuration for an application instance.\n\nThe `envOrInsID` parameter can be either an environment type (e.g., \"development\", \"production\")\nor an instance ID.\n\nUse the `dry_run` query parameter to preview changes without applying them.\nUse the `destructive` query parameter to allow clearing config keys by setting them to null.\nUse the `If-Match` header to provide optimistic concurrency control via config version.\n\nRequires the `applications:manage` scope.\n",
         "security": [
@@ -3796,9 +3666,7 @@
         "operationId": "PlatformPutConfig",
         "x-speakeasy-group": "platform",
         "x-speakeasy-name-override": "putConfig",
-        "tags": [
-          "Config"
-        ],
+        "tags": ["Config"],
         "summary": "Replace instance config",
         "description": "Replace the full configuration for an application instance.\n\nUnlike PATCH, PUT requires all config keys to be included in the request body.\nIf any keys are missing, a 400 error is returned listing the missing keys.\n\nThe `envOrInsID` parameter can be either an environment type (e.g., \"development\", \"production\")\nor an instance ID.\n\nUse the `dry_run` query parameter to preview changes without applying them.\nUse the `destructive` query parameter to allow clearing config keys by setting them to null.\nUse the `If-Match` header to provide optimistic concurrency control via config version.\n\nRequires the `applications:manage` scope.\n",
         "security": [
@@ -3906,9 +3774,7 @@
         "operationId": "PlatformGetConfigSchema",
         "x-speakeasy-group": "platform",
         "x-speakeasy-name-override": "getConfigSchema",
-        "tags": [
-          "Config"
-        ],
+        "tags": ["Config"],
         "summary": "Get instance config schema",
         "description": "Get the JSON Schema for the instance configuration.\n\nThe `envOrInsID` parameter can be either an environment type (e.g., \"development\", \"production\")\nor an instance ID.\n\nOptionally filter to specific config keys using the `keys` query parameter.\n\nRequires the `applications:manage` scope.\n",
         "security": [
@@ -3981,9 +3847,7 @@
         "operationId": "PlatformCreateInstance",
         "x-speakeasy-group": "platform",
         "x-speakeasy-name-override": "createInstance",
-        "tags": [
-          "Applications"
-        ],
+        "tags": ["Applications"],
         "summary": "Create instance",
         "description": "Creates a production instance for the given application. Optionally clones\nconfiguration from an existing development instance.\n",
         "security": [
@@ -4016,9 +3880,7 @@
                   },
                   "environment_type": {
                     "type": "string",
-                    "enum": [
-                      "production"
-                    ],
+                    "enum": ["production"],
                     "default": "production",
                     "description": "Instance environment type. Only production is currently supported."
                   },
@@ -4028,9 +3890,7 @@
                     "description": "The ID of a development instance to clone configuration from."
                   }
                 },
-                "required": [
-                  "domain"
-                ]
+                "required": ["domain"]
               }
             }
           }
@@ -4046,18 +3906,14 @@
                   "properties": {
                     "object": {
                       "type": "string",
-                      "enum": [
-                        "instance"
-                      ]
+                      "enum": ["instance"]
                     },
                     "id": {
                       "type": "string"
                     },
                     "environment_type": {
                       "type": "string",
-                      "enum": [
-                        "production"
-                      ]
+                      "enum": ["production"]
                     },
                     "active_domain": {
                       "$ref": "#/components/schemas/PlatformDomainResponse"
@@ -4120,9 +3976,7 @@
         "operationId": "PlatformClaimAccountlessApplication",
         "x-speakeasy-group": "platform",
         "x-speakeasy-name-override": "claimAccountlessApplication",
-        "tags": [
-          "Applications"
-        ],
+        "tags": ["Applications"],
         "summary": "Claim an accountless application",
         "description": "Claim an accountless application by assigning it to the authenticated principal's workspace.\nThe application is identified by a single-use claim token that was generated when the\naccountless application was created. Once claimed, the token is invalidated and cannot be reused.\n",
         "security": [
@@ -4149,10 +4003,7 @@
                     "maxLength": 50
                   }
                 },
-                "required": [
-                  "token",
-                  "name"
-                ]
+                "required": ["token", "name"]
               }
             }
           }
@@ -4210,10 +4061,7 @@
           "environment_type": {
             "type": "string",
             "description": "The environment type of the instance. Determines whether this instance is used for development/testing or production workloads.",
-            "enum": [
-              "development",
-              "production"
-            ],
+            "enum": ["development", "production"],
             "example": "production"
           },
           "secret_key": {
@@ -4228,10 +4076,7 @@
             "example": "pk_live_abc123..."
           }
         },
-        "required": [
-          "instance_id",
-          "environment_type"
-        ]
+        "required": ["instance_id", "environment_type"]
       },
       "PlatformApplicationResponse": {
         "type": "object",
@@ -4253,11 +4098,7 @@
             }
           }
         },
-        "required": [
-          "application_id",
-          "name",
-          "instances"
-        ]
+        "required": ["application_id", "name", "instances"]
       },
       "PlatformListApplicationsResponse": {
         "type": "array",
@@ -4282,11 +4123,7 @@
             "type": "object"
           }
         },
-        "required": [
-          "message",
-          "long_message",
-          "code"
-        ]
+        "required": ["message", "long_message", "code"]
       },
       "ClerkErrors": {
         "type": "object",
@@ -4304,9 +4141,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "errors"
-        ]
+        "required": ["errors"]
       },
       "PlatformCreateApplicationRequest": {
         "type": "object",
@@ -4372,9 +4207,7 @@
             "x-internal": true
           }
         },
-        "required": [
-          "name"
-        ]
+        "required": ["name"]
       },
       "PlatformDeletedObjectResponse": {
         "type": "object",
@@ -4393,11 +4226,7 @@
             "description": "The ID of the deleted resource."
           }
         },
-        "required": [
-          "deleted",
-          "object",
-          "id"
-        ]
+        "required": ["deleted", "object", "id"]
       },
       "PlatformUpdateApplicationRequest": {
         "type": "object",
@@ -4435,9 +4264,7 @@
             "description": "Optional proxy path for provider domains."
           }
         },
-        "required": [
-          "name"
-        ]
+        "required": ["name"]
       },
       "PlatformCNameTarget": {
         "type": "object",
@@ -4453,11 +4280,7 @@
             "type": "boolean"
           }
         },
-        "required": [
-          "host",
-          "value",
-          "required"
-        ]
+        "required": ["host", "value", "required"]
       },
       "PlatformDomainApplicationSummary": {
         "type": "object",
@@ -4465,9 +4288,7 @@
         "properties": {
           "object": {
             "type": "string",
-            "enum": [
-              "application"
-            ]
+            "enum": ["application"]
           },
           "id": {
             "type": "string"
@@ -4481,12 +4302,7 @@
             "format": "date-time"
           }
         },
-        "required": [
-          "object",
-          "id",
-          "created_at",
-          "updated_at"
-        ]
+        "required": ["object", "id", "created_at", "updated_at"]
       },
       "PlatformDomainInstanceSummary": {
         "type": "object",
@@ -4494,9 +4310,7 @@
         "properties": {
           "object": {
             "type": "string",
-            "enum": [
-              "instance"
-            ]
+            "enum": ["instance"]
           },
           "id": {
             "type": "string"
@@ -4504,10 +4318,7 @@
           "environment_type": {
             "type": "string",
             "description": "Instance environment type.",
-            "enum": [
-              "production",
-              "development"
-            ]
+            "enum": ["production", "development"]
           },
           "created_at": {
             "type": "string",
@@ -4518,13 +4329,7 @@
             "format": "date-time"
           }
         },
-        "required": [
-          "object",
-          "id",
-          "environment_type",
-          "created_at",
-          "updated_at"
-        ]
+        "required": ["object", "id", "environment_type", "created_at", "updated_at"]
       },
       "PlatformDomainResponse": {
         "type": "object",
@@ -4532,9 +4337,7 @@
         "properties": {
           "object": {
             "type": "string",
-            "enum": [
-              "domain"
-            ]
+            "enum": ["domain"]
           },
           "id": {
             "type": "string",
@@ -4624,10 +4427,7 @@
             "example": 2
           }
         },
-        "required": [
-          "data",
-          "total_count"
-        ]
+        "required": ["data", "total_count"]
       },
       "PlatformCreateApplicationDomainRequest": {
         "type": "object",
@@ -4646,9 +4446,7 @@
             "description": "Optional domain intent ID to complete into this domain."
           }
         },
-        "required": [
-          "name"
-        ]
+        "required": ["name"]
       },
       "FailureHint": {
         "type": "object",
@@ -4660,10 +4458,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "code",
-          "message"
-        ]
+        "required": ["code", "message"]
       },
       "CNAMEStatus": {
         "type": "object",
@@ -4698,14 +4493,7 @@
             }
           }
         },
-        "required": [
-          "clerk_subdomain",
-          "from",
-          "to",
-          "verified",
-          "required",
-          "failure_hints"
-        ]
+        "required": ["clerk_subdomain", "from", "to", "verified", "required", "failure_hints"]
       },
       "DNSStatus": {
         "type": "object",
@@ -4713,11 +4501,7 @@
         "properties": {
           "status": {
             "type": "string",
-            "enum": [
-              "not_started",
-              "in_progress",
-              "complete"
-            ]
+            "enum": ["not_started", "in_progress", "complete"]
           },
           "cnames": {
             "type": "object",
@@ -4740,10 +4524,7 @@
             }
           }
         },
-        "required": [
-          "status",
-          "cnames"
-        ]
+        "required": ["status", "cnames"]
       },
       "SSLStatus": {
         "type": "object",
@@ -4763,11 +4544,7 @@
             }
           }
         },
-        "required": [
-          "status",
-          "required",
-          "failure_hints"
-        ]
+        "required": ["status", "required", "failure_hints"]
       },
       "PlatformDomainStatusResponse": {
         "type": "object",
@@ -4781,13 +4558,7 @@
             "properties": {
               "status": {
                 "type": "string",
-                "enum": [
-                  "complete",
-                  "in_process",
-                  "not_started",
-                  "failed",
-                  "incomplete"
-                ]
+                "enum": ["complete", "in_process", "not_started", "failed", "incomplete"]
               },
               "required": {
                 "type": "boolean"
@@ -4817,10 +4588,7 @@
                 "type": "boolean"
               }
             },
-            "required": [
-              "status",
-              "required"
-            ]
+            "required": ["status", "required"]
           },
           "proxy": {
             "type": "object",
@@ -4832,24 +4600,14 @@
                 "type": "boolean"
               }
             },
-            "required": [
-              "status",
-              "required"
-            ]
+            "required": ["status", "required"]
           },
           "status": {
             "type": "string",
-            "enum": [
-              "complete",
-              "incomplete"
-            ]
+            "enum": ["complete", "incomplete"]
           }
         },
-        "required": [
-          "dns",
-          "ssl",
-          "status"
-        ]
+        "required": ["dns", "ssl", "status"]
       },
       "PlatformDNSCheckResponse": {
         "description": "Response from triggering a DNS check. Includes the current domain status\nalong with metadata about the check.\n",
@@ -4872,10 +4630,7 @@
                 "description": "The timestamp in epoch milliseconds of the last DNS check, if any.\nWill be `null` if no check has been performed yet.\n"
               }
             },
-            "required": [
-              "domain_id",
-              "last_run_at"
-            ]
+            "required": ["domain_id", "last_run_at"]
           }
         ]
       },
@@ -4886,10 +4641,7 @@
           },
           {
             "type": "object",
-            "required": [
-              "application",
-              "instance"
-            ]
+            "required": ["application", "instance"]
           }
         ]
       },
@@ -4913,10 +4665,7 @@
             "example": 5
           }
         },
-        "required": [
-          "data",
-          "total_count"
-        ]
+        "required": ["data", "total_count"]
       },
       "PlatformDomainAvailabilityResponse": {
         "type": "object",
@@ -4927,9 +4676,7 @@
             "description": "Whether the domain is available for use."
           }
         },
-        "required": [
-          "available"
-        ]
+        "required": ["available"]
       },
       "PlatformDomainIntentResponse": {
         "title": "Domain Intent",
@@ -4939,9 +4686,7 @@
         "properties": {
           "object": {
             "type": "string",
-            "enum": [
-              "domain_intent"
-            ]
+            "enum": ["domain_intent"]
           },
           "id": {
             "type": "string",
@@ -4950,11 +4695,7 @@
           },
           "status": {
             "type": "string",
-            "enum": [
-              "pending",
-              "completed",
-              "canceled"
-            ],
+            "enum": ["pending", "completed", "canceled"],
             "description": "The current status of the domain intent."
           },
           "domain_id": {
@@ -4973,12 +4714,7 @@
             }
           }
         },
-        "required": [
-          "object",
-          "id",
-          "status",
-          "records"
-        ]
+        "required": ["object", "id", "status", "records"]
       },
       "PlatformListDomainIntentsResponse": {
         "title": "List Domain Intents Response",
@@ -5000,10 +4736,7 @@
             "example": 5
           }
         },
-        "required": [
-          "data",
-          "total_count"
-        ]
+        "required": ["data", "total_count"]
       },
       "PlatformCreateDomainIntentRequest": {
         "type": "object",
@@ -5018,9 +4751,7 @@
             "description": "Optional proxy path for the domain intent. Treated as a hint to determine optionality of DNS records in the response."
           }
         },
-        "required": [
-          "name"
-        ]
+        "required": ["name"]
       },
       "PlatformApplicationTransferResponse": {
         "title": "Application Transfer",
@@ -5030,9 +4761,7 @@
         "properties": {
           "object": {
             "type": "string",
-            "enum": [
-              "application_transfer"
-            ],
+            "enum": ["application_transfer"],
             "description": "The object type."
           },
           "id": {
@@ -5053,12 +4782,7 @@
           "status": {
             "type": "string",
             "description": "The current status of the transfer.",
-            "enum": [
-              "pending",
-              "completed",
-              "canceled",
-              "expired"
-            ],
+            "enum": ["pending", "completed", "canceled", "expired"],
             "example": "pending"
           },
           "expires_at": {
@@ -5120,10 +4844,7 @@
             "example": 5
           }
         },
-        "required": [
-          "data",
-          "total_count"
-        ]
+        "required": ["data", "total_count"]
       },
       "PlatformGetOrCreateUserRequest": {
         "type": "object",
@@ -5142,11 +4863,7 @@
             "description": "The last name of the user."
           }
         },
-        "required": [
-          "email_address",
-          "first_name",
-          "last_name"
-        ]
+        "required": ["email_address", "first_name", "last_name"]
       },
       "verification_otp": {
         "x-speakeasy-name-override": "OTP",
@@ -5155,27 +4872,16 @@
         "properties": {
           "object": {
             "type": "string",
-            "enum": [
-              "verification_otp"
-            ]
+            "enum": ["verification_otp"]
           },
           "status": {
             "type": "string",
-            "enum": [
-              "unverified",
-              "verified",
-              "failed",
-              "expired"
-            ]
+            "enum": ["unverified", "verified", "failed", "expired"]
           },
           "strategy": {
             "x-speakeasy-unknown-values": "allow",
             "type": "string",
-            "enum": [
-              "phone_code",
-              "email_code",
-              "reset_password_email_code"
-            ]
+            "enum": ["phone_code", "email_code", "reset_password_email_code"]
           },
           "attempts": {
             "type": "integer",
@@ -5195,12 +4901,7 @@
             "nullable": true
           }
         },
-        "required": [
-          "status",
-          "strategy",
-          "attempts",
-          "expire_at"
-        ]
+        "required": ["status", "strategy", "attempts", "expire_at"]
       },
       "verification_admin": {
         "x-speakeasy-name-override": "Admin",
@@ -5209,22 +4910,16 @@
         "properties": {
           "object": {
             "type": "string",
-            "enum": [
-              "verification_admin"
-            ]
+            "enum": ["verification_admin"]
           },
           "status": {
             "type": "string",
-            "enum": [
-              "verified"
-            ]
+            "enum": ["verified"]
           },
           "strategy": {
             "x-speakeasy-unknown-values": "allow",
             "type": "string",
-            "enum": [
-              "admin"
-            ]
+            "enum": ["admin"]
           },
           "attempts": {
             "type": "integer",
@@ -5239,12 +4934,7 @@
             "nullable": true
           }
         },
-        "required": [
-          "status",
-          "strategy",
-          "attempts",
-          "expire_at"
-        ]
+        "required": ["status", "strategy", "attempts", "expire_at"]
       },
       "verification_from_oauth": {
         "x-speakeasy-name-override": "FromOAuth",
@@ -5253,16 +4943,11 @@
         "properties": {
           "object": {
             "type": "string",
-            "enum": [
-              "verification_from_oauth"
-            ]
+            "enum": ["verification_from_oauth"]
           },
           "status": {
             "type": "string",
-            "enum": [
-              "unverified",
-              "verified"
-            ]
+            "enum": ["unverified", "verified"]
           },
           "strategy": {
             "type": "string",
@@ -5290,12 +4975,7 @@
             "nullable": true
           }
         },
-        "required": [
-          "status",
-          "strategy",
-          "attempts",
-          "expire_at"
-        ]
+        "required": ["status", "strategy", "attempts", "expire_at"]
       },
       "verification_ticket": {
         "x-speakeasy-name-override": "Ticket",
@@ -5304,24 +4984,16 @@
         "properties": {
           "object": {
             "type": "string",
-            "enum": [
-              "verification_ticket"
-            ]
+            "enum": ["verification_ticket"]
           },
           "status": {
             "type": "string",
-            "enum": [
-              "unverified",
-              "verified",
-              "expired"
-            ]
+            "enum": ["unverified", "verified", "expired"]
           },
           "strategy": {
             "x-speakeasy-unknown-values": "allow",
             "type": "string",
-            "enum": [
-              "ticket"
-            ]
+            "enum": ["ticket"]
           },
           "attempts": {
             "type": "integer",
@@ -5336,12 +5008,7 @@
             "nullable": true
           }
         },
-        "required": [
-          "status",
-          "strategy",
-          "attempts",
-          "expire_at"
-        ]
+        "required": ["status", "strategy", "attempts", "expire_at"]
       },
       "verification_saml": {
         "x-speakeasy-name-override": "SAML",
@@ -5350,25 +5017,15 @@
         "properties": {
           "object": {
             "type": "string",
-            "enum": [
-              "verification_saml"
-            ]
+            "enum": ["verification_saml"]
           },
           "status": {
             "type": "string",
-            "enum": [
-              "unverified",
-              "verified",
-              "failed",
-              "expired",
-              "transferable"
-            ]
+            "enum": ["unverified", "verified", "failed", "expired", "transferable"]
           },
           "strategy": {
             "type": "string",
-            "enum": [
-              "saml"
-            ]
+            "enum": ["saml"]
           },
           "external_verification_redirect_url": {
             "nullable": true,
@@ -5396,11 +5053,7 @@
             "nullable": true
           }
         },
-        "required": [
-          "status",
-          "strategy",
-          "attempts"
-        ]
+        "required": ["status", "strategy", "attempts"]
       },
       "verification_email_link": {
         "x-speakeasy-name-override": "EmailLink",
@@ -5409,24 +5062,15 @@
         "properties": {
           "object": {
             "type": "string",
-            "enum": [
-              "verification_email_link"
-            ]
+            "enum": ["verification_email_link"]
           },
           "status": {
             "type": "string",
-            "enum": [
-              "unverified",
-              "verified",
-              "failed",
-              "expired"
-            ]
+            "enum": ["unverified", "verified", "failed", "expired"]
           },
           "strategy": {
             "type": "string",
-            "enum": [
-              "email_link"
-            ]
+            "enum": ["email_link"]
           },
           "attempts": {
             "type": "integer",
@@ -5441,12 +5085,7 @@
             "nullable": true
           }
         },
-        "required": [
-          "status",
-          "strategy",
-          "attempts",
-          "expire_at"
-        ]
+        "required": ["status", "strategy", "attempts", "expire_at"]
       },
       "verification_scim": {
         "x-speakeasy-name-override": "SCIM",
@@ -5455,21 +5094,15 @@
         "properties": {
           "object": {
             "type": "string",
-            "enum": [
-              "verification_scim"
-            ]
+            "enum": ["verification_scim"]
           },
           "status": {
             "type": "string",
-            "enum": [
-              "verified"
-            ]
+            "enum": ["verified"]
           },
           "strategy": {
             "type": "string",
-            "enum": [
-              "scim"
-            ]
+            "enum": ["scim"]
           },
           "attempts": {
             "type": "integer",
@@ -5480,12 +5113,7 @@
             "nullable": true
           }
         },
-        "required": [
-          "status",
-          "strategy",
-          "attempts",
-          "expire_at"
-        ]
+        "required": ["status", "strategy", "attempts", "expire_at"]
       },
       "IdentificationLink": {
         "type": "object",
@@ -5499,10 +5127,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "type",
-          "id"
-        ]
+        "required": ["type", "id"]
       },
       "EmailAddress": {
         "type": "object",
@@ -5515,9 +5140,7 @@
             "type": "string",
             "x-speakeasy-unknown-values": "allow",
             "description": "String representing the object's type. Objects of the same type share the same value.\n",
-            "enum": [
-              "email_address"
-            ]
+            "enum": ["email_address"]
           },
           "email_address": {
             "type": "string"
@@ -5605,9 +5228,7 @@
           "object": {
             "type": "string",
             "description": "String representing the object's type. Objects of the same type share the same value.\n",
-            "enum": [
-              "phone_number"
-            ]
+            "enum": ["phone_number"]
           },
           "phone_number": {
             "type": "string"
@@ -5681,18 +5302,11 @@
         "properties": {
           "object": {
             "type": "string",
-            "enum": [
-              "verification_web3"
-            ]
+            "enum": ["verification_web3"]
           },
           "status": {
             "type": "string",
-            "enum": [
-              "unverified",
-              "verified",
-              "failed",
-              "expired"
-            ]
+            "enum": ["unverified", "verified", "failed", "expired"]
           },
           "strategy": {
             "type": "string",
@@ -5725,12 +5339,7 @@
             "nullable": true
           }
         },
-        "required": [
-          "status",
-          "strategy",
-          "attempts",
-          "expire_at"
-        ]
+        "required": ["status", "strategy", "attempts", "expire_at"]
       },
       "Web3Wallet": {
         "type": "object",
@@ -5742,9 +5351,7 @@
           "object": {
             "type": "string",
             "description": "String representing the object's type. Objects of the same type share the same value.\n",
-            "enum": [
-              "web3_wallet"
-            ]
+            "enum": ["web3_wallet"]
           },
           "web3_wallet": {
             "type": "string"
@@ -5775,13 +5382,7 @@
             "description": "Unix timestamp of creation\n"
           }
         },
-        "required": [
-          "object",
-          "web3_wallet",
-          "verification",
-          "created_at",
-          "updated_at"
-        ]
+        "required": ["object", "web3_wallet", "verification", "created_at", "updated_at"]
       },
       "verification_passkey": {
         "x-speakeasy-name-override": "Passkey",
@@ -5790,27 +5391,19 @@
         "properties": {
           "object": {
             "type": "string",
-            "enum": [
-              "verification_passkey"
-            ]
+            "enum": ["verification_passkey"]
           },
           "status": {
             "type": "string",
-            "enum": [
-              "verified"
-            ]
+            "enum": ["verified"]
           },
           "strategy": {
             "type": "string",
-            "enum": [
-              "passkey"
-            ]
+            "enum": ["passkey"]
           },
           "nonce": {
             "type": "string",
-            "enum": [
-              "nonce"
-            ]
+            "enum": ["nonce"]
           },
           "message": {
             "type": "string",
@@ -5829,12 +5422,7 @@
             "nullable": true
           }
         },
-        "required": [
-          "status",
-          "strategy",
-          "attempts",
-          "expire_at"
-        ]
+        "required": ["status", "strategy", "attempts", "expire_at"]
       },
       "Passkey": {
         "type": "object",
@@ -5846,9 +5434,7 @@
           "object": {
             "type": "string",
             "description": "String representing the object's type. Objects of the same type share the same value.\n",
-            "enum": [
-              "passkey"
-            ]
+            "enum": ["passkey"]
           },
           "name": {
             "type": "string"
@@ -5871,12 +5457,7 @@
             }
           }
         },
-        "required": [
-          "object",
-          "name",
-          "last_used_at",
-          "verification"
-        ]
+        "required": ["object", "name", "last_used_at", "verification"]
       },
       "verification_oauth": {
         "x-speakeasy-name-override": "Oauth",
@@ -5885,20 +5466,12 @@
         "properties": {
           "object": {
             "type": "string",
-            "enum": [
-              "verification_oauth"
-            ]
+            "enum": ["verification_oauth"]
           },
           "status": {
             "type": "string",
             "x-speakeasy-unknown-values": "allow",
-            "enum": [
-              "unverified",
-              "verified",
-              "failed",
-              "expired",
-              "transferable"
-            ]
+            "enum": ["unverified", "verified", "failed", "expired", "transferable"]
           },
           "strategy": {
             "type": "string",
@@ -5929,12 +5502,7 @@
             "nullable": true
           }
         },
-        "required": [
-          "status",
-          "strategy",
-          "attempts",
-          "expire_at"
-        ]
+        "required": ["status", "strategy", "attempts", "expire_at"]
       },
       "verification_google_one_tap": {
         "x-speakeasy-name-override": "GoogleOneTap",
@@ -5943,22 +5511,15 @@
         "properties": {
           "object": {
             "type": "string",
-            "enum": [
-              "verification_google_one_tap"
-            ]
+            "enum": ["verification_google_one_tap"]
           },
           "status": {
             "type": "string",
-            "enum": [
-              "unverified",
-              "verified"
-            ]
+            "enum": ["unverified", "verified"]
           },
           "strategy": {
             "type": "string",
-            "enum": [
-              "google_one_tap"
-            ]
+            "enum": ["google_one_tap"]
           },
           "expire_at": {
             "type": "integer",
@@ -5982,12 +5543,7 @@
             ]
           }
         },
-        "required": [
-          "status",
-          "strategy",
-          "attempts",
-          "expire_at"
-        ]
+        "required": ["status", "strategy", "attempts", "expire_at"]
       },
       "ExternalAccountWithVerification": {
         "type": "object",
@@ -5996,11 +5552,7 @@
           "object": {
             "type": "string",
             "description": "String representing the object's type. Objects of the same type share the same value.",
-            "enum": [
-              "external_account",
-              "facebook_account",
-              "google_account"
-            ]
+            "enum": ["external_account", "facebook_account", "google_account"]
           },
           "id": {
             "type": "string"
@@ -6159,14 +5711,10 @@
         ],
         "anyOf": [
           {
-            "required": [
-              "domain"
-            ]
+            "required": ["domain"]
           },
           {
-            "required": [
-              "domains"
-            ]
+            "required": ["domains"]
           }
         ]
       },
@@ -6180,9 +5728,7 @@
           "object": {
             "type": "string",
             "description": "String representing the object's type. Objects of the same type share the same value.\n",
-            "enum": [
-              "saml_account"
-            ]
+            "enum": ["saml_account"]
           },
           "provider": {
             "type": "string"
@@ -6240,14 +5786,7 @@
             ]
           }
         },
-        "required": [
-          "id",
-          "object",
-          "provider",
-          "active",
-          "email_address",
-          "verification"
-        ]
+        "required": ["id", "object", "provider", "active", "email_address", "verification"]
       },
       "EnterpriseAccountConnection": {
         "type": "object",
@@ -6321,14 +5860,10 @@
         ],
         "anyOf": [
           {
-            "required": [
-              "domain"
-            ]
+            "required": ["domain"]
           },
           {
-            "required": [
-              "domains"
-            ]
+            "required": ["domains"]
           }
         ]
       },
@@ -6342,17 +5877,12 @@
           "object": {
             "type": "string",
             "description": "String representing the object's type. Objects of the same type share the same value.\n",
-            "enum": [
-              "enterprise_account"
-            ]
+            "enum": ["enterprise_account"]
           },
           "protocol": {
             "type": "string",
             "description": "The authentication protocol used to sign in.\n",
-            "enum": [
-              "oauth",
-              "saml"
-            ]
+            "enum": ["oauth", "saml"]
           },
           "provider": {
             "type": "string"
@@ -6418,23 +5948,14 @@
             "description": "Unix timestamp of last authentication.\n"
           }
         },
-        "required": [
-          "id",
-          "object",
-          "provider",
-          "active",
-          "email_address",
-          "verification"
-        ]
+        "required": ["id", "object", "provider", "active", "email_address", "verification"]
       },
       "Organization": {
         "type": "object",
         "properties": {
           "object": {
             "type": "string",
-            "enum": [
-              "organization"
-            ]
+            "enum": ["organization"]
           },
           "id": {
             "type": "string"
@@ -6576,9 +6097,7 @@
           "object": {
             "type": "string",
             "description": "String representing the object's type. Objects of the same type share the same value.\n",
-            "enum": [
-              "organization_membership"
-            ]
+            "enum": ["organization_membership"]
           },
           "role": {
             "type": "string"
@@ -6655,10 +6174,7 @@
             "description": "The user's external ID as reported by the SCIM directory, if any.\n"
           }
         },
-        "required": [
-          "directory_id",
-          "external_id"
-        ]
+        "required": ["directory_id", "external_id"]
       },
       "User": {
         "type": "object",
@@ -6670,9 +6186,7 @@
           "object": {
             "type": "string",
             "description": "String representing the object's type. Objects of the same type share the same value.\n",
-            "enum": [
-              "user"
-            ]
+            "enum": ["user"]
           },
           "external_id": {
             "nullable": true,
@@ -6963,9 +6477,7 @@
             "description": "The creation timestamp in RFC3339 format."
           }
         },
-        "required": [
-          "slug"
-        ]
+        "required": ["slug"]
       },
       "PlatformUpdateOrganizationRequest": {
         "type": "object",
@@ -6983,9 +6495,7 @@
             "description": "Workspace-scoped add-on subscription plan IDs."
           }
         },
-        "required": [
-          "plan_id"
-        ]
+        "required": ["plan_id"]
       },
       "PlatformCreateOrganizationSubscriptionRequest": {
         "type": "object",
@@ -7000,10 +6510,7 @@
             "description": "Subscription plan ID (e.g. pro_2025_08)."
           }
         },
-        "required": [
-          "shared_payment_token",
-          "plan_id"
-        ]
+        "required": ["shared_payment_token", "plan_id"]
       },
       "InstanceUsageMeterWithBillable": {
         "title": "Instance Usage Meter With Billable",
@@ -7022,10 +6529,7 @@
             "description": "Billable subset of total usage for this meter in the selected period."
           }
         },
-        "required": [
-          "total_usage",
-          "total_billable_usage"
-        ]
+        "required": ["total_usage", "total_billable_usage"]
       },
       "InstanceUsageMeter": {
         "title": "Instance Usage Meter",
@@ -7039,9 +6543,7 @@
             "description": "Total quantity for this meter in the selected period."
           }
         },
-        "required": [
-          "total_usage"
-        ]
+        "required": ["total_usage"]
       },
       "InstanceSMSUsage": {
         "title": "Instance SMS Usage",
@@ -7073,15 +6575,7 @@
             "$ref": "#/components/schemas/InstanceUsageMeter"
           }
         },
-        "required": [
-          "total_usage",
-          "tier_a",
-          "tier_b",
-          "tier_c",
-          "tier_d",
-          "tier_e",
-          "tier_f"
-        ]
+        "required": ["total_usage", "tier_a", "tier_b", "tier_c", "tier_d", "tier_e", "tier_f"]
       },
       "PlatformInstanceUsageResponse": {
         "title": "Instance Usage Report",
@@ -7155,10 +6649,7 @@
             "example": 100
           }
         },
-        "required": [
-          "data",
-          "total_count"
-        ]
+        "required": ["data", "total_count"]
       },
       "DeletedObject": {
         "type": "object",
@@ -7180,10 +6671,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "object",
-          "deleted"
-        ]
+        "required": ["object", "deleted"]
       },
       "JWTTemplate": {
         "type": "object",
@@ -7191,9 +6679,7 @@
         "properties": {
           "object": {
             "type": "string",
-            "enum": [
-              "jwt_template"
-            ]
+            "enum": ["jwt_template"]
           },
           "id": {
             "type": "string"
@@ -7246,9 +6732,7 @@
         "properties": {
           "object": {
             "type": "string",
-            "enum": [
-              "redirect_url"
-            ]
+            "enum": ["redirect_url"]
           },
           "id": {
             "type": "string"
@@ -7267,13 +6751,7 @@
             "description": "Unix timestamp of last update.\n"
           }
         },
-        "required": [
-          "object",
-          "id",
-          "url",
-          "created_at",
-          "updated_at"
-        ]
+        "required": ["object", "id", "url", "created_at", "updated_at"]
       },
       "PlatformListRedirectURLsResponse": {
         "title": "List Redirect URLs Response",
@@ -7295,10 +6773,7 @@
             "example": 3
           }
         },
-        "required": [
-          "data",
-          "total_count"
-        ]
+        "required": ["data", "total_count"]
       },
       "PlatformConfigResponse": {
         "type": "object",

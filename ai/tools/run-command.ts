@@ -15,9 +15,7 @@ export const runCommand = ({ writer }: Params) =>
   tool({
     description,
     inputSchema: z.object({
-      sandboxId: z
-        .string()
-        .describe("The Vercel Sandbox reference/name to run the command in"),
+      sandboxId: z.string().describe("The Vercel Sandbox reference/name to run the command in"),
       command: z
         .string()
         .describe(

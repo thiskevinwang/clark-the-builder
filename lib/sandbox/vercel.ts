@@ -21,11 +21,7 @@ import type {
 } from "./types";
 
 function getSandboxCredentials() {
-  if (
-    process.env.VERCEL_TOKEN &&
-    process.env.VERCEL_TEAM_ID &&
-    process.env.VERCEL_PROJECT_ID
-  ) {
+  if (process.env.VERCEL_TOKEN && process.env.VERCEL_TEAM_ID && process.env.VERCEL_PROJECT_ID) {
     return {
       token: process.env.VERCEL_TOKEN,
       teamId: process.env.VERCEL_TEAM_ID,

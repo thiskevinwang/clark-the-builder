@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
 
 import { platformDeleteApplication } from "@/lib/api";
-import { getCurrentLocalUser } from "@/lib/auth";
 import { createClient, createConfig } from "@/lib/api/client";
+import { getCurrentLocalUser } from "@/lib/auth";
+import { db } from "@/lib/database/db";
 import { createResourceRepository } from "@/lib/repositories/resource-repository-impl";
 import { getOwnedResourceByExternalId } from "@/lib/resource-ownership";
-import { db } from "@/lib/database/db";
 
 interface Params {
   params: Promise<{ applicationId: string }>;

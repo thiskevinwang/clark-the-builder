@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 
 import { platformCreateApplicationTransfer } from "@/lib/api";
-import { getCurrentLocalUser } from "@/lib/auth";
 import { createClient, createConfig } from "@/lib/api/client";
+import { getCurrentLocalUser } from "@/lib/auth";
 import { getOwnedResourceByExternalId } from "@/lib/resource-ownership";
 
 interface Params {

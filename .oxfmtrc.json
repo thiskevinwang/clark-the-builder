@@ -1,0 +1,35 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "semi": true,
+  "trailingComma": "all",
+  "printWidth": 100,
+  "arrowParens": "always",
+  "tabWidth": 2,
+  "sortImports": {
+    "groups": ["builtin", "external", "ai", "internal", ["parent", "sibling", "index"]],
+    "customGroups": [
+      {
+        "groupName": "ai",
+        "selector": "internal",
+        "elementNamePattern": ["@/ai/**"]
+      },
+      {
+        "groupName": "internal",
+        "selector": "internal",
+        "elementNamePattern": ["@/**"]
+      }
+    ],
+    "newlinesBetween": true
+  },
+  "sortPackageJson": false,
+  "ignorePatterns": [
+    "node_modules/**",
+    ".next/**",
+    "out/**",
+    "build/**",
+    "coverage/**",
+    "next-env.d.ts",
+    "lib/api/**/*.gen.ts",
+    "lib/api/**/*.gen.tsx"
+  ]
+}

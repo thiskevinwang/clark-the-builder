@@ -25,11 +25,7 @@ interface Props {
 function stringifyToolValue(value: unknown): string | null {
   if (value == null) return null;
   if (typeof value === "string") return value;
-  if (
-    typeof value === "number" ||
-    typeof value === "boolean" ||
-    typeof value === "bigint"
-  ) {
+  if (typeof value === "number" || typeof value === "boolean" || typeof value === "bigint") {
     return String(value);
   }
 

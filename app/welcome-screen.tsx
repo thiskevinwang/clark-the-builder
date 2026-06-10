@@ -4,12 +4,12 @@ import { ArrowUpIcon, PanelLeftIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
+import { AppAuthGuard } from "@/components/auth/app-auth-guard";
 import { ClarkAvatar } from "@/components/clark-avatar";
 import { ConnectorsMenu } from "@/components/connectors/connectors-menu";
 import { ModelSelector } from "@/components/settings/model-selector";
 import { Settings } from "@/components/settings/settings";
 import { Sidebar, useSidebar } from "@/components/sidebar";
-import { AppAuthGuard } from "@/components/auth/app-auth-guard";
 import { Button } from "@/components/ui/button";
 import {
   InputGroup,
