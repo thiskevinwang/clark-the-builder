@@ -16,6 +16,10 @@ interface Params {
   userId: string;
 }
 
+function getSandboxName(conversationId: string) {
+  return `clark-${conversationId.replaceAll("_", "-")}`;
+}
+
 export const createSandbox = ({ writer, conversationId, userId }: Params) =>
   tool({
     description,
@@ -42,7 +46,7 @@ export const createSandbox = ({ writer, conversationId, userId }: Params) =>
           "Environment variables to set in the sandbox. Use this to pass secrets and configuration like NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY and CLERK_SECRET_KEY for Clerk authentication, or any other environment variables the application needs.",
         ),
     }),
-    execute: async ({ timeout, ports }, { toolCallId }) => {
+    execute: async ({ timeout, ports, env }, { toolCallId }) => {
       writer.write({
         id: toolCallId,
         type: "data-create-sandbox",
@@ -50,6 +54,8 @@ export const createSandbox = ({ writer, conversationId, userId }: Params) =>
       });
 
       try {
+        const sandboxName = getSandboxName(conversationId);
+        const effectiveTimeout = timeout ?? 1000 * 60 * 20;
         const sandbox = await sandboxProvider.create({
           // TODO(kevin): Support creation from a git repository
           // source: {
@@ -58,8 +64,11 @@ export const createSandbox = ({ writer, conversationId, userId }: Params) =>
           // },
           // FUTURE(kevin): Can we require auth & fetch VERCEL_OIDC_TOKEN for the application visitor?
           // token: ...,
-          timeout: timeout ?? 1000 * 60 * 20, // 20 minutes
+          name: sandboxName,
+          timeout: effectiveTimeout, // 20 minutes
           ports,
+          env,
+          persistent: true,
         });
 
         writer.write({
@@ -70,19 +79,31 @@ export const createSandbox = ({ writer, conversationId, userId }: Params) =>
 
         // Save the Vercel sandbox as a resource
         const resourceRepository = createResourceRepository(db);
-        await resourceRepository.create({
-          userId,
-          type: "vercel_sandbox",
-          externalId: sandbox.sandboxId,
-          conversationId,
-          metadata: {
-            timeout: timeout ?? 1000 * 60 * 20,
-            ports,
-          },
-        });
+        const existingResource = await resourceRepository.getByExternalId(userId, sandbox.sandboxId);
+        const metadata = {
+          persistent: true,
+          sandboxName: sandbox.sandboxName,
+          timeout: effectiveTimeout,
+          ports,
+        };
+
+        if (existingResource?.type === "vercel_sandbox") {
+          await resourceRepository.update(userId, existingResource.id, {
+            conversationId,
+            metadata,
+          });
+        } else {
+          await resourceRepository.create({
+            userId,
+            type: "vercel_sandbox",
+            externalId: sandbox.sandboxId,
+            conversationId,
+            metadata,
+          });
+        }
 
         return (
-          `Sandbox created with ID: ${sandbox.sandboxId}.` +
+          `Sandbox created or resumed with reference: ${sandbox.sandboxId}.` +
           `\nYou can now upload files, run commands, and access services on the exposed ports.`
         );
       } catch (error) {

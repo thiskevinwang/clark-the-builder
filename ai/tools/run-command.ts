@@ -15,7 +15,9 @@ export const runCommand = ({ writer }: Params) =>
   tool({
     description,
     inputSchema: z.object({
-      sandboxId: z.string().describe("The ID of the Vercel Sandbox to run the command in"),
+      sandboxId: z
+        .string()
+        .describe("The Vercel Sandbox reference/name to run the command in"),
       command: z
         .string()
         .describe(
@@ -125,7 +127,7 @@ export const runCommand = ({ writer }: Params) =>
 
         return `The command \`${command} ${args.join(
           " ",
-        )}\` has been started in the background in the sandbox with ID \`${sandboxId}\` with the commandId ${
+        )}\` has been started in the background in the sandbox \`${sandboxId}\` with the commandId ${
           cmd.cmdId
         }.`;
       }

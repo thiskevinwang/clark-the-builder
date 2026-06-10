@@ -1,31 +1,56 @@
 /**
  * Vercel Sandbox implementation of the generic sandbox interface.
  */
-import { Command as VercelCommand, Sandbox as VercelSandbox } from "@vercel/sandbox";
-import { APIError } from "@vercel/sandbox/dist/api-client/api-error";
+import {
+  APIError,
+  Command as VercelCommand,
+  CommandFinished as VercelCommandFinished,
+  Sandbox as VercelSandbox,
+} from "@vercel/sandbox";
 
 import type {
   Sandbox,
   SandboxCommand,
   SandboxCommandResult,
   SandboxCreateOptions,
+  SandboxGetOptions,
   SandboxLogLine,
   SandboxProvider,
   SandboxRunCommandOptions,
   SandboxWriteFile,
 } from "./types";
 
-function wrapCommand(cmd: VercelCommand): SandboxCommand {
+function getSandboxCredentials() {
+  if (
+    process.env.VERCEL_TOKEN &&
+    process.env.VERCEL_TEAM_ID &&
+    process.env.VERCEL_PROJECT_ID
+  ) {
+    return {
+      token: process.env.VERCEL_TOKEN,
+      teamId: process.env.VERCEL_TEAM_ID,
+      projectId: process.env.VERCEL_PROJECT_ID,
+    };
+  }
+
+  return {};
+}
+
+function wrapCommandResult(done: VercelCommandFinished): SandboxCommandResult {
+  return {
+    exitCode: done.exitCode,
+    stdout: () => done.stdout(),
+    stderr: () => done.stderr(),
+  };
+}
+
+function wrapCommand(cmd: VercelCommand | VercelCommandFinished): SandboxCommand {
   return {
     cmdId: cmd.cmdId,
     startedAt: cmd.startedAt,
     async wait(): Promise<SandboxCommandResult> {
-      const done = await cmd.wait();
-      return {
-        exitCode: done.exitCode,
-        stdout: () => done.stdout(),
-        stderr: () => done.stderr(),
-      };
+      const done = cmd instanceof VercelCommandFinished ? cmd : await cmd.wait();
+      return wrapCommandResult(done);
     },
     async *logs(): AsyncIterable<SandboxLogLine> {
       for await (const logline of cmd.logs()) {
@@ -40,7 +65,9 @@ function wrapCommand(cmd: VercelCommand): SandboxCommand {
 
 function wrapSandbox(sandbox: VercelSandbox): Sandbox {
   return {
-    sandboxId: sandbox.sandboxId,
+    sandboxId: sandbox.name,
+    sandboxName: sandbox.name,
+    status: sandbox.status,
     domain: (port: number) => sandbox.domain(port),
     async runCommand(options: SandboxRunCommandOptions): Promise<SandboxCommand> {
       const cmd = await sandbox.runCommand(options);
@@ -61,22 +88,22 @@ function wrapSandbox(sandbox: VercelSandbox): Sandbox {
 
 export const vercelSandboxProvider: SandboxProvider = {
   async create(options: SandboxCreateOptions): Promise<Sandbox> {
-    const sandbox = await VercelSandbox.create({
+    const sandbox = await VercelSandbox.getOrCreate({
+      ...getSandboxCredentials(),
+      name: options.name,
       timeout: options.timeout,
       ports: options.ports,
       runtime: "node24",
-      projectId: process.env.VERCEL_PROJECT_ID,
-      teamId: process.env.VERCEL_TEAM_ID,
-      token: process.env.VERCEL_TOKEN,
+      env: options.env,
+      persistent: options.persistent ?? true,
     });
     return wrapSandbox(sandbox);
   },
-  async get(options: { sandboxId: string }): Promise<Sandbox> {
+  async get(options: SandboxGetOptions): Promise<Sandbox> {
     const sandbox = await VercelSandbox.get({
-      sandboxId: options.sandboxId,
-      projectId: process.env.VERCEL_PROJECT_ID,
-      teamId: process.env.VERCEL_TEAM_ID,
-      token: process.env.VERCEL_TOKEN,
+      ...getSandboxCredentials(),
+      name: options.sandboxId,
+      resume: options.resume ?? true,
     });
     return wrapSandbox(sandbox);
   },

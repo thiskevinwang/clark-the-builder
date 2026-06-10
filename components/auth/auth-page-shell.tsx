@@ -1,3 +1,5 @@
+import type { ReactNode } from "react";
+
 import { ClarkAvatar, ClarkName } from "@/components/clark-avatar";
 
 interface AuthPageShellProps {

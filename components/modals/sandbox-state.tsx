@@ -4,35 +4,9 @@ import { useEffect } from "react";
 import useSWR from "swr";
 
 import { useSandboxStore } from "@/app/state";
-import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 
 export function SandboxState() {
-  const { sandboxId, status, setStatus } = useSandboxStore();
-  if (status === "stopped") {
-    return (
-      <Dialog open>
-        <DialogHeader className="sr-only">
-          <DialogTitle className="sr-only">Sandbox max. duration reached</DialogTitle>
-          <DialogDescription className="sr-only">
-            The Vercel Sandbox is already stopped. You can start a new session by clicking the
-            button below.
-          </DialogDescription>
-        </DialogHeader>
-        <DialogContent>
-          Sandbox max. duration for this demo has been reached
-          <Button onClick={() => window.location.reload()}>Start a new session</Button>
-        </DialogContent>
-      </Dialog>
-    );
-  }
-
+  const { sandboxId, setStatus } = useSandboxStore();
   return sandboxId ? <DirtyChecker sandboxId={sandboxId} setStatus={setStatus} /> : null;
 }
 
@@ -42,7 +16,7 @@ interface DirtyCheckerProps {
 }
 
 function DirtyChecker({ sandboxId, setStatus }: DirtyCheckerProps) {
-  const content = useSWR<"ok" | "stopped">(
+  const content = useSWR<string>(
     `/api/sandboxes/${sandboxId}`,
     async (pathname: string, init: RequestInit) => {
       const response = await fetch(pathname, init);
@@ -55,6 +29,8 @@ function DirtyChecker({ sandboxId, setStatus }: DirtyCheckerProps) {
   useEffect(() => {
     if (content.data === "stopped") {
       setStatus("stopped");
+    } else if (content.data) {
+      setStatus("running");
     }
   }, [setStatus, content.data]);
 

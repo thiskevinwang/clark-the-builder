@@ -4,9 +4,16 @@
  */
 
 export interface SandboxCreateOptions {
+  name?: string;
   timeout?: number;
   ports?: number[];
   env?: Record<string, string>;
+  persistent?: boolean;
+}
+
+export interface SandboxGetOptions {
+  sandboxId: string;
+  resume?: boolean;
 }
 
 export interface SandboxRunCommandOptions {
@@ -41,6 +48,8 @@ export interface SandboxLogLine {
 
 export interface Sandbox {
   sandboxId: string;
+  sandboxName: string;
+  status: "pending" | "running" | "stopping" | "stopped" | "failed" | "aborted" | "snapshotting";
   domain(port: number): string;
   runCommand(options: SandboxRunCommandOptions): Promise<SandboxCommand>;
   getCommand(cmdId: string): Promise<SandboxCommand>;
@@ -50,7 +59,7 @@ export interface Sandbox {
 
 export interface SandboxProvider {
   create(options: SandboxCreateOptions): Promise<Sandbox>;
-  get(options: { sandboxId: string }): Promise<Sandbox>;
+  get(options: SandboxGetOptions): Promise<Sandbox>;
 }
 
 export interface SandboxAPIError extends Error {

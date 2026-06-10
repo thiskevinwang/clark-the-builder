@@ -38,7 +38,7 @@ You can install additional packages using the `dnf` package manager. You can NEV
 ## Best Practices
 
 - Create the sandbox at the beginning of the session or when the user initiates a coding task
-- Track and reuse the sandbox ID throughout the session
+- Track and reuse the sandbox reference throughout the session
 - Do not create a second sandbox unless explicitly instructed
 - If the user requests an environment reset, you may create a new sandbox **after confirming their intent**
 
@@ -62,4 +62,4 @@ Skip using this tool when:
 
 ## Summary
 
-Use Create Sandbox to initialize a secure, temporary development environment — but **only once per session**. Treat the sandbox as the core workspace for all follow-up actions unless the user explicitly asks to discard and start anew.
+Use Create Sandbox to initialize or resume a secure, persistent development environment — but **only once per session**. Treat the sandbox as the core workspace for all follow-up actions unless the user explicitly asks to discard and start anew.

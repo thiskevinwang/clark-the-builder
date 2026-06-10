@@ -17,7 +17,7 @@ export const getSandboxURL = ({ writer }: Params) =>
       sandboxId: z
         .string()
         .describe(
-          "The unique identifier of the Vercel Sandbox (e.g., 'sbx_abc123xyz'). This ID is returned when creating a Vercel Sandbox and is used to reference the specific sandbox instance.",
+          "The Vercel Sandbox reference/name returned when creating or resuming a sandbox.",
         ),
       port: z
         .number()

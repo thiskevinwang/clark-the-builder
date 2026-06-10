@@ -33,6 +33,10 @@ export function getModelOptions(
       v3Model = anthropic(modelId);
       break;
     case Models.OpenAIGpt52:
+    case Models.OpenAIGpt53Codex:
+    case Models.OpenAIGPT54:
+    case Models.OpenAIGPT54Mini:
+    case Models.OpenAIGPT55:
       v3Model = openai(modelId);
       break;
     default:
