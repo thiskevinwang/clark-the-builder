@@ -40,6 +40,10 @@
       "description": "An object representing a domain associated with a Clerk application. In development `instances`, a domain is provided by Clerk. Production `instances` require additional configuration to be set up."
     },
     {
+      "name": "Domain Intents",
+      "description": "An object representing the intent to create a Clerk domain.\nThe high-level for domain intent consumption:\n1. Create a domain intent, and receive the DNS records for the future domain to function. 2. Create a domain, supplying the intent ID."
+    },
+    {
       "name": "Application Transfers",
       "description": "An object representing a transfer request for an application between workspaces.\n\nThe high-level flow for application transfer:\n\n1. The initial workspace can create an application transfer. A single-use `code` will be generated which may be distributed to any end-user of Clerk.\n2. The code must be claimed through the clerk dashboard: https://dashboard.clerk.com/apps/transfer?code=<...>\n\nNote that once a transfer is claimed, the original workspace will no longer have access to the application."
     },
@@ -69,7 +73,9 @@
         "operationId": "PlatformListApplications",
         "x-speakeasy-group": "platform",
         "x-speakeasy-name-override": "listApplications",
-        "tags": ["Applications"],
+        "tags": [
+          "Applications"
+        ],
         "summary": "List applications",
         "description": "List applications.\n",
         "security": [
@@ -86,6 +92,16 @@
             "schema": {
               "type": "boolean",
               "default": false
+            }
+          },
+          {
+            "name": "owner_id",
+            "in": "query",
+            "description": "The owner ID (organization ID) for shared-secret authentication.",
+            "required": false,
+            "x-internal": true,
+            "schema": {
+              "type": "string"
             }
           }
         ],
@@ -115,12 +131,26 @@
         "operationId": "PlatformCreateApplication",
         "x-speakeasy-group": "platform",
         "x-speakeasy-name-override": "createApplication",
-        "tags": ["Applications"],
+        "tags": [
+          "Applications"
+        ],
         "summary": "Create an application",
         "description": "Create a new application.\n",
         "security": [
           {
             "platform_api_access_token": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "owner_id",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "x-internal": true,
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "requestBody": {
@@ -165,7 +195,9 @@
         "operationId": "PlatformGetApplication",
         "x-speakeasy-group": "platform",
         "x-speakeasy-name-override": "getApplication",
-        "tags": ["Applications"],
+        "tags": [
+          "Applications"
+        ],
         "summary": "Get an application",
         "description": "Get application details.\n",
         "security": [
@@ -191,6 +223,16 @@
             "schema": {
               "type": "boolean",
               "default": false
+            }
+          },
+          {
+            "name": "owner_id",
+            "in": "query",
+            "description": "The owner ID (organization ID) for shared-secret authentication.",
+            "required": false,
+            "x-internal": true,
+            "schema": {
+              "type": "string"
             }
           }
         ],
@@ -223,7 +265,9 @@
         "operationId": "PlatformUpdateApplication",
         "x-speakeasy-group": "platform",
         "x-speakeasy-name-override": "updateApplication",
-        "tags": ["Applications"],
+        "tags": [
+          "Applications"
+        ],
         "summary": "Update an application",
         "description": "Update an application.\n",
         "security": [
@@ -237,6 +281,16 @@
             "in": "path",
             "description": "Application ID.",
             "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "owner_id",
+            "in": "query",
+            "description": "The owner ID (organization ID) for shared-secret authentication.",
+            "required": false,
+            "x-internal": true,
             "schema": {
               "type": "string"
             }
@@ -285,7 +339,9 @@
         "operationId": "PlatformDeleteApplication",
         "x-speakeasy-group": "platform",
         "x-speakeasy-name-override": "deleteApplication",
-        "tags": ["Applications"],
+        "tags": [
+          "Applications"
+        ],
         "summary": "Delete an application",
         "description": "Delete an application.\n",
         "security": [
@@ -299,6 +355,16 @@
             "in": "path",
             "description": "Application ID.",
             "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "owner_id",
+            "in": "query",
+            "description": "The owner ID (organization ID) for shared-secret authentication.",
+            "required": false,
+            "x-internal": true,
             "schema": {
               "type": "string"
             }
@@ -335,7 +401,9 @@
         "operationId": "PlatformUploadApplicationLogo",
         "x-speakeasy-group": "platform",
         "x-speakeasy-name-override": "uploadApplicationLogo",
-        "tags": ["Applications"],
+        "tags": [
+          "Applications"
+        ],
         "summary": "Upload application logo",
         "description": "Set or replace an application's logo by uploading an image file.\n",
         "security": [
@@ -366,7 +434,9 @@
                     "format": "binary"
                   }
                 },
-                "required": ["file"]
+                "required": [
+                  "file"
+                ]
               }
             },
             "application/octet-stream": {
@@ -412,7 +482,9 @@
         "operationId": "PlatformDeleteApplicationLogo",
         "x-speakeasy-group": "platform",
         "x-speakeasy-name-override": "deleteApplicationLogo",
-        "tags": ["Applications"],
+        "tags": [
+          "Applications"
+        ],
         "summary": "Delete application logo",
         "description": "Delete an application's logo.\n",
         "security": [
@@ -462,7 +534,9 @@
         "operationId": "PlatformUploadApplicationFavicon",
         "x-speakeasy-group": "platform",
         "x-speakeasy-name-override": "uploadApplicationFavicon",
-        "tags": ["Applications"],
+        "tags": [
+          "Applications"
+        ],
         "summary": "Upload application favicon",
         "description": "Set or replace an application's favicon by uploading an image file.\n",
         "security": [
@@ -493,7 +567,9 @@
                     "format": "binary"
                   }
                 },
-                "required": ["file"]
+                "required": [
+                  "file"
+                ]
               }
             },
             "application/octet-stream": {
@@ -539,7 +615,9 @@
         "operationId": "PlatformDeleteApplicationFavicon",
         "x-speakeasy-group": "platform",
         "x-speakeasy-name-override": "deleteApplicationFavicon",
-        "tags": ["Applications"],
+        "tags": [
+          "Applications"
+        ],
         "summary": "Delete application favicon",
         "description": "Delete an application's favicon.\n",
         "security": [
@@ -589,7 +667,9 @@
         "operationId": "PlatformUpdateApplicationDomain",
         "x-speakeasy-group": "platform",
         "x-speakeasy-name-override": "updateApplicationDomain",
-        "tags": ["Domains"],
+        "tags": [
+          "Domains"
+        ],
         "summary": "Update application domain",
         "description": "Update the production domain for an application.\n",
         "security": [
@@ -603,6 +683,16 @@
             "in": "path",
             "description": "Application ID.",
             "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "owner_id",
+            "in": "query",
+            "description": "The owner ID (organization ID) for shared-secret authentication.",
+            "required": false,
+            "x-internal": true,
             "schema": {
               "type": "string"
             }
@@ -653,7 +743,9 @@
         "operationId": "PlatformListApplicationDomains",
         "x-speakeasy-group": "platform",
         "x-speakeasy-name-override": "listApplicationDomains",
-        "tags": ["Domains"],
+        "tags": [
+          "Domains"
+        ],
         "summary": "List application domains",
         "description": "List all domains for an application's production instance.\n",
         "security": [
@@ -698,7 +790,9 @@
         "operationId": "PlatformCreateApplicationDomain",
         "x-speakeasy-group": "platform",
         "x-speakeasy-name-override": "createApplicationDomain",
-        "tags": ["Domains"],
+        "tags": [
+          "Domains"
+        ],
         "summary": "Create application domain",
         "description": "Create a provider domain for an application's production instance.\n",
         "security": [
@@ -765,7 +859,9 @@
         "operationId": "PlatformGetApplicationDomain",
         "x-speakeasy-group": "platform",
         "x-speakeasy-name-override": "getApplicationDomain",
-        "tags": ["Domains"],
+        "tags": [
+          "Domains"
+        ],
         "summary": "Get application domain",
         "description": "Get domain information for an application.\n",
         "security": [
@@ -789,6 +885,16 @@
             "description": "Domain ID or domain name.",
             "example": "dmn_abcdefghijklmnopqrstuvwxyz0",
             "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "owner_id",
+            "in": "query",
+            "description": "The owner ID (organization ID) for shared-secret authentication.",
+            "required": false,
+            "x-internal": true,
             "schema": {
               "type": "string"
             }
@@ -823,7 +929,9 @@
         "operationId": "PlatformDeleteApplicationDomain",
         "x-speakeasy-group": "platform",
         "x-speakeasy-name-override": "deleteApplicationDomain",
-        "tags": ["Domains"],
+        "tags": [
+          "Domains"
+        ],
         "summary": "Delete application domain",
         "description": "Delete a provider domain from an application's production instance.\n\nOnly provider domains can be deleted. The primary domain cannot be deleted.\n",
         "security": [
@@ -886,7 +994,9 @@
         "operationId": "PlatformGetApplicationDomainStatus",
         "x-speakeasy-group": "platform",
         "x-speakeasy-name-override": "getApplicationDomainStatus",
-        "tags": ["Domains"],
+        "tags": [
+          "Domains"
+        ],
         "summary": "Get application domain status",
         "description": "Get the status of a domain for an application.\n",
         "security": [
@@ -910,6 +1020,16 @@
             "description": "Domain ID or domain name.",
             "example": "dmn_abcdefghijklmnopqrstuvwxyz0",
             "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "owner_id",
+            "in": "query",
+            "description": "The owner ID (organization ID) for shared-secret authentication.",
+            "required": false,
+            "x-internal": true,
             "schema": {
               "type": "string"
             }
@@ -946,7 +1066,9 @@
         "operationId": "PlatformTriggerDNSCheck",
         "x-speakeasy-group": "platform",
         "x-speakeasy-name-override": "triggerDNSCheck",
-        "tags": ["Domains"],
+        "tags": [
+          "Domains"
+        ],
         "summary": "Trigger DNS check",
         "description": "Triggers a DNS check for a domain and returns the current domain status.\n\nThis endpoint ensures that at most one DNS check job is in-flight at any time.\nIf a check is already running or was recently performed, a 409 Conflict is returned.\n\nUse this endpoint to trigger a new DNS verification check after configuring DNS records.\n",
         "security": [
@@ -1004,12 +1126,456 @@
         }
       }
     },
+    "/platform/domains": {
+      "get": {
+        "operationId": "PlatformListDomains",
+        "x-speakeasy-group": "platform",
+        "x-speakeasy-name-override": "listDomains",
+        "tags": [
+          "Domains"
+        ],
+        "summary": "List domains",
+        "description": "List production instance domains for applications in the authenticated workspace.\nResults are sorted by domain creation time in descending order (most recent first).\n\nSet `include_development` to include development instance domains.\n",
+        "security": [
+          {
+            "platform_api_access_token": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "description": "Filter domains whose name contains this substring (case-insensitive).",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "include_development",
+            "in": "query",
+            "description": "When `true`, include development instance domains. Defaults to production only.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "true"
+              ]
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Number of results to return per page (1-500, default 10).",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 500,
+              "default": 10
+            }
+          },
+          {
+            "name": "starting_after",
+            "in": "query",
+            "description": "Cursor for pagination. Provide the ID of the last domain from the\nprevious page to get the next page of results.\n",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "ending_before",
+            "in": "query",
+            "description": "Cursor for pagination. Provide the ID of the first domain from the\nprevious page to get the previous page of results.\n",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Domains retrieved successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformListDomainsResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/AuthenticationInvalid"
+          },
+          "403": {
+            "$ref": "#/components/responses/AuthorizationInvalid"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        }
+      }
+    },
+    "/platform/domains/{domainIDOrName}": {
+      "get": {
+        "operationId": "PlatformGetDomain",
+        "x-speakeasy-group": "platform",
+        "x-speakeasy-name-override": "getDomain",
+        "tags": [
+          "Domains"
+        ],
+        "summary": "Get domain",
+        "description": "Retrieve a single domain by ID or name for the authenticated workspace.\n",
+        "security": [
+          {
+            "platform_api_access_token": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "domainIDOrName",
+            "in": "path",
+            "description": "Domain ID or domain name.",
+            "example": "dmn_abcdefghijklmnopqrstuvwxyz0",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Domain retrieved successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformWorkspaceDomainResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/AuthenticationInvalid"
+          },
+          "403": {
+            "$ref": "#/components/responses/AuthorizationInvalid"
+          },
+          "404": {
+            "$ref": "#/components/responses/ResourceNotFound"
+          }
+        }
+      }
+    },
+    "/platform/domains/{domainName}/availability": {
+      "get": {
+        "operationId": "PlatformGetDomainAvailability",
+        "x-speakeasy-group": "platform",
+        "x-speakeasy-name-override": "getDomainAvailability",
+        "x-internal": true,
+        "tags": [
+          "Domains"
+        ],
+        "summary": "Check domain availability",
+        "description": "Checks whether a domain name is available for use.\n",
+        "security": [
+          {
+            "platform_api_access_token": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "domainName",
+            "in": "path",
+            "description": "Domain name to check.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Domain availability retrieved successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformDomainAvailabilityResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/ClerkErrors"
+          },
+          "401": {
+            "$ref": "#/components/responses/AuthenticationInvalid"
+          },
+          "403": {
+            "$ref": "#/components/responses/AuthorizationInvalid"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        }
+      }
+    },
+    "/platform/domain_intents": {
+      "get": {
+        "operationId": "PlatformListDomainIntents",
+        "x-speakeasy-group": "platform",
+        "x-speakeasy-name-override": "listDomainIntents",
+        "tags": [
+          "Domain Intents"
+        ],
+        "summary": "List domain intents",
+        "description": "List all domain intents created by the authenticated workspace. Returns\nintents sorted by creation date in descending order (most recent first).\n",
+        "security": [
+          {
+            "platform_api_access_token": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "description": "Filter by exact domain name.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "description": "Filter by domain intent status. Multiple values can be provided by\nrepeating the parameter (e.g., `?status=pending&status=canceled`).\n",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "pending",
+                  "completed",
+                  "expired",
+                  "canceled"
+                ]
+              }
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Number of results to return per page (1-500, default 10).",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 500,
+              "default": 10
+            }
+          },
+          {
+            "name": "starting_after",
+            "in": "query",
+            "description": "Cursor for pagination. Provide the ID of the last domain intent from\nthe previous page to get the next page of results.\n",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "ending_before",
+            "in": "query",
+            "description": "Cursor for pagination. Provide the ID of the first domain intent from\nthe previous page to get the previous page of results.\n",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Domain intents retrieved successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformListDomainIntentsResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/AuthenticationInvalid"
+          },
+          "403": {
+            "$ref": "#/components/responses/AuthorizationInvalid"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        }
+      },
+      "post": {
+        "operationId": "PlatformCreateDomainIntent",
+        "x-speakeasy-group": "platform",
+        "x-speakeasy-name-override": "createDomainIntent",
+        "tags": [
+          "Domain Intents"
+        ],
+        "summary": "Create a domain intent",
+        "description": "Create a pending domain intent and receive DNS records for\nthe domain name.\n",
+        "security": [
+          {
+            "platform_api_access_token": []
+          }
+        ],
+        "requestBody": {
+          "description": "Domain intent data to create.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlatformCreateDomainIntentRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Domain intent created successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformDomainIntentResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/ClerkErrors"
+          },
+          "401": {
+            "$ref": "#/components/responses/AuthenticationInvalid"
+          },
+          "403": {
+            "$ref": "#/components/responses/AuthorizationInvalid"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        }
+      }
+    },
+    "/platform/domain_intents/{domainIntentID}": {
+      "get": {
+        "operationId": "PlatformGetDomainIntent",
+        "x-speakeasy-group": "platform",
+        "x-speakeasy-name-override": "getDomainIntent",
+        "tags": [
+          "Domain Intents"
+        ],
+        "summary": "Get a domain intent",
+        "description": "Retrieve a domain intent by ID.\n",
+        "security": [
+          {
+            "platform_api_access_token": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "domainIntentID",
+            "in": "path",
+            "description": "Domain intent ID.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Domain intent retrieved successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformDomainIntentResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/AuthenticationInvalid"
+          },
+          "403": {
+            "$ref": "#/components/responses/AuthorizationInvalid"
+          },
+          "404": {
+            "$ref": "#/components/responses/ResourceNotFound"
+          }
+        }
+      },
+      "delete": {
+        "operationId": "PlatformCancelDomainIntent",
+        "x-speakeasy-group": "platform",
+        "x-speakeasy-name-override": "cancelDomainIntent",
+        "tags": [
+          "Domain Intents"
+        ],
+        "summary": "Cancel a domain intent",
+        "description": "Cancel a pending domain intent.\n",
+        "security": [
+          {
+            "platform_api_access_token": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "domainIntentID",
+            "in": "path",
+            "description": "Domain intent ID.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Domain intent canceled successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformDomainIntentResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/ClerkErrors"
+          },
+          "401": {
+            "$ref": "#/components/responses/AuthenticationInvalid"
+          },
+          "403": {
+            "$ref": "#/components/responses/AuthorizationInvalid"
+          },
+          "404": {
+            "$ref": "#/components/responses/ResourceNotFound"
+          }
+        }
+      }
+    },
     "/platform/application_transfers": {
       "get": {
         "operationId": "PlatformListApplicationTransfers",
         "x-speakeasy-group": "platform",
         "x-speakeasy-name-override": "listApplicationTransfers",
-        "tags": ["Application Transfers"],
+        "tags": [
+          "Application Transfers"
+        ],
         "summary": "List application transfers",
         "description": "List all transfer requests created by the authenticated workspace. Returns\ntransfers sorted by creation date in descending order (most recent first).\n\nUse the `status` parameter to filter by transfer status.\n",
         "security": [
@@ -1029,7 +1595,12 @@
               "type": "array",
               "items": {
                 "type": "string",
-                "enum": ["pending", "completed", "canceled", "expired"]
+                "enum": [
+                  "pending",
+                  "completed",
+                  "canceled",
+                  "expired"
+                ]
               }
             }
           },
@@ -1092,7 +1663,9 @@
         "operationId": "PlatformCreateApplicationTransfer",
         "x-speakeasy-group": "platform",
         "x-speakeasy-name-override": "createApplicationTransfer",
-        "tags": ["Application Transfers"],
+        "tags": [
+          "Application Transfers"
+        ],
         "summary": "Create an application transfer",
         "description": "Create a new transfer request for an application. This initiates the process of\ntransferring ownership of the application to another workspace.\n\nOnly one pending transfer can exist for an application at a time. The transfer\nwill expire after 24 hours if not completed.\n",
         "security": [
@@ -1139,7 +1712,9 @@
         "operationId": "PlatformGetApplicationTransfer",
         "x-speakeasy-group": "platform",
         "x-speakeasy-name-override": "getApplicationTransfer",
-        "tags": ["Application Transfers"],
+        "tags": [
+          "Application Transfers"
+        ],
         "summary": "Get an application transfer",
         "description": "Retrieve details of an application transfer by its ID.\n",
         "security": [
@@ -1193,7 +1768,9 @@
         "operationId": "PlatformCancelApplicationTransfer",
         "x-speakeasy-group": "platform",
         "x-speakeasy-name-override": "cancelApplicationTransfer",
-        "tags": ["Application Transfers"],
+        "tags": [
+          "Application Transfers"
+        ],
         "summary": "Cancel an application transfer",
         "description": "Cancel an existing application transfer. Only transfers in 'pending' status can be canceled.\n",
         "security": [
@@ -1247,12 +1824,655 @@
         }
       }
     },
+    "/platform/users": {
+      "post": {
+        "operationId": "PlatformGetOrCreateUser",
+        "x-speakeasy-group": "platform",
+        "x-speakeasy-name-override": "getOrCreateUser",
+        "tags": [
+          "Users"
+        ],
+        "summary": "Get or create a user",
+        "x-internal": true,
+        "description": "Get an existing user by email address or create a new user if one does not exist.\n",
+        "security": [
+          {
+            "platform_api_access_token": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "owner_id",
+            "in": "query",
+            "description": "The owner ID (organization ID) for shared-secret authentication.",
+            "required": false,
+            "x-internal": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "User data used to find or create a user.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlatformGetOrCreateUserRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Existing user retrieved successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "New user created successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/ClerkErrors"
+          },
+          "401": {
+            "$ref": "#/components/responses/AuthenticationInvalid"
+          },
+          "403": {
+            "$ref": "#/components/responses/AuthorizationInvalid"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        }
+      }
+    },
+    "/platform/organizations": {
+      "post": {
+        "operationId": "PlatformCreateOrganization",
+        "x-speakeasy-group": "platform",
+        "x-speakeasy-name-override": "createOrganization",
+        "tags": [
+          "Organizations"
+        ],
+        "summary": "Create an organization",
+        "x-internal": true,
+        "description": "Create a new organization.\n",
+        "security": [
+          {
+            "platform_api_access_token": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "owner_id",
+            "in": "query",
+            "description": "The owner ID (organization ID) for shared-secret authentication.",
+            "required": false,
+            "x-internal": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Organization data to create.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlatformCreateOrganizationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/Organization"
+          },
+          "400": {
+            "$ref": "#/components/responses/ClerkErrors"
+          },
+          "401": {
+            "$ref": "#/components/responses/AuthenticationInvalid"
+          },
+          "403": {
+            "$ref": "#/components/responses/AuthorizationInvalid"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        }
+      }
+    },
+    "/platform/organizations/{organizationID}": {
+      "patch": {
+        "operationId": "PlatformUpdateOrganization",
+        "x-speakeasy-group": "platform",
+        "x-speakeasy-name-override": "updateOrganization",
+        "tags": [
+          "Organizations"
+        ],
+        "summary": "Update a Vercel-managed organization subscription",
+        "x-internal": true,
+        "description": "Create or update a V3 workspace-scoped externally-paid subscription for a\nVercel-managed organization.\n",
+        "parameters": [
+          {
+            "name": "organizationID",
+            "in": "path",
+            "description": "Organization ID.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Organization update data.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlatformUpdateOrganizationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/Organization"
+          },
+          "400": {
+            "$ref": "#/components/responses/ClerkErrors"
+          },
+          "401": {
+            "$ref": "#/components/responses/AuthenticationInvalid"
+          },
+          "403": {
+            "$ref": "#/components/responses/AuthorizationInvalid"
+          },
+          "404": {
+            "$ref": "#/components/responses/ResourceNotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        }
+      },
+      "delete": {
+        "operationId": "PlatformDeleteOrganization",
+        "x-speakeasy-group": "platform",
+        "x-speakeasy-name-override": "deleteOrganization",
+        "tags": [
+          "Organizations"
+        ],
+        "summary": "Delete an organization",
+        "x-internal": true,
+        "description": "Delete an organization.\n",
+        "security": [
+          {
+            "platform_api_access_token": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "organizationID",
+            "in": "path",
+            "description": "Organization ID.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Organization deleted successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformDeletedObjectResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/AuthenticationInvalid"
+          },
+          "403": {
+            "$ref": "#/components/responses/AuthorizationInvalid"
+          },
+          "404": {
+            "$ref": "#/components/responses/ResourceNotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        }
+      }
+    },
+    "/platform/organizations/{organizationID}/subscription/stripe": {
+      "post": {
+        "operationId": "PlatformCreateOrganizationSubscription",
+        "x-speakeasy-group": "platform",
+        "x-speakeasy-name-override": "createOrganizationSubscription",
+        "tags": [
+          "Organizations"
+        ],
+        "summary": "Create a Stripe-billed workspace subscription",
+        "x-internal": true,
+        "description": "Create a V3 workspace-scoped Stripe subscription for an existing organization\nusing a Shared Payment Token (SPT) from Stripe agentic provisioning.\n",
+        "security": [
+          {
+            "platform_api_access_token": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "organizationID",
+            "in": "path",
+            "description": "Organization ID.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Subscription data.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlatformCreateOrganizationSubscriptionRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Subscription created successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "object": {
+                      "type": "string",
+                      "description": "Object type — always \"subscription\"."
+                    },
+                    "id": {
+                      "type": "string",
+                      "description": "The Clerk subscription record ID."
+                    },
+                    "organization_id": {
+                      "type": "string",
+                      "description": "The organization ID the subscription was created for."
+                    },
+                    "plan_id": {
+                      "type": "string",
+                      "description": "The plan ID that was activated."
+                    },
+                    "status": {
+                      "type": "string",
+                      "description": "Subscription status — \"active\" for new, \"already_active\" if subscription existed."
+                    },
+                    "stripe_subscription_id": {
+                      "type": "string",
+                      "description": "The Stripe subscription ID (empty if subscription already existed)."
+                    },
+                    "billing_account_id": {
+                      "type": "string",
+                      "description": "The Clerk billing account ID linked to this subscription."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/ClerkErrors"
+          },
+          "401": {
+            "$ref": "#/components/responses/AuthenticationInvalid"
+          },
+          "404": {
+            "$ref": "#/components/responses/ResourceNotFound"
+          }
+        }
+      }
+    },
+    "/platform/applications/{applicationID}/rotate_secret_keys": {
+      "post": {
+        "operationId": "PlatformRotateSecretKeys",
+        "x-speakeasy-group": "platform",
+        "x-speakeasy-name-override": "rotateSecretKeys",
+        "tags": [
+          "Applications"
+        ],
+        "summary": "Rotate application secret keys",
+        "x-internal": true,
+        "description": "Rotate the secret keys for an application's instances.\n",
+        "security": [
+          {
+            "platform_api_access_token": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "applicationID",
+            "in": "path",
+            "description": "Application ID.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "owner_id",
+            "in": "query",
+            "description": "The owner ID (organization ID) for shared-secret authentication.",
+            "required": false,
+            "x-internal": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Secret key rotation parameters.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "delay_old_secrets_expiration_hours": {
+                    "type": "integer",
+                    "description": "Hours to delay old secret expiration."
+                  },
+                  "reason": {
+                    "type": "string",
+                    "description": "Reason for rotation."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Secret keys rotated successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformApplicationResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/ClerkErrors"
+          },
+          "401": {
+            "$ref": "#/components/responses/AuthenticationInvalid"
+          },
+          "403": {
+            "$ref": "#/components/responses/AuthorizationInvalid"
+          },
+          "404": {
+            "$ref": "#/components/responses/ResourceNotFound"
+          }
+        }
+      }
+    },
+    "/platform/applications/{applicationID}/subscription": {
+      "get": {
+        "operationId": "PlatformGetApplicationSubscription",
+        "x-speakeasy-group": "platform",
+        "x-speakeasy-name-override": "getApplicationSubscription",
+        "tags": [
+          "Applications"
+        ],
+        "summary": "Get application subscription",
+        "x-internal": true,
+        "description": "Get the subscription for an application.\n",
+        "security": [
+          {
+            "platform_api_access_token": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "applicationID",
+            "in": "path",
+            "description": "Application ID.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "owner_id",
+            "in": "query",
+            "description": "The owner ID (organization ID) for shared-secret authentication.",
+            "required": false,
+            "x-internal": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Application subscription retrieved successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "object": {
+                      "type": "string"
+                    },
+                    "id": {
+                      "type": "string"
+                    },
+                    "stripe_subscription_id": {
+                      "type": "string",
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/AuthenticationInvalid"
+          },
+          "403": {
+            "$ref": "#/components/responses/AuthorizationInvalid"
+          },
+          "404": {
+            "$ref": "#/components/responses/ResourceNotFound"
+          }
+        }
+      }
+    },
+    "/platform/applications/{applicationID}/usage": {
+      "get": {
+        "operationId": "PlatformGetApplicationUsage",
+        "x-speakeasy-group": "platform",
+        "x-speakeasy-name-override": "getApplicationUsage",
+        "tags": [
+          "Applications"
+        ],
+        "summary": "Get application usage",
+        "x-internal": true,
+        "description": "Get usage information for an application.\n",
+        "security": [
+          {
+            "platform_api_access_token": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "applicationID",
+            "in": "path",
+            "description": "Application ID.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "owner_id",
+            "in": "query",
+            "description": "The owner ID (organization ID) for shared-secret authentication.",
+            "required": false,
+            "x-internal": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Application usage retrieved successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/AuthenticationInvalid"
+          },
+          "403": {
+            "$ref": "#/components/responses/AuthorizationInvalid"
+          },
+          "404": {
+            "$ref": "#/components/responses/ResourceNotFound"
+          }
+        }
+      }
+    },
+    "/platform/applications/{applicationID}/transfer_ownership": {
+      "post": {
+        "operationId": "PlatformTransferOwnership",
+        "x-speakeasy-group": "platform",
+        "x-speakeasy-name-override": "transferOwnership",
+        "tags": [
+          "Applications"
+        ],
+        "summary": "Transfer application ownership",
+        "x-internal": true,
+        "description": "Transfer ownership of an application to another organization.\n",
+        "security": [
+          {
+            "platform_api_access_token": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "applicationID",
+            "in": "path",
+            "description": "Application ID.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "owner_id",
+            "in": "query",
+            "description": "The owner ID (organization ID) for shared-secret authentication.",
+            "required": false,
+            "x-internal": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Transfer ownership parameters.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "organization_id": {
+                    "type": "string",
+                    "description": "The target organization ID to transfer ownership to."
+                  },
+                  "subscription_metadata": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "string"
+                    },
+                    "nullable": true
+                  },
+                  "paid_externally": {
+                    "type": "boolean",
+                    "nullable": true
+                  }
+                },
+                "required": [
+                  "organization_id"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Application ownership transferred successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformApplicationResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/ClerkErrors"
+          },
+          "401": {
+            "$ref": "#/components/responses/AuthenticationInvalid"
+          },
+          "403": {
+            "$ref": "#/components/responses/AuthorizationInvalid"
+          },
+          "404": {
+            "$ref": "#/components/responses/ResourceNotFound"
+          }
+        }
+      }
+    },
     "/platform/applications/{applicationID}/instances/{envOrInsID}/usage": {
       "get": {
         "operationId": "PlatformGetInstanceUsage",
         "x-speakeasy-group": "platform",
         "x-speakeasy-name-override": "getInstanceUsage",
-        "tags": ["Applications"],
+        "tags": [
+          "Applications"
+        ],
         "summary": "Get instance usage",
         "description": "Get usage totals for an application instance across meters such as MAU, MAO,\nSMS, custom domains, and enterprise connections.\n\nThe `envOrInsID` parameter can be either an environment type (e.g., \"development\", \"production\")\nor an instance ID.\n\nRequires the `application_usage:read` scope.\n",
         "security": [
@@ -1331,7 +2551,9 @@
         "operationId": "PlatformListInstanceUsers",
         "x-speakeasy-group": "platform",
         "x-speakeasy-name-override": "listInstanceUsers",
-        "tags": ["Users"],
+        "tags": [
+          "Users"
+        ],
         "summary": "List instance users",
         "description": "List all users for an application instance.\n\nThe `envOrInsID` parameter can be either an environment type (e.g., \"development\", \"production\")\nor an instance ID.\n\nUse the `query` parameter to filter users by searching across email addresses, phone numbers,\nusernames, web3 wallets, user IDs, first names, and last names.\n\nUse the `order_by` parameter to sort the results. Prefix with `+` for ascending or `-` for descending order.\nValid fields: `created_at`, `updated_at`, `last_sign_in_at`, `last_active_at`, `email_address`, `first_name`,\n`last_name`, `username`, `phone_number`, `web3_wallet`. Default is `-created_at` (most recent first).\n\nRequires the `users:read` scope.\n",
         "security": [
@@ -1430,12 +2652,77 @@
         }
       }
     },
+    "/platform/applications/{applicationID}/instances/{envOrInsID}/users/{userID}": {
+      "delete": {
+        "operationId": "PlatformDeleteUser",
+        "x-speakeasy-group": "platform",
+        "x-speakeasy-name-override": "deleteUser",
+        "tags": [
+          "Users"
+        ],
+        "summary": "Delete a user",
+        "description": "Delete a user within an application instance. Returns the deleted user object.\n\nDeleting a user that does not exist (or has already been deleted) returns 404.\n\nThe `envOrInsID` parameter can be either an environment type (e.g., \"development\", \"production\")\nor an instance ID.\n\nRequires the `users:delete` scope.\n",
+        "security": [
+          {
+            "platform_api_access_token": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "applicationID",
+            "in": "path",
+            "description": "Application ID.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "envOrInsID",
+            "in": "path",
+            "description": "Environment type (e.g., \"development\", \"production\") or instance ID.\n",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userID",
+            "in": "path",
+            "description": "User ID.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/DeletedObject"
+          },
+          "400": {
+            "$ref": "#/components/responses/ClerkErrors"
+          },
+          "401": {
+            "$ref": "#/components/responses/AuthenticationInvalid"
+          },
+          "403": {
+            "$ref": "#/components/responses/AuthorizationInvalid"
+          },
+          "404": {
+            "$ref": "#/components/responses/ResourceNotFound"
+          }
+        }
+      }
+    },
     "/platform/applications/{applicationID}/instances/{envOrInsID}/users/{userID}/ban": {
       "post": {
         "operationId": "PlatformBanUser",
         "x-speakeasy-group": "platform",
         "x-speakeasy-name-override": "banUser",
-        "tags": ["Users"],
+        "tags": [
+          "Users"
+        ],
         "summary": "Ban a user",
         "description": "Marks a user as banned within an application instance. This terminates their active sessions\n(marks them as revoked) and prevents them from signing in again.\n\nRequires the `users:manage` scope.\n",
         "security": [
@@ -1503,7 +2790,9 @@
         "operationId": "PlatformUnbanUser",
         "x-speakeasy-group": "platform",
         "x-speakeasy-name-override": "unbanUser",
-        "tags": ["Users"],
+        "tags": [
+          "Users"
+        ],
         "summary": "Unban a user",
         "description": "Removes the ban from a user within an application instance. This allows them to sign in again.\n\nRequires the `users:manage` scope.\n",
         "security": [
@@ -1571,7 +2860,9 @@
         "operationId": "PlatformListJWTTemplates",
         "x-speakeasy-group": "platform",
         "x-speakeasy-name-override": "listJWTTemplates",
-        "tags": ["JWT Templates"],
+        "tags": [
+          "JWT Templates"
+        ],
         "summary": "List JWT templates",
         "description": "List all JWT templates for an application instance.\n\nRequires the `jwt_templates:read` scope.\n",
         "security": [
@@ -1631,7 +2922,9 @@
         "operationId": "PlatformCreateJWTTemplate",
         "x-speakeasy-group": "platform",
         "x-speakeasy-name-override": "createJWTTemplate",
-        "tags": ["JWT Templates"],
+        "tags": [
+          "JWT Templates"
+        ],
         "summary": "Create a JWT template",
         "description": "Create a new JWT template for an application instance.\n\nRequires the `jwt_templates:manage` scope.\n",
         "security": [
@@ -1704,7 +2997,10 @@
                     "nullable": true
                   }
                 },
-                "required": ["name", "claims"]
+                "required": [
+                  "name",
+                  "claims"
+                ]
               }
             }
           }
@@ -1746,7 +3042,9 @@
         "operationId": "PlatformGetJWTTemplate",
         "x-speakeasy-group": "platform",
         "x-speakeasy-name-override": "getJWTTemplate",
-        "tags": ["JWT Templates"],
+        "tags": [
+          "JWT Templates"
+        ],
         "summary": "Get a JWT template",
         "description": "Retrieve a specific JWT template for an application instance.\n\nRequires the `jwt_templates:read` scope.\n",
         "security": [
@@ -1812,7 +3110,9 @@
         "operationId": "PlatformUpdateJWTTemplate",
         "x-speakeasy-group": "platform",
         "x-speakeasy-name-override": "updateJWTTemplate",
-        "tags": ["JWT Templates"],
+        "tags": [
+          "JWT Templates"
+        ],
         "summary": "Update a JWT template",
         "description": "Update an existing JWT template for an application instance.\n\nRequires the `jwt_templates:manage` scope.\n",
         "security": [
@@ -1894,7 +3194,10 @@
                     "nullable": true
                   }
                 },
-                "required": ["name", "claims"]
+                "required": [
+                  "name",
+                  "claims"
+                ]
               }
             }
           }
@@ -1934,7 +3237,9 @@
         "operationId": "PlatformDeleteJWTTemplate",
         "x-speakeasy-group": "platform",
         "x-speakeasy-name-override": "deleteJWTTemplate",
-        "tags": ["JWT Templates"],
+        "tags": [
+          "JWT Templates"
+        ],
         "summary": "Delete a JWT template",
         "description": "Delete a JWT template from an application instance.\n\nRequires the `jwt_templates:manage` scope.\n",
         "security": [
@@ -1995,7 +3300,9 @@
         "operationId": "PlatformListRedirectURLs",
         "x-speakeasy-group": "platform",
         "x-speakeasy-name-override": "listRedirectURLs",
-        "tags": ["Redirect URLs"],
+        "tags": [
+          "Redirect URLs"
+        ],
         "summary": "List redirect URLs",
         "description": "List all redirect URLs for an application instance.\n\nThe `envOrInsID` parameter can be either an environment type (e.g., \"development\", \"production\")\nor an instance ID.\n\nRequires the `applications:read` scope.\n",
         "security": [
@@ -2078,7 +3385,9 @@
         "operationId": "PlatformCreateRedirectURL",
         "x-speakeasy-group": "platform",
         "x-speakeasy-name-override": "createRedirectURL",
-        "tags": ["Redirect URLs"],
+        "tags": [
+          "Redirect URLs"
+        ],
         "summary": "Create a redirect URL",
         "description": "Create a redirect URL for an application instance.\n\nThe `envOrInsID` parameter can be either an environment type (e.g., \"development\", \"production\")\nor an instance ID.\n\nRequires the `applications:manage` scope.\n",
         "security": [
@@ -2120,7 +3429,9 @@
                     "description": "The full URL value prefixed with `https://` or a custom scheme e.g. `\"https://my-app.com/oauth-callback\"` or `\"my-app://oauth-callback\"`."
                   }
                 },
-                "required": ["url"]
+                "required": [
+                  "url"
+                ]
               }
             }
           }
@@ -2159,7 +3470,9 @@
         "operationId": "PlatformGetRedirectURL",
         "x-speakeasy-group": "platform",
         "x-speakeasy-name-override": "getRedirectURL",
-        "tags": ["Redirect URLs"],
+        "tags": [
+          "Redirect URLs"
+        ],
         "summary": "Get a redirect URL",
         "description": "Retrieve a redirect URL for an application instance.\n\nThe `envOrInsID` parameter can be either an environment type (e.g., \"development\", \"production\")\nor an instance ID.\n\nRequires the `applications:read` scope.\n",
         "security": [
@@ -2225,7 +3538,9 @@
         "operationId": "PlatformDeleteRedirectURL",
         "x-speakeasy-group": "platform",
         "x-speakeasy-name-override": "deleteRedirectURL",
-        "tags": ["Redirect URLs"],
+        "tags": [
+          "Redirect URLs"
+        ],
         "summary": "Delete a redirect URL",
         "description": "Delete a redirect URL from an application instance.\n\nThe `envOrInsID` parameter can be either an environment type (e.g., \"development\", \"production\")\nor an instance ID.\n\nRequires the `applications:manage` scope.\n",
         "security": [
@@ -2286,7 +3601,9 @@
         "operationId": "PlatformGetConfig",
         "x-speakeasy-group": "platform",
         "x-speakeasy-name-override": "getConfig",
-        "tags": ["Config"],
+        "tags": [
+          "Config"
+        ],
         "summary": "Get instance config",
         "description": "Get the configuration for an application instance.\n\nThe `envOrInsID` parameter can be either an environment type (e.g., \"development\", \"production\")\nor an instance ID.\n\nOptionally filter to specific config keys using the `keys` query parameter.\n\nRequires the `applications:manage` scope.\n",
         "security": [
@@ -2357,7 +3674,9 @@
         "operationId": "PlatformPatchConfig",
         "x-speakeasy-group": "platform",
         "x-speakeasy-name-override": "patchConfig",
-        "tags": ["Config"],
+        "tags": [
+          "Config"
+        ],
         "summary": "Update instance config",
         "description": "Update the configuration for an application instance.\n\nThe `envOrInsID` parameter can be either an environment type (e.g., \"development\", \"production\")\nor an instance ID.\n\nUse the `dry_run` query parameter to preview changes without applying them.\nUse the `destructive` query parameter to allow clearing config keys by setting them to null.\nUse the `If-Match` header to provide optimistic concurrency control via config version.\n\nRequires the `applications:manage` scope.\n",
         "security": [
@@ -2472,6 +3791,114 @@
             "$ref": "#/components/responses/UnprocessableEntity"
           }
         }
+      },
+      "put": {
+        "operationId": "PlatformPutConfig",
+        "x-speakeasy-group": "platform",
+        "x-speakeasy-name-override": "putConfig",
+        "tags": [
+          "Config"
+        ],
+        "summary": "Replace instance config",
+        "description": "Replace the full configuration for an application instance.\n\nUnlike PATCH, PUT requires all config keys to be included in the request body.\nIf any keys are missing, a 400 error is returned listing the missing keys.\n\nThe `envOrInsID` parameter can be either an environment type (e.g., \"development\", \"production\")\nor an instance ID.\n\nUse the `dry_run` query parameter to preview changes without applying them.\nUse the `destructive` query parameter to allow clearing config keys by setting them to null.\nUse the `If-Match` header to provide optimistic concurrency control via config version.\n\nRequires the `applications:manage` scope.\n",
+        "security": [
+          {
+            "platform_api_access_token": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "applicationID",
+            "in": "path",
+            "description": "Application ID.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "envOrInsID",
+            "in": "path",
+            "description": "Environment type (e.g., \"development\", \"production\") or instance ID.\n",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "dry_run",
+            "in": "query",
+            "description": "If true, preview the changes without applying them.",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "destructive",
+            "in": "query",
+            "description": "If true, allow clearing config keys by setting them to null.",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "If-Match",
+            "in": "header",
+            "description": "Config version for optimistic concurrency control.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Complete config to apply. All config keys must be included.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlatformConfigPatchRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Instance config replaced successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformConfigPatchResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/ClerkErrors"
+          },
+          "401": {
+            "$ref": "#/components/responses/AuthenticationInvalid"
+          },
+          "402": {
+            "$ref": "#/components/responses/PaymentRequired"
+          },
+          "403": {
+            "$ref": "#/components/responses/AuthorizationInvalid"
+          },
+          "404": {
+            "$ref": "#/components/responses/ResourceNotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        }
       }
     },
     "/platform/applications/{applicationID}/instances/{envOrInsID}/config/schema": {
@@ -2479,7 +3906,9 @@
         "operationId": "PlatformGetConfigSchema",
         "x-speakeasy-group": "platform",
         "x-speakeasy-name-override": "getConfigSchema",
-        "tags": ["Config"],
+        "tags": [
+          "Config"
+        ],
         "summary": "Get instance config schema",
         "description": "Get the JSON Schema for the instance configuration.\n\nThe `envOrInsID` parameter can be either an environment type (e.g., \"development\", \"production\")\nor an instance ID.\n\nOptionally filter to specific config keys using the `keys` query parameter.\n\nRequires the `applications:manage` scope.\n",
         "security": [
@@ -2546,6 +3975,216 @@
           }
         }
       }
+    },
+    "/platform/applications/{applicationID}/instances": {
+      "post": {
+        "operationId": "PlatformCreateInstance",
+        "x-speakeasy-group": "platform",
+        "x-speakeasy-name-override": "createInstance",
+        "tags": [
+          "Applications"
+        ],
+        "summary": "Create instance",
+        "description": "Creates a production instance for the given application. Optionally clones\nconfiguration from an existing development instance.\n",
+        "security": [
+          {
+            "platform_api_access_token": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "applicationID",
+            "in": "path",
+            "description": "Application ID.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "domain": {
+                    "type": "string",
+                    "description": "The production domain for the instance (e.g. \"example.com\")."
+                  },
+                  "environment_type": {
+                    "type": "string",
+                    "enum": [
+                      "production"
+                    ],
+                    "default": "production",
+                    "description": "Instance environment type. Only production is currently supported."
+                  },
+                  "clone_instance_id": {
+                    "type": "string",
+                    "nullable": true,
+                    "description": "The ID of a development instance to clone configuration from."
+                  }
+                },
+                "required": [
+                  "domain"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Instance created successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "object": {
+                      "type": "string",
+                      "enum": [
+                        "instance"
+                      ]
+                    },
+                    "id": {
+                      "type": "string"
+                    },
+                    "environment_type": {
+                      "type": "string",
+                      "enum": [
+                        "production"
+                      ]
+                    },
+                    "active_domain": {
+                      "$ref": "#/components/schemas/PlatformDomainResponse"
+                    },
+                    "secret_key": {
+                      "type": "string",
+                      "x-sensitive": true
+                    },
+                    "publishable_key": {
+                      "type": "string"
+                    },
+                    "created_at": {
+                      "type": "integer",
+                      "format": "int64",
+                      "description": "Unix timestamp in milliseconds."
+                    },
+                    "updated_at": {
+                      "type": "integer",
+                      "format": "int64",
+                      "description": "Unix timestamp in milliseconds."
+                    }
+                  },
+                  "required": [
+                    "object",
+                    "id",
+                    "environment_type",
+                    "active_domain",
+                    "secret_key",
+                    "publishable_key",
+                    "created_at",
+                    "updated_at"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/ClerkErrors"
+          },
+          "401": {
+            "$ref": "#/components/responses/AuthenticationInvalid"
+          },
+          "402": {
+            "$ref": "#/components/responses/PaymentRequired"
+          },
+          "403": {
+            "$ref": "#/components/responses/AuthorizationInvalid"
+          },
+          "404": {
+            "$ref": "#/components/responses/ResourceNotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        }
+      }
+    },
+    "/platform/accountless_applications/claim": {
+      "post": {
+        "operationId": "PlatformClaimAccountlessApplication",
+        "x-speakeasy-group": "platform",
+        "x-speakeasy-name-override": "claimAccountlessApplication",
+        "tags": [
+          "Applications"
+        ],
+        "summary": "Claim an accountless application",
+        "description": "Claim an accountless application by assigning it to the authenticated principal's workspace.\nThe application is identified by a single-use claim token that was generated when the\naccountless application was created. Once claimed, the token is invalidated and cannot be reused.\n",
+        "security": [
+          {
+            "platform_api_access_token": []
+          }
+        ],
+        "requestBody": {
+          "description": "Claim token and application name.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "token": {
+                    "type": "string",
+                    "description": "The single-use claim token for the accountless application."
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "The name to assign to the claimed application.",
+                    "maxLength": 50
+                  }
+                },
+                "required": [
+                  "token",
+                  "name"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Application claimed successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformApplicationResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/ClerkErrors"
+          },
+          "401": {
+            "$ref": "#/components/responses/AuthenticationInvalid"
+          },
+          "403": {
+            "$ref": "#/components/responses/AuthorizationInvalid"
+          },
+          "404": {
+            "$ref": "#/components/responses/ResourceNotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -2571,7 +4210,10 @@
           "environment_type": {
             "type": "string",
             "description": "The environment type of the instance. Determines whether this instance is used for development/testing or production workloads.",
-            "enum": ["development", "production"],
+            "enum": [
+              "development",
+              "production"
+            ],
             "example": "production"
           },
           "secret_key": {
@@ -2586,7 +4228,10 @@
             "example": "pk_live_abc123..."
           }
         },
-        "required": ["instance_id", "environment_type"]
+        "required": [
+          "instance_id",
+          "environment_type"
+        ]
       },
       "PlatformApplicationResponse": {
         "type": "object",
@@ -2608,7 +4253,11 @@
             }
           }
         },
-        "required": ["application_id", "name", "instances"]
+        "required": [
+          "application_id",
+          "name",
+          "instances"
+        ]
       },
       "PlatformListApplicationsResponse": {
         "type": "array",
@@ -2633,7 +4282,11 @@
             "type": "object"
           }
         },
-        "required": ["message", "long_message", "code"]
+        "required": [
+          "message",
+          "long_message",
+          "code"
+        ]
       },
       "ClerkErrors": {
         "type": "object",
@@ -2651,7 +4304,9 @@
             "type": "string"
           }
         },
-        "required": ["errors"]
+        "required": [
+          "errors"
+        ]
       },
       "PlatformCreateApplicationRequest": {
         "type": "object",
@@ -2661,6 +4316,19 @@
             "type": "string",
             "description": "The name of the application."
           },
+          "plan_id": {
+            "type": "string",
+            "description": "The plan ID for the application (e.g., \"free_2022_06\", \"pro_2023_11\").",
+            "x-internal": true
+          },
+          "addon_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of add-on IDs (e.g., [\"enhanced_auth_2023_11\", \"enhanced_orgs_2023_11\"]).",
+            "x-internal": true
+          },
           "domain": {
             "type": "string",
             "description": "The domain for the application (optional)."
@@ -2668,6 +4336,19 @@
           "proxy_path": {
             "type": "string",
             "description": "Custom proxy path for provider domains (e.g., \"/__clerk\"). Must start with a leading slash and be a single path segment. Defaults to \"/__clerk\" if not provided."
+          },
+          "paid_externally": {
+            "type": "boolean",
+            "description": "Whether the application is paid externally.",
+            "x-internal": true
+          },
+          "subscription_metadata": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Subscription metadata for the application.",
+            "x-internal": true
           },
           "environment_types": {
             "type": "array",
@@ -2679,9 +4360,21 @@
           "template": {
             "type": "string",
             "description": "Application template to use for configuring the application (e.g., \"b2b-saas\", \"b2c-saas\", \"waitlist\")."
+          },
+          "partitioned_cookies": {
+            "type": "boolean",
+            "description": "Enable partitioned cookies (CHIPS) for the application's instances.",
+            "x-internal": true
+          },
+          "from_source": {
+            "type": "string",
+            "description": "Attribution marker for the creation channel. Persisted as-is to applications.from_source. CLI stamps \"cli\"; partner integrations may stamp \"replit\", \"vercel\", \"stripe\", etc. Optional; no server- side allowlist — this is a soft attribution hint, not a security boundary.",
+            "x-internal": true
           }
         },
-        "required": ["name"]
+        "required": [
+          "name"
+        ]
       },
       "PlatformDeletedObjectResponse": {
         "type": "object",
@@ -2700,7 +4393,11 @@
             "description": "The ID of the deleted resource."
           }
         },
-        "required": ["deleted", "object", "id"]
+        "required": [
+          "deleted",
+          "object",
+          "id"
+        ]
       },
       "PlatformUpdateApplicationRequest": {
         "type": "object",
@@ -2709,6 +4406,19 @@
           "name": {
             "type": "string",
             "description": "The name of the application."
+          },
+          "plan_id": {
+            "x-internal": true,
+            "type": "string",
+            "description": "The plan ID for the application."
+          },
+          "addon_ids": {
+            "x-internal": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of add-on IDs for the application."
           }
         }
       },
@@ -2725,7 +4435,96 @@
             "description": "Optional proxy path for provider domains."
           }
         },
-        "required": ["name"]
+        "required": [
+          "name"
+        ]
+      },
+      "PlatformCNameTarget": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "host": {
+            "type": "string"
+          },
+          "value": {
+            "type": "string"
+          },
+          "required": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "host",
+          "value",
+          "required"
+        ]
+      },
+      "PlatformDomainApplicationSummary": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "object": {
+            "type": "string",
+            "enum": [
+              "application"
+            ]
+          },
+          "id": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "object",
+          "id",
+          "created_at",
+          "updated_at"
+        ]
+      },
+      "PlatformDomainInstanceSummary": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "object": {
+            "type": "string",
+            "enum": [
+              "instance"
+            ]
+          },
+          "id": {
+            "type": "string"
+          },
+          "environment_type": {
+            "type": "string",
+            "description": "Instance environment type.",
+            "enum": [
+              "production",
+              "development"
+            ]
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "object",
+          "id",
+          "environment_type",
+          "created_at",
+          "updated_at"
+        ]
       },
       "PlatformDomainResponse": {
         "type": "object",
@@ -2733,7 +4532,9 @@
         "properties": {
           "object": {
             "type": "string",
-            "enum": ["domain"]
+            "enum": [
+              "domain"
+            ]
           },
           "id": {
             "type": "string",
@@ -2770,20 +4571,27 @@
           "cname_targets": {
             "type": "array",
             "items": {
-              "type": "object",
-              "properties": {
-                "host": {
-                  "type": "string"
-                },
-                "value": {
-                  "type": "string"
-                },
-                "required": {
-                  "type": "boolean"
-                }
-              }
+              "$ref": "#/components/schemas/PlatformCNameTarget"
             },
-            "description": "CNAME targets for the domain."
+            "description": "CNAME targets for the domain. Omitted for development domains, which do not use custom-domain DNS setup.\n"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "When the domain was created."
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "When the domain was last updated."
+          },
+          "application": {
+            "$ref": "#/components/schemas/PlatformDomainApplicationSummary",
+            "description": "Included on workspace-wide domain endpoints (`GET /platform/domains`, `GET /platform/domains/{domainIDOrName}`)."
+          },
+          "instance": {
+            "$ref": "#/components/schemas/PlatformDomainInstanceSummary",
+            "description": "Included on workspace-wide domain endpoints (`GET /platform/domains`, `GET /platform/domains/{domainIDOrName}`)."
           }
         },
         "required": [
@@ -2792,7 +4600,8 @@
           "name",
           "frontend_api_url",
           "development_origin",
-          "cname_targets"
+          "created_at",
+          "updated_at"
         ]
       },
       "PlatformListApplicationDomainsResponse": {
@@ -2815,7 +4624,10 @@
             "example": 2
           }
         },
-        "required": ["data", "total_count"]
+        "required": [
+          "data",
+          "total_count"
+        ]
       },
       "PlatformCreateApplicationDomainRequest": {
         "type": "object",
@@ -2823,14 +4635,20 @@
         "properties": {
           "name": {
             "type": "string",
-            "description": "The provider domain name."
+            "description": "The domain name."
           },
           "proxy_path": {
             "type": "string",
             "description": "Optional proxy path for provider domains."
+          },
+          "domain_intent_id": {
+            "type": "string",
+            "description": "Optional domain intent ID to complete into this domain."
           }
         },
-        "required": ["name"]
+        "required": [
+          "name"
+        ]
       },
       "FailureHint": {
         "type": "object",
@@ -2842,12 +4660,21 @@
             "type": "string"
           }
         },
-        "required": ["code", "message"]
+        "required": [
+          "code",
+          "message"
+        ]
       },
       "CNAMEStatus": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
+          "actual": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
           "clerk_subdomain": {
             "type": "string"
           },
@@ -2871,7 +4698,14 @@
             }
           }
         },
-        "required": ["clerk_subdomain", "from", "to", "verified", "required", "failure_hints"]
+        "required": [
+          "clerk_subdomain",
+          "from",
+          "to",
+          "verified",
+          "required",
+          "failure_hints"
+        ]
       },
       "DNSStatus": {
         "type": "object",
@@ -2879,7 +4713,11 @@
         "properties": {
           "status": {
             "type": "string",
-            "enum": ["not_started", "in_progress", "complete"]
+            "enum": [
+              "not_started",
+              "in_progress",
+              "complete"
+            ]
           },
           "cnames": {
             "type": "object",
@@ -2902,7 +4740,10 @@
             }
           }
         },
-        "required": ["status", "cnames"]
+        "required": [
+          "status",
+          "cnames"
+        ]
       },
       "SSLStatus": {
         "type": "object",
@@ -2922,7 +4763,11 @@
             }
           }
         },
-        "required": ["status", "required", "failure_hints"]
+        "required": [
+          "status",
+          "required",
+          "failure_hints"
+        ]
       },
       "PlatformDomainStatusResponse": {
         "type": "object",
@@ -2936,7 +4781,13 @@
             "properties": {
               "status": {
                 "type": "string",
-                "enum": ["complete", "in_process", "not_started", "failed", "incomplete"]
+                "enum": [
+                  "complete",
+                  "in_process",
+                  "not_started",
+                  "failed",
+                  "incomplete"
+                ]
               },
               "required": {
                 "type": "boolean"
@@ -2966,7 +4817,10 @@
                 "type": "boolean"
               }
             },
-            "required": ["status", "required"]
+            "required": [
+              "status",
+              "required"
+            ]
           },
           "proxy": {
             "type": "object",
@@ -2978,14 +4832,24 @@
                 "type": "boolean"
               }
             },
-            "required": ["status", "required"]
+            "required": [
+              "status",
+              "required"
+            ]
           },
           "status": {
             "type": "string",
-            "enum": ["complete", "incomplete"]
+            "enum": [
+              "complete",
+              "incomplete"
+            ]
           }
         },
-        "required": ["dns", "ssl", "status"]
+        "required": [
+          "dns",
+          "ssl",
+          "status"
+        ]
       },
       "PlatformDNSCheckResponse": {
         "description": "Response from triggering a DNS check. Includes the current domain status\nalong with metadata about the check.\n",
@@ -3008,8 +4872,154 @@
                 "description": "The timestamp in epoch milliseconds of the last DNS check, if any.\nWill be `null` if no check has been performed yet.\n"
               }
             },
-            "required": ["domain_id", "last_run_at"]
+            "required": [
+              "domain_id",
+              "last_run_at"
+            ]
           }
+        ]
+      },
+      "PlatformWorkspaceDomainResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/PlatformDomainResponse"
+          },
+          {
+            "type": "object",
+            "required": [
+              "application",
+              "instance"
+            ]
+          }
+        ]
+      },
+      "PlatformListDomainsResponse": {
+        "title": "List Domains Response",
+        "description": "A paginated list of domains across the workspace.",
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "data": {
+            "type": "array",
+            "description": "The list of domains.",
+            "items": {
+              "$ref": "#/components/schemas/PlatformWorkspaceDomainResponse"
+            }
+          },
+          "total_count": {
+            "type": "integer",
+            "format": "int64",
+            "description": "The total number of domains matching the query.",
+            "example": 5
+          }
+        },
+        "required": [
+          "data",
+          "total_count"
+        ]
+      },
+      "PlatformDomainAvailabilityResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "available": {
+            "type": "boolean",
+            "description": "Whether the domain is available for use."
+          }
+        },
+        "required": [
+          "available"
+        ]
+      },
+      "PlatformDomainIntentResponse": {
+        "title": "Domain Intent",
+        "description": "Represents the intent to create a domain. Can later be completed into a real application domain.",
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "object": {
+            "type": "string",
+            "enum": [
+              "domain_intent"
+            ]
+          },
+          "id": {
+            "type": "string",
+            "description": "The unique identifier for the domain intent.",
+            "example": "dmnint_2abc123def456"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "completed",
+              "canceled"
+            ],
+            "description": "The current status of the domain intent."
+          },
+          "domain_id": {
+            "type": "string",
+            "description": "The completed domain ID, if the intent has been completed."
+          },
+          "domain_name": {
+            "type": "string",
+            "description": "The intended domain name."
+          },
+          "records": {
+            "type": "array",
+            "description": "DNS records to configure before completion.",
+            "items": {
+              "$ref": "#/components/schemas/PlatformCNameTarget"
+            }
+          }
+        },
+        "required": [
+          "object",
+          "id",
+          "status",
+          "records"
+        ]
+      },
+      "PlatformListDomainIntentsResponse": {
+        "title": "List Domain Intents Response",
+        "description": "A paginated list of domain intents.",
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "data": {
+            "type": "array",
+            "description": "The list of domain intents.",
+            "items": {
+              "$ref": "#/components/schemas/PlatformDomainIntentResponse"
+            }
+          },
+          "total_count": {
+            "type": "integer",
+            "format": "int64",
+            "description": "The total number of domain intents matching the query.",
+            "example": 5
+          }
+        },
+        "required": [
+          "data",
+          "total_count"
+        ]
+      },
+      "PlatformCreateDomainIntentRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Domain name."
+          },
+          "proxy_path": {
+            "type": "string",
+            "description": "Optional proxy path for the domain intent. Treated as a hint to determine optionality of DNS records in the response."
+          }
+        },
+        "required": [
+          "name"
         ]
       },
       "PlatformApplicationTransferResponse": {
@@ -3020,7 +5030,9 @@
         "properties": {
           "object": {
             "type": "string",
-            "enum": ["application_transfer"],
+            "enum": [
+              "application_transfer"
+            ],
             "description": "The object type."
           },
           "id": {
@@ -3041,7 +5053,12 @@
           "status": {
             "type": "string",
             "description": "The current status of the transfer.",
-            "enum": ["pending", "completed", "canceled", "expired"],
+            "enum": [
+              "pending",
+              "completed",
+              "canceled",
+              "expired"
+            ],
             "example": "pending"
           },
           "expires_at": {
@@ -3103,123 +5120,32 @@
             "example": 5
           }
         },
-        "required": ["data", "total_count"]
+        "required": [
+          "data",
+          "total_count"
+        ]
       },
-      "InstanceUsageMeterWithBillable": {
-        "title": "Instance Usage Meter With Billable",
-        "description": "Usage totals for a meter that includes both total and billable quantities.",
+      "PlatformGetOrCreateUserRequest": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
-          "total_usage": {
-            "type": "integer",
-            "format": "int64",
-            "description": "Total quantity for this meter in the selected period."
-          },
-          "total_billable_usage": {
-            "type": "integer",
-            "format": "int64",
-            "description": "Billable subset of total usage for this meter in the selected period."
-          }
-        },
-        "required": ["total_usage", "total_billable_usage"]
-      },
-      "InstanceUsageMeter": {
-        "title": "Instance Usage Meter",
-        "description": "Usage totals for a single meter.",
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "total_usage": {
-            "type": "integer",
-            "format": "int64",
-            "description": "Total quantity for this meter in the selected period."
-          }
-        },
-        "required": ["total_usage"]
-      },
-      "InstanceSMSUsage": {
-        "title": "Instance SMS Usage",
-        "description": "Total SMS usage with per-geographic-tier breakdowns.",
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "total_usage": {
-            "type": "integer",
-            "format": "int64",
-            "description": "Total SMS messages across all tiers."
-          },
-          "tier_a": {
-            "$ref": "#/components/schemas/InstanceUsageMeter"
-          },
-          "tier_b": {
-            "$ref": "#/components/schemas/InstanceUsageMeter"
-          },
-          "tier_c": {
-            "$ref": "#/components/schemas/InstanceUsageMeter"
-          },
-          "tier_d": {
-            "$ref": "#/components/schemas/InstanceUsageMeter"
-          },
-          "tier_e": {
-            "$ref": "#/components/schemas/InstanceUsageMeter"
-          },
-          "tier_f": {
-            "$ref": "#/components/schemas/InstanceUsageMeter"
-          }
-        },
-        "required": ["total_usage", "tier_a", "tier_b", "tier_c", "tier_d", "tier_e", "tier_f"]
-      },
-      "PlatformInstanceUsageResponse": {
-        "title": "Instance Usage Report",
-        "description": "Usage report for an application instance containing per-meter totals.",
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "application_id": {
+          "email_address": {
             "type": "string",
-            "description": "The ID of the application."
+            "description": "The email address of the user."
           },
-          "instance_id": {
+          "first_name": {
             "type": "string",
-            "description": "The ID of the instance."
+            "description": "The first name of the user."
           },
-          "period_start": {
+          "last_name": {
             "type": "string",
-            "format": "date-time",
-            "description": "Inclusive start of the usage period boundary (RFC3339). When an\nexplicit date range is provided, this is midnight UTC on the start\ndate. When no date range is provided, this is the start of the\ncurrent billing cycle.\n"
-          },
-          "period_end": {
-            "type": "string",
-            "format": "date-time",
-            "description": "Exclusive end of the usage period boundary (RFC3339). When an\nexplicit date range is provided, this is midnight UTC immediately\nafter the requested end date. When no date range is provided, this\nis the end of the current billing cycle.\n"
-          },
-          "mau": {
-            "$ref": "#/components/schemas/InstanceUsageMeterWithBillable"
-          },
-          "mao": {
-            "$ref": "#/components/schemas/InstanceUsageMeterWithBillable"
-          },
-          "custom_domains": {
-            "$ref": "#/components/schemas/InstanceUsageMeter"
-          },
-          "sms_messages": {
-            "$ref": "#/components/schemas/InstanceSMSUsage"
-          },
-          "enterprise_connections": {
-            "$ref": "#/components/schemas/InstanceUsageMeter"
+            "description": "The last name of the user."
           }
         },
         "required": [
-          "application_id",
-          "instance_id",
-          "period_start",
-          "period_end",
-          "mau",
-          "mao",
-          "custom_domains",
-          "sms_messages",
-          "enterprise_connections"
+          "email_address",
+          "first_name",
+          "last_name"
         ]
       },
       "verification_otp": {
@@ -3229,16 +5155,27 @@
         "properties": {
           "object": {
             "type": "string",
-            "enum": ["verification_otp"]
+            "enum": [
+              "verification_otp"
+            ]
           },
           "status": {
             "type": "string",
-            "enum": ["unverified", "verified", "failed", "expired"]
+            "enum": [
+              "unverified",
+              "verified",
+              "failed",
+              "expired"
+            ]
           },
           "strategy": {
             "x-speakeasy-unknown-values": "allow",
             "type": "string",
-            "enum": ["phone_code", "email_code", "reset_password_email_code"]
+            "enum": [
+              "phone_code",
+              "email_code",
+              "reset_password_email_code"
+            ]
           },
           "attempts": {
             "type": "integer",
@@ -3248,12 +5185,22 @@
             "type": "integer",
             "nullable": true
           },
+          "channel": {
+            "type": "string",
+            "nullable": true,
+            "description": "The delivery channel of the code (phone codes only)."
+          },
           "verified_at_client": {
             "type": "string",
             "nullable": true
           }
         },
-        "required": ["status", "strategy", "attempts", "expire_at"]
+        "required": [
+          "status",
+          "strategy",
+          "attempts",
+          "expire_at"
+        ]
       },
       "verification_admin": {
         "x-speakeasy-name-override": "Admin",
@@ -3262,16 +5209,22 @@
         "properties": {
           "object": {
             "type": "string",
-            "enum": ["verification_admin"]
+            "enum": [
+              "verification_admin"
+            ]
           },
           "status": {
             "type": "string",
-            "enum": ["verified"]
+            "enum": [
+              "verified"
+            ]
           },
           "strategy": {
             "x-speakeasy-unknown-values": "allow",
             "type": "string",
-            "enum": ["admin"]
+            "enum": [
+              "admin"
+            ]
           },
           "attempts": {
             "type": "integer",
@@ -3286,7 +5239,12 @@
             "nullable": true
           }
         },
-        "required": ["status", "strategy", "attempts", "expire_at"]
+        "required": [
+          "status",
+          "strategy",
+          "attempts",
+          "expire_at"
+        ]
       },
       "verification_from_oauth": {
         "x-speakeasy-name-override": "FromOAuth",
@@ -3295,11 +5253,16 @@
         "properties": {
           "object": {
             "type": "string",
-            "enum": ["verification_from_oauth"]
+            "enum": [
+              "verification_from_oauth"
+            ]
           },
           "status": {
             "type": "string",
-            "enum": ["unverified", "verified"]
+            "enum": [
+              "unverified",
+              "verified"
+            ]
           },
           "strategy": {
             "type": "string",
@@ -3327,7 +5290,12 @@
             "nullable": true
           }
         },
-        "required": ["status", "strategy", "attempts", "expire_at"]
+        "required": [
+          "status",
+          "strategy",
+          "attempts",
+          "expire_at"
+        ]
       },
       "verification_ticket": {
         "x-speakeasy-name-override": "Ticket",
@@ -3336,16 +5304,24 @@
         "properties": {
           "object": {
             "type": "string",
-            "enum": ["verification_ticket"]
+            "enum": [
+              "verification_ticket"
+            ]
           },
           "status": {
             "type": "string",
-            "enum": ["unverified", "verified", "expired"]
+            "enum": [
+              "unverified",
+              "verified",
+              "expired"
+            ]
           },
           "strategy": {
             "x-speakeasy-unknown-values": "allow",
             "type": "string",
-            "enum": ["ticket"]
+            "enum": [
+              "ticket"
+            ]
           },
           "attempts": {
             "type": "integer",
@@ -3360,7 +5336,12 @@
             "nullable": true
           }
         },
-        "required": ["status", "strategy", "attempts", "expire_at"]
+        "required": [
+          "status",
+          "strategy",
+          "attempts",
+          "expire_at"
+        ]
       },
       "verification_saml": {
         "x-speakeasy-name-override": "SAML",
@@ -3369,15 +5350,25 @@
         "properties": {
           "object": {
             "type": "string",
-            "enum": ["verification_saml"]
+            "enum": [
+              "verification_saml"
+            ]
           },
           "status": {
             "type": "string",
-            "enum": ["unverified", "verified", "failed", "expired", "transferable"]
+            "enum": [
+              "unverified",
+              "verified",
+              "failed",
+              "expired",
+              "transferable"
+            ]
           },
           "strategy": {
             "type": "string",
-            "enum": ["saml"]
+            "enum": [
+              "saml"
+            ]
           },
           "external_verification_redirect_url": {
             "nullable": true,
@@ -3405,7 +5396,11 @@
             "nullable": true
           }
         },
-        "required": ["status", "strategy", "attempts"]
+        "required": [
+          "status",
+          "strategy",
+          "attempts"
+        ]
       },
       "verification_email_link": {
         "x-speakeasy-name-override": "EmailLink",
@@ -3414,15 +5409,24 @@
         "properties": {
           "object": {
             "type": "string",
-            "enum": ["verification_email_link"]
+            "enum": [
+              "verification_email_link"
+            ]
           },
           "status": {
             "type": "string",
-            "enum": ["unverified", "verified", "failed", "expired"]
+            "enum": [
+              "unverified",
+              "verified",
+              "failed",
+              "expired"
+            ]
           },
           "strategy": {
             "type": "string",
-            "enum": ["email_link"]
+            "enum": [
+              "email_link"
+            ]
           },
           "attempts": {
             "type": "integer",
@@ -3437,7 +5441,51 @@
             "nullable": true
           }
         },
-        "required": ["status", "strategy", "attempts", "expire_at"]
+        "required": [
+          "status",
+          "strategy",
+          "attempts",
+          "expire_at"
+        ]
+      },
+      "verification_scim": {
+        "x-speakeasy-name-override": "SCIM",
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "object": {
+            "type": "string",
+            "enum": [
+              "verification_scim"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "verified"
+            ]
+          },
+          "strategy": {
+            "type": "string",
+            "enum": [
+              "scim"
+            ]
+          },
+          "attempts": {
+            "type": "integer",
+            "nullable": true
+          },
+          "expire_at": {
+            "type": "integer",
+            "nullable": true
+          }
+        },
+        "required": [
+          "status",
+          "strategy",
+          "attempts",
+          "expire_at"
+        ]
       },
       "IdentificationLink": {
         "type": "object",
@@ -3451,7 +5499,10 @@
             "type": "string"
           }
         },
-        "required": ["type", "id"]
+        "required": [
+          "type",
+          "id"
+        ]
       },
       "EmailAddress": {
         "type": "object",
@@ -3464,7 +5515,9 @@
             "type": "string",
             "x-speakeasy-unknown-values": "allow",
             "description": "String representing the object's type. Objects of the same type share the same value.\n",
-            "enum": ["email_address"]
+            "enum": [
+              "email_address"
+            ]
           },
           "email_address": {
             "type": "string"
@@ -3493,6 +5546,9 @@
               },
               {
                 "$ref": "#/components/schemas/verification_email_link"
+              },
+              {
+                "$ref": "#/components/schemas/verification_scim"
               }
             ],
             "discriminator": {
@@ -3503,7 +5559,8 @@
                 "verification_from_oauth": "#/components/schemas/verification_from_oauth",
                 "verification_ticket": "#/components/schemas/verification_ticket",
                 "verification_saml": "#/components/schemas/verification_saml",
-                "verification_email_link": "#/components/schemas/verification_email_link"
+                "verification_email_link": "#/components/schemas/verification_email_link",
+                "verification_scim": "#/components/schemas/verification_scim"
               }
             }
           },
@@ -3548,7 +5605,9 @@
           "object": {
             "type": "string",
             "description": "String representing the object's type. Objects of the same type share the same value.\n",
-            "enum": ["phone_number"]
+            "enum": [
+              "phone_number"
+            ]
           },
           "phone_number": {
             "type": "string"
@@ -3622,11 +5681,18 @@
         "properties": {
           "object": {
             "type": "string",
-            "enum": ["verification_web3"]
+            "enum": [
+              "verification_web3"
+            ]
           },
           "status": {
             "type": "string",
-            "enum": ["unverified", "verified", "failed", "expired"]
+            "enum": [
+              "unverified",
+              "verified",
+              "failed",
+              "expired"
+            ]
           },
           "strategy": {
             "type": "string",
@@ -3659,7 +5725,12 @@
             "nullable": true
           }
         },
-        "required": ["status", "strategy", "attempts", "expire_at"]
+        "required": [
+          "status",
+          "strategy",
+          "attempts",
+          "expire_at"
+        ]
       },
       "Web3Wallet": {
         "type": "object",
@@ -3671,7 +5742,9 @@
           "object": {
             "type": "string",
             "description": "String representing the object's type. Objects of the same type share the same value.\n",
-            "enum": ["web3_wallet"]
+            "enum": [
+              "web3_wallet"
+            ]
           },
           "web3_wallet": {
             "type": "string"
@@ -3702,7 +5775,13 @@
             "description": "Unix timestamp of creation\n"
           }
         },
-        "required": ["object", "web3_wallet", "verification", "created_at", "updated_at"]
+        "required": [
+          "object",
+          "web3_wallet",
+          "verification",
+          "created_at",
+          "updated_at"
+        ]
       },
       "verification_passkey": {
         "x-speakeasy-name-override": "Passkey",
@@ -3711,19 +5790,27 @@
         "properties": {
           "object": {
             "type": "string",
-            "enum": ["verification_passkey"]
+            "enum": [
+              "verification_passkey"
+            ]
           },
           "status": {
             "type": "string",
-            "enum": ["verified"]
+            "enum": [
+              "verified"
+            ]
           },
           "strategy": {
             "type": "string",
-            "enum": ["passkey"]
+            "enum": [
+              "passkey"
+            ]
           },
           "nonce": {
             "type": "string",
-            "enum": ["nonce"]
+            "enum": [
+              "nonce"
+            ]
           },
           "message": {
             "type": "string",
@@ -3742,7 +5829,12 @@
             "nullable": true
           }
         },
-        "required": ["status", "strategy", "attempts", "expire_at"]
+        "required": [
+          "status",
+          "strategy",
+          "attempts",
+          "expire_at"
+        ]
       },
       "Passkey": {
         "type": "object",
@@ -3754,7 +5846,9 @@
           "object": {
             "type": "string",
             "description": "String representing the object's type. Objects of the same type share the same value.\n",
-            "enum": ["passkey"]
+            "enum": [
+              "passkey"
+            ]
           },
           "name": {
             "type": "string"
@@ -3777,7 +5871,12 @@
             }
           }
         },
-        "required": ["object", "name", "last_used_at", "verification"]
+        "required": [
+          "object",
+          "name",
+          "last_used_at",
+          "verification"
+        ]
       },
       "verification_oauth": {
         "x-speakeasy-name-override": "Oauth",
@@ -3786,12 +5885,20 @@
         "properties": {
           "object": {
             "type": "string",
-            "enum": ["verification_oauth"]
+            "enum": [
+              "verification_oauth"
+            ]
           },
           "status": {
             "type": "string",
             "x-speakeasy-unknown-values": "allow",
-            "enum": ["unverified", "verified", "failed", "expired", "transferable"]
+            "enum": [
+              "unverified",
+              "verified",
+              "failed",
+              "expired",
+              "transferable"
+            ]
           },
           "strategy": {
             "type": "string",
@@ -3822,7 +5929,12 @@
             "nullable": true
           }
         },
-        "required": ["status", "strategy", "attempts", "expire_at"]
+        "required": [
+          "status",
+          "strategy",
+          "attempts",
+          "expire_at"
+        ]
       },
       "verification_google_one_tap": {
         "x-speakeasy-name-override": "GoogleOneTap",
@@ -3831,15 +5943,22 @@
         "properties": {
           "object": {
             "type": "string",
-            "enum": ["verification_google_one_tap"]
+            "enum": [
+              "verification_google_one_tap"
+            ]
           },
           "status": {
             "type": "string",
-            "enum": ["unverified", "verified"]
+            "enum": [
+              "unverified",
+              "verified"
+            ]
           },
           "strategy": {
             "type": "string",
-            "enum": ["google_one_tap"]
+            "enum": [
+              "google_one_tap"
+            ]
           },
           "expire_at": {
             "type": "integer",
@@ -3863,7 +5982,12 @@
             ]
           }
         },
-        "required": ["status", "strategy", "attempts", "expire_at"]
+        "required": [
+          "status",
+          "strategy",
+          "attempts",
+          "expire_at"
+        ]
       },
       "ExternalAccountWithVerification": {
         "type": "object",
@@ -3872,7 +5996,11 @@
           "object": {
             "type": "string",
             "description": "String representing the object's type. Objects of the same type share the same value.",
-            "enum": ["external_account", "facebook_account", "google_account"]
+            "enum": [
+              "external_account",
+              "facebook_account",
+              "google_account"
+            ]
           },
           "id": {
             "type": "string"
@@ -3971,7 +6099,7 @@
           "verification"
         ]
       },
-      "SAMLConnection": {
+      "SAMLAccountConnection": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
@@ -4031,10 +6159,14 @@
         ],
         "anyOf": [
           {
-            "required": ["domain"]
+            "required": [
+              "domain"
+            ]
           },
           {
-            "required": ["domains"]
+            "required": [
+              "domains"
+            ]
           }
         ]
       },
@@ -4048,7 +6180,9 @@
           "object": {
             "type": "string",
             "description": "String representing the object's type. Objects of the same type share the same value.\n",
-            "enum": ["saml_account"]
+            "enum": [
+              "saml_account"
+            ]
           },
           "provider": {
             "type": "string"
@@ -4101,14 +6235,21 @@
             "nullable": true,
             "oneOf": [
               {
-                "$ref": "#/components/schemas/SAMLConnection"
+                "$ref": "#/components/schemas/SAMLAccountConnection"
               }
             ]
           }
         },
-        "required": ["id", "object", "provider", "active", "email_address", "verification"]
+        "required": [
+          "id",
+          "object",
+          "provider",
+          "active",
+          "email_address",
+          "verification"
+        ]
       },
-      "EnterpriseConnection": {
+      "EnterpriseAccountConnection": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
@@ -4180,10 +6321,14 @@
         ],
         "anyOf": [
           {
-            "required": ["domain"]
+            "required": [
+              "domain"
+            ]
           },
           {
-            "required": ["domains"]
+            "required": [
+              "domains"
+            ]
           }
         ]
       },
@@ -4197,12 +6342,17 @@
           "object": {
             "type": "string",
             "description": "String representing the object's type. Objects of the same type share the same value.\n",
-            "enum": ["enterprise_account"]
+            "enum": [
+              "enterprise_account"
+            ]
           },
           "protocol": {
             "type": "string",
             "description": "The authentication protocol used to sign in.\n",
-            "enum": ["oauth", "saml"]
+            "enum": [
+              "oauth",
+              "saml"
+            ]
           },
           "provider": {
             "type": "string"
@@ -4257,7 +6407,7 @@
             "nullable": true,
             "oneOf": [
               {
-                "$ref": "#/components/schemas/EnterpriseConnection"
+                "$ref": "#/components/schemas/EnterpriseAccountConnection"
               }
             ]
           },
@@ -4268,14 +6418,23 @@
             "description": "Unix timestamp of last authentication.\n"
           }
         },
-        "required": ["id", "object", "provider", "active", "email_address", "verification"]
+        "required": [
+          "id",
+          "object",
+          "provider",
+          "active",
+          "email_address",
+          "verification"
+        ]
       },
       "Organization": {
         "type": "object",
         "properties": {
           "object": {
             "type": "string",
-            "enum": ["organization"]
+            "enum": [
+              "organization"
+            ]
           },
           "id": {
             "type": "string"
@@ -4306,6 +6465,12 @@
           },
           "admin_delete_enabled": {
             "type": "boolean"
+          },
+          "self_serve_sso_enabled": {
+            "x-internal": true,
+            "type": "boolean",
+            "nullable": true,
+            "description": "Whether this organization can configure self-serve enterprise SSO. TODO(SELF-SERVE-release): remove x-internal and nullable once self-serve SSO ships publicly.\n"
           },
           "public_metadata": {
             "type": "object",
@@ -4387,6 +6552,9 @@
           "username": {
             "type": "string",
             "nullable": true
+          },
+          "banned": {
+            "type": "boolean"
           }
         },
         "required": [
@@ -4408,7 +6576,9 @@
           "object": {
             "type": "string",
             "description": "String representing the object's type. Objects of the same type share the same value.\n",
-            "enum": ["organization_membership"]
+            "enum": [
+              "organization_membership"
+            ]
           },
           "role": {
             "type": "string"
@@ -4466,6 +6636,30 @@
           "organization"
         ]
       },
+      "SCIMUserMetadata": {
+        "type": "object",
+        "additionalProperties": false,
+        "description": "Metadata describing a user's linkage to a SCIM directory. This object is only delivered on `user.created` and `user.updated` webhook events, and only when the user is provisioned through a SCIM directory. Its absence does not necessarily mean the user is not SCIM-managed.\n",
+        "properties": {
+          "directory_id": {
+            "type": "string",
+            "description": "The ID of the SCIM directory the user is provisioned from.\n"
+          },
+          "directory_enabled": {
+            "type": "boolean",
+            "description": "Whether the SCIM directory is currently enabled. Omitted when false.\n"
+          },
+          "external_id": {
+            "type": "string",
+            "nullable": true,
+            "description": "The user's external ID as reported by the SCIM directory, if any.\n"
+          }
+        },
+        "required": [
+          "directory_id",
+          "external_id"
+        ]
+      },
       "User": {
         "type": "object",
         "additionalProperties": false,
@@ -4476,7 +6670,9 @@
           "object": {
             "type": "string",
             "description": "String representing the object's type. Objects of the same type share the same value.\n",
-            "enum": ["user"]
+            "enum": [
+              "user"
+            ]
           },
           "external_id": {
             "nullable": true,
@@ -4625,6 +6821,10 @@
             "type": "boolean",
             "description": "Flag to denote whether user is currently locked, i.e. restricted from signing in or not.\n"
           },
+          "deprovisioned": {
+            "type": "boolean",
+            "description": "Flag to denote whether user has been deprovisioned and is restricted from signing in.\n"
+          },
           "lockout_expires_in_seconds": {
             "type": "integer",
             "format": "int64",
@@ -4674,10 +6874,23 @@
             "description": "Unix timestamp of when the user accepted the legal requirements.\n",
             "example": 1700690400000
           },
+          "requires_password_reset": {
+            "x-internal": true,
+            "type": "boolean",
+            "description": "If true, the user's password is marked as requiring a reset and they will be required to reset their password upon next login.\n"
+          },
           "bypass_client_trust": {
             "type": "boolean",
             "description": "When set to `true`, the user will bypass client trust checks during sign-in.",
             "default": false
+          },
+          "scim": {
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/SCIMUserMetadata"
+              }
+            ]
           }
         },
         "required": [
@@ -4718,6 +6931,210 @@
           "legal_accepted_at"
         ]
       },
+      "PlatformCreateOrganizationRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The name of the organization."
+          },
+          "slug": {
+            "type": "string",
+            "description": "The slug of the organization."
+          },
+          "created_by": {
+            "type": "string",
+            "description": "The ID of the user who created the organization."
+          },
+          "managed_by": {
+            "type": "string",
+            "description": "Internal-only. Requires integration-server authentication on PLAPI. The platform provider managing the organization (e.g. Stripe, Vercel). When supplied, it is written to public_metadata.managed_by if that key is not already set.",
+            "x-internal": true
+          },
+          "public_metadata": {
+            "type": "object",
+            "description": "Public metadata for the organization. Used by platform integrations to store provider-specific fields (e.g. Vercel Marketplace url).",
+            "x-internal": true
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "The creation timestamp in RFC3339 format."
+          }
+        },
+        "required": [
+          "slug"
+        ]
+      },
+      "PlatformUpdateOrganizationRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "plan_id": {
+            "type": "string",
+            "description": "Workspace-scoped subscription plan ID."
+          },
+          "addon_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Workspace-scoped add-on subscription plan IDs."
+          }
+        },
+        "required": [
+          "plan_id"
+        ]
+      },
+      "PlatformCreateOrganizationSubscriptionRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "shared_payment_token": {
+            "type": "string",
+            "description": "Stripe Shared Payment Token for recurring billing."
+          },
+          "plan_id": {
+            "type": "string",
+            "description": "Subscription plan ID (e.g. pro_2025_08)."
+          }
+        },
+        "required": [
+          "shared_payment_token",
+          "plan_id"
+        ]
+      },
+      "InstanceUsageMeterWithBillable": {
+        "title": "Instance Usage Meter With Billable",
+        "description": "Usage totals for a meter that includes both total and billable quantities.",
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "total_usage": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Total quantity for this meter in the selected period."
+          },
+          "total_billable_usage": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Billable subset of total usage for this meter in the selected period."
+          }
+        },
+        "required": [
+          "total_usage",
+          "total_billable_usage"
+        ]
+      },
+      "InstanceUsageMeter": {
+        "title": "Instance Usage Meter",
+        "description": "Usage totals for a single meter.",
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "total_usage": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Total quantity for this meter in the selected period."
+          }
+        },
+        "required": [
+          "total_usage"
+        ]
+      },
+      "InstanceSMSUsage": {
+        "title": "Instance SMS Usage",
+        "description": "Total SMS usage with per-geographic-tier breakdowns.",
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "total_usage": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Total SMS messages across all tiers."
+          },
+          "tier_a": {
+            "$ref": "#/components/schemas/InstanceUsageMeter"
+          },
+          "tier_b": {
+            "$ref": "#/components/schemas/InstanceUsageMeter"
+          },
+          "tier_c": {
+            "$ref": "#/components/schemas/InstanceUsageMeter"
+          },
+          "tier_d": {
+            "$ref": "#/components/schemas/InstanceUsageMeter"
+          },
+          "tier_e": {
+            "$ref": "#/components/schemas/InstanceUsageMeter"
+          },
+          "tier_f": {
+            "$ref": "#/components/schemas/InstanceUsageMeter"
+          }
+        },
+        "required": [
+          "total_usage",
+          "tier_a",
+          "tier_b",
+          "tier_c",
+          "tier_d",
+          "tier_e",
+          "tier_f"
+        ]
+      },
+      "PlatformInstanceUsageResponse": {
+        "title": "Instance Usage Report",
+        "description": "Usage report for an application instance containing per-meter totals.",
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "application_id": {
+            "type": "string",
+            "description": "The ID of the application."
+          },
+          "instance_id": {
+            "type": "string",
+            "description": "The ID of the instance."
+          },
+          "period_start": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Inclusive start of the usage period boundary (RFC3339). When an\nexplicit date range is provided, this is midnight UTC on the start\ndate. When no date range is provided, this is the start of the\ncurrent billing cycle.\n"
+          },
+          "period_end": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Exclusive end of the usage period boundary (RFC3339). When an\nexplicit date range is provided, this is midnight UTC immediately\nafter the requested end date. When no date range is provided, this\nis the end of the current billing cycle.\n"
+          },
+          "mau": {
+            "$ref": "#/components/schemas/InstanceUsageMeterWithBillable"
+          },
+          "mao": {
+            "$ref": "#/components/schemas/InstanceUsageMeterWithBillable"
+          },
+          "custom_domains": {
+            "$ref": "#/components/schemas/InstanceUsageMeter"
+          },
+          "sms_messages": {
+            "$ref": "#/components/schemas/InstanceSMSUsage"
+          },
+          "enterprise_connections": {
+            "$ref": "#/components/schemas/InstanceUsageMeter"
+          }
+        },
+        "required": [
+          "application_id",
+          "instance_id",
+          "period_start",
+          "period_end",
+          "mau",
+          "mao",
+          "custom_domains",
+          "sms_messages",
+          "enterprise_connections"
+        ]
+      },
       "PlatformListInstanceUsersResponse": {
         "title": "List Instance Users Response",
         "description": "A paginated list of users for an application instance.",
@@ -4738,7 +7155,35 @@
             "example": 100
           }
         },
-        "required": ["data", "total_count"]
+        "required": [
+          "data",
+          "total_count"
+        ]
+      },
+      "DeletedObject": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "object": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "deleted": {
+            "type": "boolean"
+          },
+          "external_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "object",
+          "deleted"
+        ]
       },
       "JWTTemplate": {
         "type": "object",
@@ -4746,7 +7191,9 @@
         "properties": {
           "object": {
             "type": "string",
-            "enum": ["jwt_template"]
+            "enum": [
+              "jwt_template"
+            ]
           },
           "id": {
             "type": "string"
@@ -4793,35 +7240,15 @@
           "updated_at"
         ]
       },
-      "DeletedObject": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "object": {
-            "type": "string"
-          },
-          "id": {
-            "type": "string"
-          },
-          "slug": {
-            "type": "string"
-          },
-          "deleted": {
-            "type": "boolean"
-          },
-          "external_id": {
-            "type": "string"
-          }
-        },
-        "required": ["object", "deleted"]
-      },
       "RedirectURL": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
           "object": {
             "type": "string",
-            "enum": ["redirect_url"]
+            "enum": [
+              "redirect_url"
+            ]
           },
           "id": {
             "type": "string"
@@ -4840,7 +7267,13 @@
             "description": "Unix timestamp of last update.\n"
           }
         },
-        "required": ["object", "id", "url", "created_at", "updated_at"]
+        "required": [
+          "object",
+          "id",
+          "url",
+          "created_at",
+          "updated_at"
+        ]
       },
       "PlatformListRedirectURLsResponse": {
         "title": "List Redirect URLs Response",
@@ -4862,7 +7295,10 @@
             "example": 3
           }
         },
-        "required": ["data", "total_count"]
+        "required": [
+          "data",
+          "total_count"
+        ]
       },
       "PlatformConfigResponse": {
         "type": "object",
@@ -4990,12 +7426,12 @@
           }
         }
       },
-      "PaymentRequired": {
-        "description": "Payment required",
+      "Organization": {
+        "description": "An organization",
         "content": {
           "application/json": {
             "schema": {
-              "$ref": "#/components/schemas/ClerkErrors"
+              "$ref": "#/components/schemas/Organization"
             }
           }
         }
@@ -5009,6 +7445,16 @@
             }
           }
         }
+      },
+      "PaymentRequired": {
+        "description": "Payment required",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ClerkErrors"
+            }
+          }
+        }
       }
     }
   },
@@ -5018,6 +7464,7 @@
       "tags": [
         "Applications",
         "Domains",
+        "Domain Intents",
         "Application Transfers",
         "Users",
         "JWT Templates",
