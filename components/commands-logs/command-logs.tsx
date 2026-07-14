@@ -18,7 +18,7 @@ export function CommandLogs({ command, onLog, onCompleted }: Props) {
     if (!ref.current) {
       const iterator = getCommandLogs(command.sandboxId, command.cmdId);
       ref.current = iterator;
-      (async () => {
+      void (async () => {
         for await (const log of iterator) {
           onLog({
             sandboxId: command.sandboxId,

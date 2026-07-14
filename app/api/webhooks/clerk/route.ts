@@ -3,7 +3,7 @@ import { verifyWebhook } from "@clerk/nextjs/webhooks";
 import { NextRequest, NextResponse } from "next/server";
 
 import { db } from "@/lib/database/db";
-import { createUserRepository } from "@/lib/repositories/user-repository-impl";
+import { createUserRepository } from "@/lib/repositories/user-repository";
 
 function getPrimaryEmailAddress(user: UserJSON): string | null {
   if (!user.primary_email_address_id) {

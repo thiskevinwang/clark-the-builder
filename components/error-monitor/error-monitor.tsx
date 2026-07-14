@@ -100,7 +100,7 @@ function ErrorMonitorWithChat({
         lastReportedErrors.current = newErrors;
         lastErrorReportTime.current = Date.now();
 
-        sendMessage({
+        void sendMessage({
           role: "user",
           parts: [{ type: "data-report-errors", data: summary }],
         });

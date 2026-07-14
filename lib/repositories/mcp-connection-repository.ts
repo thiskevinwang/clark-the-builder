@@ -1,22 +1,100 @@
+import { and, desc, eq, ilike, or } from "drizzle-orm";
+
+import type { DB } from "@/lib/database/db";
+import { MCPConnectionRow, mcpConnections } from "@/lib/database/schema";
+
 import type {
   CreateMCPConnectionInput,
   MCPConnection,
   UpdateMCPConnectionInput,
 } from "../models/mcp-connection";
 
-export interface MCPConnectionRepository {
-  getById(userId: string, id: string): Promise<MCPConnection | null>;
-  listRecent(
-    userId: string,
-    limit: number,
-    offset?: number,
-    query?: string,
-  ): Promise<MCPConnection[]>;
-  create(input: CreateMCPConnectionInput): Promise<MCPConnection>;
-  update(
-    userId: string,
-    id: string,
-    input: UpdateMCPConnectionInput,
-  ): Promise<MCPConnection | null>;
-  delete(userId: string, id: string): Promise<boolean>;
-}
+const rowToModel = (row: MCPConnectionRow): MCPConnection => ({
+  id: row.id,
+  userId: row.userId,
+  name: row.name,
+  url: row.url,
+  auth: row.auth as MCPConnection["auth"],
+  enabled: row.enabled,
+  createdAt: row.createdAt,
+  updatedAt: row.updatedAt,
+});
+
+const buildInsertValues = (
+  input: CreateMCPConnectionInput,
+): typeof mcpConnections.$inferInsert => ({
+  ...(input.id ? { id: input.id } : {}),
+  userId: input.userId,
+  name: input.name,
+  url: input.url,
+  ...(input.auth !== undefined ? { auth: input.auth as MCPConnectionRow["auth"] } : {}),
+  ...(input.enabled !== undefined ? { enabled: input.enabled } : {}),
+});
+
+export const createMCPConnectionRepository = (db: DB) => ({
+  async getById(userId: string, id: string) {
+    const rows = await db
+      .select()
+      .from(mcpConnections)
+      .where(and(eq(mcpConnections.userId, userId), eq(mcpConnections.id, id)))
+      .limit(1);
+    return rows[0] ? rowToModel(rows[0]) : null;
+  },
+  async listRecent(userId: string, limit: number, offset = 0, query?: string) {
+    const q = query?.trim();
+    const searchWhere = q
+      ? or(
+          ilike(mcpConnections.name, `%${q}%`),
+          ilike(mcpConnections.url, `%${q}%`),
+          ilike(mcpConnections.id, `%${q}%`),
+        )
+      : undefined;
+    const where = and(eq(mcpConnections.userId, userId), searchWhere);
+
+    const rows = await db
+      .select()
+      .from(mcpConnections)
+      .where(where)
+      .orderBy(desc(mcpConnections.updatedAt))
+      .limit(limit)
+      .offset(offset);
+
+    return rows.map(rowToModel);
+  },
+  async create(input: CreateMCPConnectionInput) {
+    const rows = await db.insert(mcpConnections).values(buildInsertValues(input)).returning();
+    return rowToModel(rows[0]);
+  },
+  async update(userId: string, id: string, input: UpdateMCPConnectionInput) {
+    const set: Partial<MCPConnectionRow> = {};
+    if (input.name !== undefined) set.name = input.name;
+    if (input.url !== undefined) set.url = input.url;
+    if (Object.prototype.hasOwnProperty.call(input, "auth")) {
+      set.auth = (input.auth ?? null) as MCPConnectionRow["auth"];
+    }
+    if (input.enabled !== undefined) set.enabled = input.enabled;
+
+    if (Object.keys(set).length === 0) {
+      const rows = await db
+        .select()
+        .from(mcpConnections)
+        .where(and(eq(mcpConnections.userId, userId), eq(mcpConnections.id, id)))
+        .limit(1);
+      return rows[0] ? rowToModel(rows[0]) : null;
+    }
+
+    const rows = await db
+      .update(mcpConnections)
+      .set(set)
+      .where(and(eq(mcpConnections.userId, userId), eq(mcpConnections.id, id)))
+      .returning();
+    return rows[0] ? rowToModel(rows[0]) : null;
+  },
+  async delete(userId: string, id: string) {
+    const rows = await db
+      .delete(mcpConnections)
+      .where(and(eq(mcpConnections.userId, userId), eq(mcpConnections.id, id)))
+      .returning({ id: mcpConnections.id });
+    return rows.length > 0;
+  },
+});

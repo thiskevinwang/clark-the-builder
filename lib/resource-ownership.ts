@@ -1,6 +1,6 @@
 import { db } from "./database/db";
 import type { Resource } from "./models/resource";
-import { createResourceRepository } from "./repositories/resource-repository-impl";
+import { createResourceRepository } from "./repositories/resource-repository";
 
 export async function getOwnedResourceByExternalId(
   userId: string,

@@ -4,7 +4,7 @@ import z from "zod";
 import { getCurrentLocalUser } from "@/lib/auth";
 import { db } from "@/lib/database/db";
 import type { MCPConnection, MCPConnectionAuth } from "@/lib/models/mcp-connection";
-import { createMCPConnectionRepository } from "@/lib/repositories/mcp-connection-repository-impl";
+import { createMCPConnectionRepository } from "@/lib/repositories/mcp-connection-repository";
 
 const HeadersSchema = z.record(z.string().min(1)).refine((value) => Object.keys(value).length > 0, {
   message: "Headers must not be empty",

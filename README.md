@@ -22,14 +22,17 @@ This is made possible by the [Clerk Platform API](https://clerk.com/docs/referen
 Populate environment variables
 
 ```env
-#.env
-OPEAI_API_KEY=
-ANTHROPIC_API_KEY=
+DATABASE_URL=postgresql://USER:PASSWORD@HOST:5432/DATABASE?sslmode=require
+OPENAI_API_KEY=
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=
 CLERK_SECRET_KEY=
 CLERK_WEBHOOK_SIGNING_SECRET=
-CLERK_PLATFORM_API_BASE_URL=
 CLERK_PLATFORM_ACCESS_TOKEN=
+
+# Optional: enables the Vercel Sandbox integration
+VERCEL_TOKEN=
+VERCEL_TEAM_ID=
+VERCEL_PROJECT_ID=
 ```
 
 Install deps
@@ -41,10 +44,7 @@ bun i
 Generate the api client
 
 ```bash
-bunx @hey-api/openapi-ts \
-  -i openapi.json \
-  -o lib/api \
-  -c @tanstack/react-query
+bun run api:generate
 ```
 
 Get vercel token for Sandbox access

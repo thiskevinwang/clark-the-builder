@@ -4,7 +4,7 @@ import z from "zod";
 import { getCurrentLocalUser } from "@/lib/auth";
 import { db } from "@/lib/database/db";
 import { Conversation } from "@/lib/models/conversation";
-import { createConversationRepository } from "@/lib/repositories/conversation-repository-impl";
+import { createConversationRepository } from "@/lib/repositories/conversation-repository";
 
 const ParamsSchema = z.object({
   chatId: z.string().nonempty(),
@@ -59,11 +59,11 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ chatId
     return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
   }
 
-  const chat = await conversationRepo.update(currentUser.id, parsedParams.data.chatId, {
-    ...(Object.prototype.hasOwnProperty.call(parsedBody.data, "title")
-      ? { title: parsedBody.data.title ?? null }
-      : {}),
-  });
+  const chat = await conversationRepo.update(
+    currentUser.id,
+    parsedParams.data.chatId,
+    parsedBody.data,
+  );
 
   if (!chat) {
     return NextResponse.json({ error: "Chat not found" }, { status: 404 });

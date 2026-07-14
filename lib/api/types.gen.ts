@@ -581,7 +581,7 @@ export type EmailAddress = {
         object: 'verification_email_link';
     } & VerificationEmailLink) | ({
         object: 'verification_scim';
-    } & VerificationScim) | null;
+    } & VerificationScim);
     linked_to: Array<IdentificationLink>;
     /**
      * Indicates whether this email address domain matches an active enterprise connection.
@@ -615,7 +615,7 @@ export type PhoneNumber = {
         object: 'verification_otp';
     } & VerificationOtp) | ({
         object: 'verification_admin';
-    } & VerificationAdmin) | null;
+    } & VerificationAdmin);
     linked_to: Array<IdentificationLink>;
     backup_codes?: Array<string> | null;
     /**
@@ -653,7 +653,7 @@ export type Web3Wallet = {
         object: 'verification_web3';
     } & VerificationWeb3) | ({
         object: 'verification_admin';
-    } & VerificationAdmin) | null;
+    } & VerificationAdmin);
     /**
      * Unix timestamp of creation
      *
@@ -692,7 +692,7 @@ export type Passkey = {
     last_used_at: number;
     verification: ({
         object: 'verification_passkey';
-    } & VerificationPasskey) | null;
+    } & VerificationPasskey);
 };
 
 export type VerificationOauth = {
@@ -764,7 +764,7 @@ export type ExternalAccountWithVerification = {
         object: 'verification_oauth';
     } & VerificationOauth) | ({
         object: 'verification_google_one_tap';
-    } & VerificationGoogleOneTap) | null;
+    } & VerificationGoogleOneTap);
     [key: string]: unknown;
 };
 
@@ -819,7 +819,7 @@ export type SamlAccount = {
         object: 'verification_saml';
     } & VerificationSaml) | ({
         object: 'verification_ticket';
-    } & VerificationTicket) | null;
+    } & VerificationTicket);
     saml_connection?: SamlAccountConnection | null;
 };
 
@@ -882,7 +882,7 @@ export type EnterpriseAccount = {
         object: 'verification_saml';
     } & VerificationSaml) | ({
         object: 'verification_oauth';
-    } & VerificationOauth) | null;
+    } & VerificationOauth);
     enterprise_connection?: EnterpriseAccountConnection | null;
     /**
      * Unix timestamp of last authentication.

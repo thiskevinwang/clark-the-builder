@@ -107,7 +107,7 @@ export function WelcomeScreen() {
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
-                  handleSubmit();
+                  void handleSubmit();
                 }}
               >
                 <InputGroup className="border-border/50 bg-card shadow-lg transition-colors hover:border-border">
@@ -117,7 +117,7 @@ export function WelcomeScreen() {
                     onKeyDown={(e) => {
                       if (e.key === "Enter" && !e.shiftKey) {
                         e.preventDefault();
-                        handleSubmit();
+                        void handleSubmit();
                       }
                     }}
                     placeholder="Describe the app you want to build..."

@@ -45,7 +45,7 @@ export function Chat({ className }: { className: string }) {
     (text: string) => {
       if (text.trim()) {
         setInput("");
-        sendMessage({ text }, { body: { modelId, reasoningEffort } });
+        void sendMessage({ text }, { body: { modelId, reasoningEffort } });
       }
     },
     [modelId, reasoningEffort, sendMessage, setInput],

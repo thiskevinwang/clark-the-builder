@@ -5,7 +5,7 @@ import z from "zod";
 import { platformCreateApplication } from "@/lib/api";
 import { createClient, createConfig } from "@/lib/api/client";
 import { db } from "@/lib/database/db";
-import { createResourceRepository } from "@/lib/repositories/resource-repository-impl";
+import { createResourceRepository } from "@/lib/repositories/resource-repository";
 
 import type { DataPart } from "../messages/data-parts";
 import description from "./create-clerk-app.prompt.md";

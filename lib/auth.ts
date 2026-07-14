@@ -3,7 +3,7 @@ import { auth } from "@clerk/nextjs/server";
 import type { User } from "@/lib/models/user";
 
 import { db } from "./database/db";
-import { createUserRepository } from "./repositories/user-repository-impl";
+import { createUserRepository } from "./repositories/user-repository";
 
 export async function getCurrentLocalUser(): Promise<User | null> {
   const { userId } = await auth();

@@ -102,7 +102,7 @@ export const Message = memo(function Message({ message }: Props) {
           </div>
           <CollapsibleContent className="[&[data-state=open]]:animate-collapsible-down [&[data-state=closed]]:animate-collapsible-up">
             <Streamdown className="**:text-xs! text-muted-foreground max-w-full">
-              {"\`\`\`json\n" + JSON.stringify(message, null, 2) + "\n\`\`\`"}
+              {"```json\n" + JSON.stringify(message, null, 2) + "\n```"}
             </Streamdown>
           </CollapsibleContent>
         </Collapsible>

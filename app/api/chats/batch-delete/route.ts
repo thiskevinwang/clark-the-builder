@@ -3,7 +3,7 @@ import z from "zod";
 
 import { getCurrentLocalUser } from "@/lib/auth";
 import { db } from "@/lib/database/db";
-import { createConversationRepository } from "@/lib/repositories/conversation-repository-impl";
+import { createConversationRepository } from "@/lib/repositories/conversation-repository";
 
 const BatchDeleteChatsBodySchema = z
   .object({

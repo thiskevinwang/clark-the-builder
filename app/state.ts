@@ -126,7 +126,7 @@ export function useDataStateMapper() {
         break;
       case "data-create-clerk-app":
         if (data.data.status === "done" && data.data.applicationId && data.data.name) {
-          addApp({
+          void addApp({
             applicationId: data.data.applicationId,
             name: data.data.name,
             createdAt: Date.now(),

@@ -4,7 +4,7 @@ import { platformDeleteApplication } from "@/lib/api";
 import { createClient, createConfig } from "@/lib/api/client";
 import { getCurrentLocalUser } from "@/lib/auth";
 import { db } from "@/lib/database/db";
-import { createResourceRepository } from "@/lib/repositories/resource-repository-impl";
+import { createResourceRepository } from "@/lib/repositories/resource-repository";
 import { getOwnedResourceByExternalId } from "@/lib/resource-ownership";
 
 interface Params {

@@ -864,27 +864,30 @@ export const platformGetInstanceUsageInfiniteQueryKey = (options: Options<Platfo
  * Requires the `application_usage:read` scope.
  *
  */
-export const platformGetInstanceUsageInfiniteOptions = (options: Options<PlatformGetInstanceUsageData>) => infiniteQueryOptions<PlatformGetInstanceUsageResponse, PlatformGetInstanceUsageError, InfiniteData<PlatformGetInstanceUsageResponse>, QueryKey<Options<PlatformGetInstanceUsageData>>, string | Pick<QueryKey<Options<PlatformGetInstanceUsageData>>[0], 'body' | 'headers' | 'path' | 'query'>>(
-// @ts-ignore
-{
-    queryFn: async ({ pageParam, queryKey, signal }) => {
-        // @ts-ignore
-        const page: Pick<QueryKey<Options<PlatformGetInstanceUsageData>>[0], 'body' | 'headers' | 'path' | 'query'> = typeof pageParam === 'object' ? pageParam : {
-            query: {
-                start: pageParam
-            }
-        };
-        const params = createInfiniteParams(queryKey, page);
-        const { data } = await platformGetInstanceUsage({
-            ...options,
-            ...params,
-            signal,
-            throwOnError: true
-        });
-        return data;
-    },
-    queryKey: platformGetInstanceUsageInfiniteQueryKey(options)
-});
+export const platformGetInstanceUsageInfiniteOptions = (options: Options<PlatformGetInstanceUsageData>) => {
+    const opts = infiniteQueryOptions<PlatformGetInstanceUsageResponse, PlatformGetInstanceUsageError, InfiniteData<PlatformGetInstanceUsageResponse>, QueryKey<Options<PlatformGetInstanceUsageData>>, string | Pick<QueryKey<Options<PlatformGetInstanceUsageData>>[0], 'body' | 'headers' | 'path' | 'query'>>(
+    // @ts-ignore
+    {
+        queryFn: async ({ pageParam, queryKey, signal }) => {
+            // @ts-ignore
+            const page: Pick<QueryKey<Options<PlatformGetInstanceUsageData>>[0], 'body' | 'headers' | 'path' | 'query'> = typeof pageParam === 'object' ? pageParam : {
+                query: {
+                    start: pageParam
+                }
+            };
+            const params = createInfiniteParams(queryKey, page);
+            const { data } = await platformGetInstanceUsage({
+                ...options,
+                ...params,
+                signal,
+                throwOnError: true
+            });
+            return data;
+        },
+        queryKey: platformGetInstanceUsageInfiniteQueryKey(options)
+    });
+    return opts as Omit<typeof opts, 'initialData'>;
+};
 
 export const platformListInstanceUsersQueryKey = (options: Options<PlatformListInstanceUsersData>) => createQueryKey('platformListInstanceUsers', options);
 
@@ -939,27 +942,30 @@ export const platformListInstanceUsersInfiniteQueryKey = (options: Options<Platf
  * Requires the `users:read` scope.
  *
  */
-export const platformListInstanceUsersInfiniteOptions = (options: Options<PlatformListInstanceUsersData>) => infiniteQueryOptions<PlatformListInstanceUsersResponse2, PlatformListInstanceUsersError, InfiniteData<PlatformListInstanceUsersResponse2>, QueryKey<Options<PlatformListInstanceUsersData>>, number | Pick<QueryKey<Options<PlatformListInstanceUsersData>>[0], 'body' | 'headers' | 'path' | 'query'>>(
-// @ts-ignore
-{
-    queryFn: async ({ pageParam, queryKey, signal }) => {
-        // @ts-ignore
-        const page: Pick<QueryKey<Options<PlatformListInstanceUsersData>>[0], 'body' | 'headers' | 'path' | 'query'> = typeof pageParam === 'object' ? pageParam : {
-            query: {
-                offset: pageParam
-            }
-        };
-        const params = createInfiniteParams(queryKey, page);
-        const { data } = await platformListInstanceUsers({
-            ...options,
-            ...params,
-            signal,
-            throwOnError: true
-        });
-        return data;
-    },
-    queryKey: platformListInstanceUsersInfiniteQueryKey(options)
-});
+export const platformListInstanceUsersInfiniteOptions = (options: Options<PlatformListInstanceUsersData>) => {
+    const opts = infiniteQueryOptions<PlatformListInstanceUsersResponse2, PlatformListInstanceUsersError, InfiniteData<PlatformListInstanceUsersResponse2>, QueryKey<Options<PlatformListInstanceUsersData>>, number | Pick<QueryKey<Options<PlatformListInstanceUsersData>>[0], 'body' | 'headers' | 'path' | 'query'>>(
+    // @ts-ignore
+    {
+        queryFn: async ({ pageParam, queryKey, signal }) => {
+            // @ts-ignore
+            const page: Pick<QueryKey<Options<PlatformListInstanceUsersData>>[0], 'body' | 'headers' | 'path' | 'query'> = typeof pageParam === 'object' ? pageParam : {
+                query: {
+                    offset: pageParam
+                }
+            };
+            const params = createInfiniteParams(queryKey, page);
+            const { data } = await platformListInstanceUsers({
+                ...options,
+                ...params,
+                signal,
+                throwOnError: true
+            });
+            return data;
+        },
+        queryKey: platformListInstanceUsersInfiniteQueryKey(options)
+    });
+    return opts as Omit<typeof opts, 'initialData'>;
+};
 
 /**
  * Delete a user
@@ -1184,27 +1190,30 @@ export const platformListRedirectUrlsInfiniteQueryKey = (options: Options<Platfo
  * Requires the `applications:read` scope.
  *
  */
-export const platformListRedirectUrlsInfiniteOptions = (options: Options<PlatformListRedirectUrlsData>) => infiniteQueryOptions<PlatformListRedirectUrlsResponse2, PlatformListRedirectUrlsError, InfiniteData<PlatformListRedirectUrlsResponse2>, QueryKey<Options<PlatformListRedirectUrlsData>>, number | Pick<QueryKey<Options<PlatformListRedirectUrlsData>>[0], 'body' | 'headers' | 'path' | 'query'>>(
-// @ts-ignore
-{
-    queryFn: async ({ pageParam, queryKey, signal }) => {
-        // @ts-ignore
-        const page: Pick<QueryKey<Options<PlatformListRedirectUrlsData>>[0], 'body' | 'headers' | 'path' | 'query'> = typeof pageParam === 'object' ? pageParam : {
-            query: {
-                offset: pageParam
-            }
-        };
-        const params = createInfiniteParams(queryKey, page);
-        const { data } = await platformListRedirectUrls({
-            ...options,
-            ...params,
-            signal,
-            throwOnError: true
-        });
-        return data;
-    },
-    queryKey: platformListRedirectUrlsInfiniteQueryKey(options)
-});
+export const platformListRedirectUrlsInfiniteOptions = (options: Options<PlatformListRedirectUrlsData>) => {
+    const opts = infiniteQueryOptions<PlatformListRedirectUrlsResponse2, PlatformListRedirectUrlsError, InfiniteData<PlatformListRedirectUrlsResponse2>, QueryKey<Options<PlatformListRedirectUrlsData>>, number | Pick<QueryKey<Options<PlatformListRedirectUrlsData>>[0], 'body' | 'headers' | 'path' | 'query'>>(
+    // @ts-ignore
+    {
+        queryFn: async ({ pageParam, queryKey, signal }) => {
+            // @ts-ignore
+            const page: Pick<QueryKey<Options<PlatformListRedirectUrlsData>>[0], 'body' | 'headers' | 'path' | 'query'> = typeof pageParam === 'object' ? pageParam : {
+                query: {
+                    offset: pageParam
+                }
+            };
+            const params = createInfiniteParams(queryKey, page);
+            const { data } = await platformListRedirectUrls({
+                ...options,
+                ...params,
+                signal,
+                throwOnError: true
+            });
+            return data;
+        },
+        queryKey: platformListRedirectUrlsInfiniteQueryKey(options)
+    });
+    return opts as Omit<typeof opts, 'initialData'>;
+};
 
 /**
  * Create a redirect URL

@@ -71,12 +71,20 @@ function detectFormat(entries: unknown[]): SessionFormat {
   return "unknown";
 }
 
+function stringValue(value: unknown): string | undefined {
+  if (typeof value === "string") return value;
+  if (typeof value === "number" || typeof value === "boolean" || typeof value === "bigint") {
+    return String(value);
+  }
+  return undefined;
+}
+
 function extractCodexContent(content: unknown): string | undefined {
   if (!Array.isArray(content)) return undefined;
   const texts = content
     .map((item) =>
       typeof item === "object" && item && "text" in item
-        ? String((item as { text?: unknown }).text ?? "")
+        ? (stringValue((item as { text?: unknown }).text) ?? "")
         : "",
     )
     .filter(Boolean);
@@ -86,14 +94,17 @@ function extractCodexContent(content: unknown): string | undefined {
 function extractClaudeContent(content: unknown): string | undefined {
   if (typeof content === "string") return content;
   if (typeof content === "object" && content) {
-    if ("text" in content) return String((content as { text?: unknown }).text ?? "");
+    if ("text" in content) return stringValue((content as { text?: unknown }).text);
   }
   if (!Array.isArray(content)) return undefined;
   const texts = content
     .map((item) => {
       if (typeof item === "object" && item) {
-        if ("text" in item) return String((item as { text?: unknown }).text ?? "");
-        if ("type" in item) return `[${String((item as { type?: unknown }).type)}]`;
+        if ("text" in item) return stringValue((item as { text?: unknown }).text) ?? "";
+        if ("type" in item) {
+          const type = stringValue((item as { type?: unknown }).type);
+          return type ? `[${type}]` : "";
+        }
       }
       return "";
     })
@@ -106,13 +117,9 @@ function normalizeEntry(entry: unknown, format: SessionFormat, index: number): N
     const record = entry as Record<string, unknown>;
     const message = typeof record.message === "object" && record.message ? record.message : null;
     const role =
-      message && "role" in message
-        ? String(message.role)
-        : typeof record.role === "string"
-          ? record.role
-          : typeof record.type === "string"
-            ? record.type
-            : undefined;
+      (message ? stringValue((message as Record<string, unknown>).role) : undefined) ??
+      stringValue(record.role) ??
+      stringValue(record.type);
     const contentSource = message
       ? (message as Record<string, unknown>).content
       : (record.content ?? record.text);
@@ -128,15 +135,14 @@ function normalizeEntry(entry: unknown, format: SessionFormat, index: number): N
           : undefined;
 
     return {
-      id: String(
-        record.uuid ??
-          record.id ??
-          record.message_id ??
-          record.messageId ??
-          `${record.type ?? role ?? "claude"}-${index}`,
-      ),
+      id:
+        stringValue(record.uuid) ??
+        stringValue(record.id) ??
+        stringValue(record.message_id) ??
+        stringValue(record.messageId) ??
+        `${stringValue(record.type) ?? role ?? "claude"}-${index}`,
       source: "claude",
-      kind: typeof record.type === "string" ? record.type : "message",
+      kind: stringValue(record.type) ?? "message",
       role,
       timestamp,
       text,
@@ -146,12 +152,12 @@ function normalizeEntry(entry: unknown, format: SessionFormat, index: number): N
 
   if (format === "codex" && typeof entry === "object" && entry !== null) {
     const record = entry as Record<string, unknown>;
-    const kind = String(record.type ?? "event");
+    const kind = stringValue(record.type) ?? "event";
     const payload = typeof record.payload === "object" && record.payload ? record.payload : null;
 
     if (kind === "response_item" && payload && (payload as { type?: unknown }).type === "message") {
       const payloadRecord = payload as Record<string, unknown>;
-      const role = payloadRecord.role ? String(payloadRecord.role) : undefined;
+      const role = stringValue(payloadRecord.role);
       const text = extractCodexContent(payloadRecord.content);
       return {
         id: `${kind}-${index}`,
@@ -170,7 +176,7 @@ function normalizeEntry(entry: unknown, format: SessionFormat, index: number): N
       typeof (payload as { type?: unknown }).type === "string"
     ) {
       const payloadRecord = payload as Record<string, unknown>;
-      const payloadType = String(payloadRecord.type);
+      const payloadType = typeof payloadRecord.type === "string" ? payloadRecord.type : "event";
       if (payloadType === "user_message" || payloadType === "agent_message") {
         const role = payloadType === "user_message" ? "user" : "assistant";
         const text = typeof payloadRecord.message === "string" ? payloadRecord.message : undefined;
@@ -202,7 +208,7 @@ function normalizeEntry(entry: unknown, format: SessionFormat, index: number): N
       timestamp: typeof record.timestamp === "string" ? record.timestamp : undefined,
       text:
         payload && typeof (payload as { type?: unknown }).type === "string"
-          ? String((payload as { type?: unknown }).type)
+          ? stringValue((payload as { type?: unknown }).type)
           : undefined,
       raw: entry,
     };
@@ -286,7 +292,7 @@ export default function ChatUploadPage() {
       if (typeof first === "object" && first !== null) {
         const record = first as Record<string, unknown>;
         const sessionValue = record.sessionId ?? record.session_id ?? record.conversation_id;
-        if (sessionValue) return String(sessionValue);
+        return stringValue(sessionValue);
       }
     }
 

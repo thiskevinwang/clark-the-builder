@@ -5,10 +5,27 @@ import { create } from "zustand";
 
 import type { ApplicationWithTransfers } from "@/app/api/applications/route";
 
-import { storage } from "./local-storage";
 import type { ClerkAppData, ClerkAppStoredData, ClerkAppTransferStatus } from "./types";
 
 const CLERK_APPS_KEY = "clerk-apps";
+const STORAGE_KEY = `clark:${CLERK_APPS_KEY}`;
+
+function readStoredApps(): ClerkAppStoredData[] {
+  if (typeof window === "undefined") return [];
+
+  try {
+    const storedApps: unknown = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "[]");
+    return Array.isArray(storedApps) ? (storedApps as ClerkAppStoredData[]) : [];
+  } catch {
+    return [];
+  }
+}
+
+function writeStoredApps(apps: ClerkAppStoredData[]) {
+  if (typeof window !== "undefined") {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(apps));
+  }
+}
 
 interface ClerkAppsStore {
   apps: ClerkAppData[];
@@ -101,7 +118,7 @@ export const useClerkAppsStore = create<ClerkAppsStore>()((set, get) => ({
 
     try {
       // Load localStorage apps first (minimal stored data)
-      const storedApps = (await storage.get<ClerkAppStoredData[]>(CLERK_APPS_KEY)) ?? [];
+      const storedApps = readStoredApps();
 
       // Try to fetch from API
       try {
@@ -112,7 +129,7 @@ export const useClerkAppsStore = create<ClerkAppsStore>()((set, get) => ({
           const mergedApps = mergeApplications(data.applications, storedApps);
 
           // Save only minimal data back to localStorage
-          await storage.set(CLERK_APPS_KEY, toStoredData(mergedApps));
+          writeStoredApps(toStoredData(mergedApps));
 
           set({ apps: mergedApps, isLoaded: true, isLoading: false });
           return;
@@ -152,7 +169,7 @@ export const useClerkAppsStore = create<ClerkAppsStore>()((set, get) => ({
       ownership: "owned",
     };
     const updatedApps = [newApp, ...currentApps];
-    await storage.set(CLERK_APPS_KEY, toStoredData(updatedApps));
+    writeStoredApps(toStoredData(updatedApps));
     set({ apps: updatedApps });
   },
 
@@ -174,7 +191,7 @@ export const useClerkAppsStore = create<ClerkAppsStore>()((set, get) => ({
 
     // Remove from local storage regardless of ownership
     const updatedApps = currentApps.filter((app) => app.applicationId !== applicationId);
-    await storage.set(CLERK_APPS_KEY, toStoredData(updatedApps));
+    writeStoredApps(toStoredData(updatedApps));
     set({ apps: updatedApps });
   },
 }));
@@ -187,7 +204,7 @@ export function useClerkAppsInit() {
 
   useEffect(() => {
     if (!isLoaded && !isLoading) {
-      loadApps();
+      void loadApps();
     }
   }, [loadApps, isLoaded, isLoading]);
 }

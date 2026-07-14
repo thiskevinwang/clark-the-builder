@@ -46,9 +46,9 @@ export async function* getContents(params: Params): AsyncGenerator<FileContentCh
       ...params.messages,
       {
         role: "user",
-        content: `Generate the content of the following files according to the conversation: ${params.paths.map(
-          (path) => `\n - ${path}`,
-        )}`,
+        content: `Generate the content of the following files according to the conversation: ${params.paths
+          .map((path) => `\n - ${path}`)
+          .join("")}`,
       },
     ],
     output: Output.object({ schema: z.object({ files: z.array(fileSchema) }) }),

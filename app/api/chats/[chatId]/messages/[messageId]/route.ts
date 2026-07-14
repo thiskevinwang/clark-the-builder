@@ -4,8 +4,8 @@ import z from "zod";
 import { getCurrentLocalUser } from "@/lib/auth";
 import { db } from "@/lib/database/db";
 import { Message, UpdateMessageInput } from "@/lib/models/message";
-import { createConversationRepository } from "@/lib/repositories/conversation-repository-impl";
-import { createMessageRepository } from "@/lib/repositories/message-repository-impl";
+import { createConversationRepository } from "@/lib/repositories/conversation-repository";
+import { createMessageRepository } from "@/lib/repositories/message-repository";
 
 const ParamsSchema = z.object({
   chatId: z.string().min(1),

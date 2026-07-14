@@ -62,7 +62,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       prepareSendMessagesRequest: async ({ id: conversationId, messages, body }) => {
         return {
           body: {
-            ...(body ?? {}),
+            ...body,
             chatId: conversationId,
             messages,
           } satisfies ChatRequestBody,

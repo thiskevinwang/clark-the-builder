@@ -4,7 +4,7 @@ import z from "zod";
 import { getCurrentLocalUser } from "@/lib/auth";
 import { db } from "@/lib/database/db";
 import { Conversation, ConversationWithMessageCount } from "@/lib/models/conversation";
-import { createConversationRepository } from "@/lib/repositories/conversation-repository-impl";
+import { createConversationRepository } from "@/lib/repositories/conversation-repository";
 
 const ListChatsQuerySchema = z.object({
   limit: z.coerce.number().int().min(1).max(200).default(50),

@@ -30,6 +30,8 @@
     "coverage/**",
     "next-env.d.ts",
     "lib/api/**/*.gen.ts",
-    "lib/api/**/*.gen.tsx"
+    "lib/api/**/*.gen.tsx",
+    "lib/api/client/index.ts",
+    "lib/api/index.ts"
   ]
 }

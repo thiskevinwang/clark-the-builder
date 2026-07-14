@@ -3,8 +3,8 @@ import { NextResponse, type NextRequest } from "next/server";
 import { getCurrentLocalUser } from "@/lib/auth";
 import { db } from "@/lib/database/db";
 import type { Resource } from "@/lib/models/resource";
-import { createConversationRepository } from "@/lib/repositories/conversation-repository-impl";
-import { createResourceRepository } from "@/lib/repositories/resource-repository-impl";
+import { createConversationRepository } from "@/lib/repositories/conversation-repository";
+import { createResourceRepository } from "@/lib/repositories/resource-repository";
 
 interface RouteParams {
   params: Promise<{ chatId: string }>;

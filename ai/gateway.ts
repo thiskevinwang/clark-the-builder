@@ -1,4 +1,3 @@
-import { anthropic, type AnthropicProviderOptions } from "@ai-sdk/anthropic";
 import { openai, type OpenAIResponsesProviderOptions } from "@ai-sdk/openai";
 import type { LanguageModelV3 } from "@ai-sdk/provider";
 import type { JSONValue } from "ai";
@@ -17,47 +16,22 @@ export async function getAvailableModels() {
 export interface ModelOptions {
   model: LanguageModelV3;
   providerOptions?: Record<string, Record<string, JSONValue>>;
-  headers?: Record<string, string>;
 }
 
 export function getModelOptions(
   modelId: ModelId,
   options?: {
-    // gpt-5.2:  'none', 'low', 'medium', 'high', and 'xhigh'
+    // gpt-5.5: 'none', 'low', 'medium', 'high', and 'xhigh'
     reasoningEffort?: "none" | "low" | "medium" | "high" | "xhigh";
   },
 ): ModelOptions {
-  let v3Model;
-  switch (modelId) {
-    case Models.AnthropicClaudeOpus45:
-      v3Model = anthropic(modelId);
-      break;
-    case Models.OpenAIGpt52:
-    case Models.OpenAIGpt53Codex:
-    case Models.OpenAIGPT54:
-    case Models.OpenAIGPT54Mini:
-    case Models.OpenAIGPT55:
-      v3Model = openai(modelId);
-      break;
-    default:
-      throw new Error(`Unsupported model id: ${modelId}`);
-  }
-
   return {
-    model: v3Model,
-    headers: { "anthropic-beta": "fine-grained-tool-streaming-2025-05-14" },
+    model: openai(modelId),
     providerOptions: {
-      anthropic: {
-        thinking: {
-          type: "enabled",
-        },
-        sendReasoning: true,
-        cacheControl: { type: "ephemeral" },
-      } satisfies AnthropicProviderOptions /* https://ai-sdk.dev/providers/ai-sdk-providers/anthropic */,
       openai: {
         reasoningSummary: "auto",
         ...options,
-      } satisfies OpenAIResponsesProviderOptions /* https://ai-sdk.dev/providers/ai-sdk-providers/openai */,
+      } satisfies OpenAIResponsesProviderOptions,
     },
   };
 }

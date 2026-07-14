@@ -43,7 +43,7 @@ export function ClarkAvatar({ size = 28, className }: ClarkAvatarProps) {
 }
 
 export function ClarkName() {
-  const { resolvedTheme, setTheme } = useTheme();
+  const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -51,12 +51,6 @@ export function ClarkName() {
   }, []);
 
   const isDark = resolvedTheme === "dark";
-  // Show clark.png by default (before hydration) to avoid flash
-
-  const handleDoubleClick = () => {
-    setTheme(isDark ? "light" : "dark");
-  };
-
   const name = mounted && isDark ? "Karl" : "Clark";
 
   return <>{name}</>;

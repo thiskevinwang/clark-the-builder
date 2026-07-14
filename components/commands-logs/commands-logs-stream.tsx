@@ -18,7 +18,7 @@ export function CommandLogsStream() {
         if (!ref.current[command.cmdId]) {
           const iterator = getCommandLogs(sandboxId, command.cmdId);
           ref.current[command.cmdId] = iterator;
-          (async () => {
+          void (async () => {
             for await (const log of iterator) {
               addLog({
                 sandboxId: sandboxId,

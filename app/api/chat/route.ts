@@ -19,9 +19,9 @@ import { type ChatUIMessage } from "@/components/chat/types";
 import { getCurrentLocalUser } from "@/lib/auth";
 import { db } from "@/lib/database/db";
 import { genMessageId } from "@/lib/identifiers/generator";
-import { createConversationRepository } from "@/lib/repositories/conversation-repository-impl";
-import { createMCPConnectionRepository } from "@/lib/repositories/mcp-connection-repository-impl";
-import { createMessageRepository } from "@/lib/repositories/message-repository-impl";
+import { createConversationRepository } from "@/lib/repositories/conversation-repository";
+import { createMCPConnectionRepository } from "@/lib/repositories/mcp-connection-repository";
+import { createMessageRepository } from "@/lib/repositories/message-repository";
 
 import prompt from "./prompt.md";
 
@@ -155,7 +155,7 @@ export async function POST(req: Request) {
           sendStart: true,
           sendFinish: true,
           onFinish: () => {
-            closeMCPClients();
+            void closeMCPClients();
           },
           messageMetadata: ({ part }) => {
             if (part.type === "finish") {

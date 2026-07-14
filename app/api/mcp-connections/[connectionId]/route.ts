@@ -8,7 +8,7 @@ import type {
   MCPConnectionAuth,
   UpdateMCPConnectionInput,
 } from "@/lib/models/mcp-connection";
-import { createMCPConnectionRepository } from "@/lib/repositories/mcp-connection-repository-impl";
+import { createMCPConnectionRepository } from "@/lib/repositories/mcp-connection-repository";
 
 const ParamsSchema = z.object({
   connectionId: z.string().nonempty(),

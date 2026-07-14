@@ -1,15 +1,4 @@
 /**
- * Storage interface abstraction.
- * This can be implemented with localStorage, remote storage, etc.
- */
-export interface Storage {
-  get<T>(key: string): Promise<T | null>;
-  set<T>(key: string, value: T): Promise<void>;
-  remove(key: string): Promise<void>;
-  keys(): Promise<string[]>;
-}
-
-/**
  * Ownership status of a Clerk application (derived from API, not stored)
  * - "owned": Application is owned by this app (returned in ListApplications)
  * - "transferred": Application was transferred to another account (has completed transfer in API)

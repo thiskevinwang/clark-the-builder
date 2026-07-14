@@ -3,7 +3,7 @@ import { tool } from "ai";
 import z from "zod";
 
 import { db } from "@/lib/database/db";
-import { createResourceRepository } from "@/lib/repositories/resource-repository-impl";
+import { createResourceRepository } from "@/lib/repositories/resource-repository";
 
 import { sandboxProvider } from "../../lib/sandbox";
 import type { DataPart } from "../messages/data-parts";
